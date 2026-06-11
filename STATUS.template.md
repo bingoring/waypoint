@@ -1,6 +1,7 @@
 # {Project Name} — Waypoint Status
 
 **Framework:** [Waypoint](https://github.com/bingoring/waypoint)  
+**Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
 **Last updated:** YYYY-MM-DD
 
 ---
