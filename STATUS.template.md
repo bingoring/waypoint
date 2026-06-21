@@ -21,6 +21,14 @@
 | 2-1 (컴포넌트명) | [링크] | PENDING |
 | 2-2 (컴포넌트명) | [링크] | PENDING |
 
+## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
+
+> 작성자와 **컨텍스트가 분리된** 독립·적대적 리뷰어가 코드를 검토한다. FRAMEWORK "리뷰 게이트" 참조.
+
+| 스테이지 | 문서 | 상태 |
+|---------|------|------|
+| R-1 Independent Code Review | [01-independent-review.md](0R-review/01-independent-review.md) | PENDING |
+
 ## Phase 3 — Operations (Ship)
 
 | 스테이지 | 문서 | 상태 |
