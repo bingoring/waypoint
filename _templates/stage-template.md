@@ -28,8 +28,9 @@ updated: YYYY-MM-DD
 > 깊이는 복잡도에 맞춘다(FRAMEWORK "적응형 깊이"). 단순 단계는 짧게. **복잡·고위험 단계**는
 > 아래를 추가: 컴포넌트/모듈 분해 · NFR·성능 목표 · 테스트·검증 계획.
 > **실제 로직/화면/알고리즘/콘텐츠를 산출하는 단계**는 코딩 전 **구현 스펙(Build Spec)** 을 쓴다
-> (FRAMEWORK "구현 스펙"): 작으면 여기에 인라인, 크면 `<topic>/` 폴더로 분리 후 링크.
-> 템플릿: `../../_templates/build-spec-template.md`.
+> (FRAMEWORK "구현 스펙"): 네 아티팩트(domain-entities·business-rules·business-logic-model·frontend-components)
+> + 인덱스. 작으면 여기 인라인/압축, 크면 `<topic>/` 폴더로 분리 후 링크.
+> 템플릿: `../../_templates/build-spec/`.
 
 *[AI가 분석 결과와 설계안을 여기에 작성]*
 
