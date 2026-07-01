@@ -128,13 +128,13 @@ Build Spec은 각각 **자체 상세 템플릿**을 가진 네 개의 1급 아�
 6. **편차는 승인 후 기록.** SoT 대비 의도적 편차만 §편차 로그에. 미승인 불일치는 편차가 아니라 버그다.
 
 ### 위치 (하이브리드)
-- **작으면 인라인/압축**: 인덱스 하나에 필요한 아티팩트를 섹션으로 접어 넣거나, 콘텐츠 시리즈는 항목당 1문서로
-  압축(예: `departments/<dept>.md` — 네 아티팩트를 맵 도메인 섹션으로 특화).
-- **크면 분리**: `projects/{name}/{phase}/<topic>/`에 인덱스 + 아티팩트별 `.md`(4파일). 스테이지 문서에서 링크.
+- **작으면 인라인/압축**: 인덱스 하나에 필요한 아티팩트를 섹션으로 접어 넣음(minimal 티어).
+- **크면 분리(기본 권장)**: `projects/{name}/{phase}/<topic>/`에 **아티팩트별 파일**(인덱스 + 4). 콘텐츠 시리즈는
+  항목마다 자체 디렉토리(예: `departments/<dept>/` — 부서당 5파일). 스테이지 문서에서 링크.
 - 상태 흐름: `DRAFT → QUESTIONS_OPEN → READY → IMPLEMENTED`. 스테이지 승인 게이트는 **READY**(구현 착수 승인) 후
   구현, 코드 산출물은 기존 **리뷰 게이트 🔍**를 그대로 통과한다.
 
-> 템플릿: `_templates/build-spec/`(인덱스 + 4 아티팩트). 실사례: `projects/forin/02-construction/departments/`(콘텐츠 시리즈 압축형).
+> 템플릿: `_templates/build-spec/`(인덱스 + 4 아티팩트). 실사례: `projects/forin/02-construction/departments/<dept>/`(부서당 디렉토리 + 5파일).
 
 ## 결정 로그 (Decision Log)
 
