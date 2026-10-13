@@ -8,7 +8,8 @@
 > ✅ **1-1 승인 (2026-10-13).** PRD v1.0 확정, P1~P6 채택, Q1~Q8 결정(조직 계정·한영 동시·Android 먼저·AdMob 단독·광고 제거 IAP 포함·Wave 1 순서 확정).
 > ⏳ **오너 선행 작업:** 사업자등록 → D-U-N-S → Play 조직 계정 개설, 스튜디오명 결정 (3-1 전까지).
 > ✅ **1-2 승인 (2026-10-13).** 코어/앱 경계·`app.yaml`·광고 정책·원격 설정·분석 계약 확정. 광고 제거 ₩2,500 / $1.99, 전면 광고 보수적 기본값, 보상형 실패 시 보상 지급.
-> 📝 **1-3 Architecture Decision ⚠️ 작성 중.**
+> 📝 **1-3 Architecture Decision ⚠️ 제안 → 승인 대기 (2026-10-13).** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트, 기능별 코어 패키지,
+> Riverpod 3, 앱별 Firebase, GitHub Actions + fastlane, **§7 품질 기준(리뷰 기준선)**. 미해결 질문 F1~F3.
 
 ---
 
@@ -18,7 +19,7 @@
 |---------|------|------|
 | 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | HUMAN_APPROVED |
 | 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | HUMAN_APPROVED |
-| 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | IN_PROGRESS |
+| 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | AI_PROPOSED |
 
 ## Phase 2 — Construction (How)
 
