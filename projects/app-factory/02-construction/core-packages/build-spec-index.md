@@ -26,7 +26,7 @@ updated: 2026-10-13
 | `factory_firebase` | Analytics·Remote Config·Crashlytics 게이트웨이 | core, `firebase_*` | 신규 |
 | `factory_iap` | `in_app_purchase` 게이트웨이 | core, `in_app_purchase` | 신규 |
 | `factory_ui` | `DesignTokens → ThemeData`, 설정 행 부품 6종, 다국어 문자열(ko·en) | core, runtime | 신규 |
-| `examples/core_demo` | 비출시 검증 앱: 부트스트랩·광고(테스트 ID)·광고 제거·설정 부품 통합 테스트 | 위 전부 | 신규 |
+| `examples/core_demo` | 비출시 검증 앱: 부트스트랩·광고(테스트 ID)·광고 제거·설정 부품 통합 테스트. 1-3 §3 트리에 없던 `examples/` 디렉터리를 추가한다(릴리스 파이프라인 대상 아님, 의존 규칙은 `apps/`와 동일) | 위 전부 | 신규 |
 | CI (`.github/workflows/ci.yml`) | 품질 게이트(§5) | — | 신규 |
 
 ## §2. 아티팩트 인덱스 (Manifest)
@@ -47,6 +47,7 @@ updated: 2026-10-13
 ## §4. 구현 체크리스트
 
 **골격**
+- [ ] 로컬 도구: Android cmdline-tools + platform 36 + API 36 에뮬레이터 이미지 설치
 - [ ] 루트 `pubspec.yaml`(workspace: `packages/*`, `examples/*`; `melos:` 스크립트 `analyze`·`test`·`format:check`·`coverage`·`deps:check`), `.fvmrc`(3.47.7), `analysis_options.yaml`
 - [ ] `factory_lints` 규칙 세트 (BR §6)
 - [ ] `tool/check_deps.dart`: 의존 방향·금지 import 검사 (BR R-ARCH-1~4)
@@ -88,10 +89,10 @@ updated: 2026-10-13
 
 | 항목 | 목표 | 측정 |
 |---|---|---|
-| 부트스트랩 지연 (runApp까지, UMP 폼 제외) | ≤ 400ms (기준 기기, 릴리스) | `Stopwatch` 계측 → 디버그 로그, 통합 테스트에서 상한 검사 |
+| 부트스트랩 지연 (runApp까지. 동의·광고 초기화는 첫 프레임 뒤라 포함되지 않음) | ≤ 400ms (기준 기기, 릴리스) | `Stopwatch` 계측 → 디버그 로그, 통합 테스트에서 상한 검사 |
 | 코어가 추가하는 메모리 | 광고 미리 로드 포함 ≤ 60MB PSS (빈 Flutter 앱 대비) | `dumpsys meminfo` 비교 |
 | 미리 로드 광고 수 | 전면 ≤ 1, 보상형 ≤ 1, 앱 오프닝 ≤ 1 (선언한 경우) | 단위 테스트(INV-ADS-2) |
-| 네트워크 대기 | 부트스트랩은 네트워크를 기다리지 않음(동의 정보 갱신 제외, 상한 5초) | BLM §1.1 타임아웃 테스트 |
+| 네트워크 대기 | 첫 프레임 전에는 네트워크를 전혀 기다리지 않음. 동의 갱신은 첫 프레임 뒤 비동기(상한 5초) | BLM §1.1 순서 테스트 |
 | 보안 | 코어는 개인 식별 정보 저장·전송 0, 평문 HTTP 0 | 코드 리뷰 + 분석 이벤트 매개변수 검증 |
 | 공개 API | 앱이 import할 수 있는 라이브러리 진입점은 패키지당 1개(`package:<name>/<name>.dart`), `src/` 직접 import 금지 | lint(`implementation_imports`) |
 
@@ -99,4 +100,5 @@ updated: 2026-10-13
 
 | SoT | 실제 구현 | 사유 |
 |---|---|---|
-|  |  |  |
+| 1-2 §3 부트스트랩: 동의·광고 초기화 → `runApp` | `runApp` → 첫 프레임 후 동의·광고 초기화 (BLM §1.1-5) | 1-3 §7.4 콜드 스타트 1.5초와 충돌. 동의 전 광고 요청 금지는 유지 — Build Spec 작성 시 승인 대상 |
+| 1-3 §3 저장소 트리 | `examples/` 디렉터리 추가 | 비출시 검증 앱 위치 |

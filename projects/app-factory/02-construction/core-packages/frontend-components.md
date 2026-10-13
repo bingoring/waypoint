@@ -28,7 +28,7 @@ updated: 2026-10-13
 - **props:** `placementId: String` (필수, `banner_` 접두사).
 - **상태:** `loading` → `loaded`(배너 표시) / `failed`(높이 0) / `hidden`(adFree·광고 비활성 → 높이 0).
 - **크기:** `AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(width)`. 로드 전에는 **높이 0**(자리 예약 없음 — 빈 공간이 생기지 않게). 로드되면 위에 8dp 여백을 포함해 펼친다(R: 버튼과 8dp 이상 간격).
-- **수명:** 위젯 `dispose`에서 `BannerAd.dispose()`. 화면 밖(라우트가 가려짐)에서는 `TickerMode`/`Visibility`로 감지해 dispose하고, 다시 보이면 새로 로드한다(1-3 §7.4 메모리 규칙).
+- **수명:** 위젯 `dispose`에서 `BannerAd.dispose()`. 다른 라우트가 위에 올라와 가려지면 `RouteAware`(`factory_runtime`이 `RouteObserver`를 제공하고 앱의 `navigatorObservers`에 등록)의 `didPushNext`에서 dispose하고, `didPopNext`에서 새로 로드한다(1-3 §7.4 메모리 규칙).
 - **이벤트:** 배너는 `ad_show_attempt`를 기록하지 않는다(노출마다 기록하면 이벤트가 과다) `(AI)`.
 - **배치 규칙(문서화, 코드로 강제 불가):** 화면당 1개, `Scaffold.bottomNavigationBar` 또는 본문 하단 고정. 스크롤 목록 안 금지.
 

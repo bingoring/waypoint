@@ -20,7 +20,7 @@ updated: 2026-10-13
 | R-ADS-4 | `canRequestAds == false`이면 `AdGateway.initialize`·로드를 호출하지 않는다 | `AdService` | 모든 판정 `disabled` | 1-2 §7 |
 | R-ADS-5 | 전면·앱 오프닝·보상형 표시 직후 `lastFullscreenAt = now` | `AdRuntimeState` | — | 1-2 §4 |
 | R-ADS-6 | 전면 광고는 `onTransition`에서만 표시한다. 앱 코드가 전면 광고를 직접 띄우는 API는 없다 | `AdService` 공개 API | 컴파일 불가 | 1-2 §3 |
-| R-ADS-7 | 보상형은 `showRewarded`(사용자 탭 핸들러)에서만 호출한다. 디버그 빌드에서 직전 500ms 안에 포인터 업 이벤트가 없으면 assert 실패 `(AI)` | `AdService` | 디버그 assert | 1-2 §4 |
+| R-ADS-7 | 보상형은 사용자 탭 핸들러에서만 `showRewarded`를 호출한다. 포인터 추적은 Flutter가 필요해 순수 Dart인 `AdService`에서 강제할 수 없으므로(R-ARCH-1) **R-1 코드 리뷰 체크 항목**으로 검사한다 | 앱 코드 | 리뷰 결함 | 1-2 §4 |
 | R-ADS-8 | 형식별 미리 로드 광고는 최대 1개. 표시 후 즉시 다음 1개를 로드한다 | `AdGateway` | — | 1-3 §7.4 |
 | R-ADS-9 | 앱 오프닝 광고는 로드 후 4시간이 지나면 폐기하고 다시 로드한다 `(AI)` | `GoogleAdsGateway` | — | AdMob 앱 오프닝 가이드 |
 | R-ADS-10 | 광고 요청 설정: `tagForChildDirectedTreatment=no`, `tagForUnderAgeOfConsent=no`, `maxAdContentRating=T` | `GoogleAdsGateway.initialize` | — | 1-2 §4 |
@@ -114,7 +114,7 @@ updated: 2026-10-13
 | 케이스 | 조건 | 기대 동작 |
 |---|---|---|
 | 첫 실행 오프라인 | UMP 갱신 실패, 저장값 없음 | `canRequestAds=false` → 광고 없음, 기능 정상 |
-| 동의 갱신 타임아웃 | 5초 초과 `(AI)` | 이전 값 사용, 백그라운드에서 계속 시도하지 않음(다음 실행) |
+| 동의 갱신 타임아웃 | 5초 초과 `(AI)` | 첫 프레임 후 비동기로 실행하므로 화면은 막지 않는다. 저장된 `canRequestAds`를 사용하고, 같은 실행에서 재시도하지 않음(다음 실행) |
 | 전면 표시 실패 | `failedToShow` | `lastFullscreenAt` 갱신 안 함, 카운터 유지, 이벤트 `not_loaded` |
 | 보상형 로드 실패 | 5초 안에 로드 안 됨 `(AI)` | `grantOnUnavailable`에 따라 `unavailable` + 보상 지급/미지급 |
 | 보상형 도중 앱 백그라운드 | SDK 콜백 순서 | `earnedReward` 콜백을 받았으면 `earned`, 아니면 `dismissed` |

@@ -18,14 +18,19 @@ updated: 2026-10-13
    4. Firebase: `firebaseProjectId != null`이면 `Firebase.initializeApp()` + Crashlytics 에러 훅(`FlutterError.onError`, `PlatformDispatcher.onError`) 연결. 아니면 Noop.
    5. 원격 설정: `activateFetched()` → `RemoteSnapshot` 고정(R-RC-4). 실패해도 기본값.
    6. `SessionTracker.onColdStart()` → 세션 번호 증가.
-   7. 동의: `ConsentGateway.gather(timeout: 5s)` → `ConsentState`; `AnalyticsSink.setConsent`; `consent_result` 기록.
-   8. `EntitlementService.load()` (캐시) → `PurchaseGateway.restore()`는 **기다리지 않고** 시작(BLM §1.6).
-   9. `canRequestAds && adsEnabled && !adFree`이면 `AdGateway.initialize()` 후 선언된 전면형 placement 미리 로드(기다리지 않음).
-   10. 사용자 속성(`app_category`, `ad_free`, `app_locale`) 설정.
-   11. `runApp(ProviderScope(overrides: [...services], child: def.buildApp(services)))`.
-   12. 다음 프레임 이후: `RemoteConfigSource.fetchInBackground()`.
-3. **결과:** 앱 첫 프레임. 2~10단계의 실패는 기능을 막지 않는다(각 단계 `try`·로그·폴백).
-4. **적용 규칙:** R-ADS-3·4, R-RC-4, R-SES-1, INV-RC-1, NFR 부트스트랩 ≤ 400ms(7단계의 사용자 폼 시간 제외).
+   7. `EntitlementService.load()` (캐시만 읽음).
+   8. 사용자 속성(`app_category`, `ad_free`, `app_locale`) 설정.
+   9. `runApp(ProviderScope(overrides: [...services], child: def.buildApp(services)))` — **이 시점에 광고는 꺼진 상태**(`canRequestAds`는 저장값이 아니라 false로 시작).
+   10. 첫 프레임 이후(`addPostFrameCallback`), 아래를 **기다리지 않고** 순서대로 실행한다:
+       1. 동의: `ConsentGateway.gather(timeout: 5s)` — 필요하면 UMP 폼이 실행 중인 앱 위에 뜬다 → `ConsentState`; `AnalyticsSink.setConsent`; `consent_result` 기록.
+       2. `canRequestAds && adsEnabled && !adFree`이면 `AdGateway.initialize()` 후 선언된 전면형 placement 미리 로드.
+       3. `EntitlementService.syncWithStore()`(§1.6).
+       4. `RemoteConfigSource.fetchInBackground()`.
+3. **결과:** 첫 프레임이 네트워크·동의 폼을 기다리지 않는다. 2~10단계의 실패는 기능을 막지 않는다(각 단계 `try`·로그·폴백).
+4. **적용 규칙:** R-ADS-3·4, R-RC-4, R-SES-1, INV-RC-1, NFR 부트스트랩 ≤ 400ms(1~9단계), 1-3 §7.4 콜드 스타트 ≤ 1.5초.
+5. **1-2 §3 계약 조정:** 1-2 §3 부트스트랩 순서는 동의(3단계)와 광고 초기화(4단계)를 `runApp`(6단계) 앞에 두었다. 이 Build Spec은 콜드 스타트 예산(1-3 §7.4)과의
+   충돌을 피하려고 둘 다 첫 프레임 **뒤**로 옮긴다. 광고는 동의 전에 절대 요청되지 않으므로 1-2 §7의 의도(동의 후에만 광고 SDK 초기화)는 유지된다.
+   → 인덱스 §7 편차 로그, DECISIONS에 기록.
 
 ### 1.2 `Lifecycle` (factory_runtime, `AppLifecycleListener`)
 - `onHide/onPause` → `SessionTracker.onBackground(now)`.
@@ -56,8 +61,10 @@ updated: 2026-10-13
 ### 1.6 광고 제거 결제 (`EntitlementService`)
 - **구매:** `purchaseRemoveAds()` → `suppressNextAppOpen()` → `gateway.buy(productId)` → `updates` 스트림에서 결과 처리 → `remove_ads_result` 기록.
 - **업데이트 처리:** §3.2 상태 기계. `purchased/restored` → 저장 → `complete()` → `adFree` 스트림 방출 → `AdService`가 미리 로드한 광고 `disposeAll()`, 배너 슬롯은 높이 0으로 접힘.
-- **시작 시 동기화:** `restore()` 호출 → 응답 스트림이 **완료 신호** 안에 상품을 포함하지 않으면 R-IAP-3에 따라 하향. `in_app_purchase`의 restore는 완료 신호가 없으므로,
-  Android는 `InAppPurchaseAndroidPlatformAddition.queryPastPurchases()` 결과(성공·목록)를 기준으로 판정한다 `(AI)`.
+- **시작 시 동기화(`syncWithStore`):** `restorePurchases()`는 결과를 `purchaseStream`으로만 보내고 완료 신호가 없어 "구매 없음"과 "아직 도착 안 함"을 구분할 수 없다.
+  그래서 하향 판정은 Android에서 `InAppPurchaseAndroidPlatformAddition.queryPastPurchases()`를 쓴다 — 반환값 `QueryPurchaseDetailsResponse`의
+  `error == null`(조회 성공)이고 `pastPurchases`에 상품이 없을 때만 하향한다(R-IAP-3). 상품이 있으면서 미확인 상태면 `complete()`로 acknowledge한다.
+  (`in_app_purchase_android` 0.5.3 소스에서 메서드 존재 확인, 2026-10-13. iOS는 확장 시 별도 설계.)
 
 ## 2. 알고리즘
 
@@ -128,11 +135,10 @@ if moments >= cfg.minMoments
 ## 4. 시퀀스 — 첫 실행(EEA 사용자)
 
 ```
-main → runFactoryApp → 저장소 → (Firebase) → 원격 activate → 세션 #1
-     → UMP gather: 동의 폼 표시 → 사용자 선택 → ConsentState(canRequestAds=true)
-     → Entitlement 캐시(none) → restore() 시작(비동기)
-     → AdGateway.initialize → 전면·보상형 미리 로드(비동기)
-     → runApp → 첫 프레임 → fetchInBackground
+main → runFactoryApp → 저장소 → (Firebase) → 원격 activate → 세션 #1 → Entitlement 캐시(none)
+     → runApp → 첫 프레임(광고 꺼짐)
+     → UMP gather: 앱 위에 동의 폼 표시 → 사용자 선택 → ConsentState(canRequestAds=true)
+     → AdGateway.initialize → 전면·보상형 미리 로드(비동기) → syncWithStore → fetchInBackground
 사용자: 결과 확인 → 다음 행동 → onTransition('interstitial_result')
      → decide: session 1 ≤ grace 1 → grace → ad_show_attempt{result: grace}
 ```
@@ -141,10 +147,10 @@ main → runFactoryApp → 저장소 → (Firebase) → 원격 activate → 세�
 
 | 대상 | 호출 시점 | 실패 처리 |
 |---|---|---|
-| UMP (`ConsentInformation.requestConsentInfoUpdate`, `ConsentForm.loadAndShowConsentFormIfRequired`) | 부트스트랩 7 | 5초 타임아웃 → 저장된 `canRequestAds` 사용 |
-| `MobileAds.instance.initialize` | 부트스트랩 9 | 실패 로그, 광고 없음 |
+| UMP (`ConsentInformation.requestConsentInfoUpdate`, `ConsentForm.loadAndShowConsentFormIfRequired`) | 부트스트랩 10-1 (첫 프레임 후) | 5초 타임아웃 → 저장된 `canRequestAds` 사용 |
+| `MobileAds.instance.initialize` | 부트스트랩 10-2 | 실패 로그, 광고 없음 |
 | `InterstitialAd/RewardedAd/AppOpenAd.load` | 미리 로드, 표시 후 | 실패 시 지수 백오프 재시도 (10s·30s·60s, 최대 3회/세션) `(AI)` |
-| Firebase Remote Config `activate`/`fetch` | 부트스트랩 5·12 | 기본값 |
+| Firebase Remote Config `activate`/`fetch` | 부트스트랩 5·10-4 | 기본값 |
 | Firebase Analytics `logEvent` | 이벤트마다 | 오류 무시(로그) |
 | Crashlytics | 에러 훅 | — |
 | `in_app_purchase` `buyNonConsumable`/`restorePurchases`/`completePurchase` | 구매·시작 | §3.2 |
