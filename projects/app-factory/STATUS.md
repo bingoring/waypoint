@@ -1,12 +1,13 @@
 # App Factory — Waypoint Status
 
 **Framework:** [Waypoint](https://github.com/bingoring/waypoint)
-**PRD:** [prd.md](prd.md) (AI 초안, 1-1 승인 시 확정)
+**PRD:** [prd.md](prd.md) (v1.0 확정)
 **Decisions (audit):** [DECISIONS.md](DECISIONS.md)
 **Last updated:** 2026-10-13
 
-> 📝 **1-1 Context Synthesis 제안 → 승인 대기 (2026-10-13).** 수익 가설(게임 ARPDAU ≈ ₩46 → 월 1,000만 원에 DAU 약 7,200),
-> 반복 콘텐츠 정책 대응 포트폴리오 규칙 P1~P6, 공통 모듈 12종, Wave 1 후보 5개(로또·연봉 계산기·소음 측정기·물 마시기·퍼즐). 미해결 질문 Q1~Q8.
+> ✅ **1-1 승인 (2026-10-13).** PRD v1.0 확정, P1~P6 채택, Q1~Q8 결정(조직 계정·한영 동시·Android 먼저·AdMob 단독·광고 제거 IAP 포함·Wave 1 순서 확정).
+> ⏳ **오너 선행 작업:** 사업자등록 → D-U-N-S → Play 조직 계정 개설, 스튜디오명 결정 (3-1 전까지).
+> 📝 **1-2 Domain Model 작성 중.**
 
 ---
 
@@ -14,8 +15,8 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | AI_PROPOSED |
-| 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | PENDING |
+| 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | HUMAN_APPROVED |
+| 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | IN_PROGRESS |
 | 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | PENDING |
 
 ## Phase 2 — Construction (How)

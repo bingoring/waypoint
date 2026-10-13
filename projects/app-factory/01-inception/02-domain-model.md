@@ -1,7 +1,7 @@
 ---
 phase: 01-inception
 stage: 02-domain-model
-status: PENDING
+status: IN_PROGRESS
 updated: 2026-10-13
 ---
 
