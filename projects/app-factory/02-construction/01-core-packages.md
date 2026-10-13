@@ -23,7 +23,7 @@ updated: 2026-10-13
 
 - [x] 메인 저장소 생성(`bingoring/app-factory`, 비공개), waypoint 서브모듈 연결 (2026-10-13)
 - [x] Build Spec 작성 — [`core-packages/build-spec-index.md`](core-packages/build-spec-index.md) (comprehensive)
-- [ ] Build Spec 미해결 질문 해소 → `READY` 승인
+- [x] Build Spec 미해결 질문 해소 → `READY` 승인 (2026-10-13)
 - [ ] 구현 (Build Spec §4 체크리스트)
 - [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
 
@@ -47,7 +47,7 @@ updated: 2026-10-13
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
-- [ ] Build Spec이 `READY`로 승인되었는가? (구현 착수 승인)
+- [x] Build Spec이 `READY`로 승인되었는가? (구현 착수 승인)
 - [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
 
 ## 다음 단계

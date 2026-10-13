@@ -9,7 +9,7 @@
 > ⏳ **오너 선행 작업:** 사업자등록 → D-U-N-S → Play 조직 계정 개설, 스튜디오명 결정 (3-1 전까지).
 > ✅ **1-2 승인 (2026-10-13).** 코어/앱 경계·`app.yaml`·광고 정책·원격 설정·분석 계약 확정. 광고 제거 ₩2,500 / $1.99, 전면 광고 보수적 기본값, 보상형 실패 시 보상 지급.
 > ✅ **1-3 승인 (2026-10-13) → Inception 완료.** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트·Firebase, GitHub Actions + fastlane, §7 품질 기준 확정.
-> 🛠 **2-1 Core Packages 진행 중.** 저장소 `bingoring/app-factory`(비공개) 생성, Build Spec(comprehensive) 작성 → `QUESTIONS_OPEN`.
+> 🛠 **2-1 Core Packages 진행 중.** 저장소 `bingoring/app-factory`(비공개) 생성, Build Spec(comprehensive) `READY` 승인 → 구현 중.
 
 ---
 

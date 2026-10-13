@@ -1,7 +1,7 @@
 ---
 build-spec: core-packages
 stage: 02-construction/01-core-packages
-status: QUESTIONS_OPEN
+status: READY
 depth: comprehensive
 updated: 2026-10-13
 ---
@@ -39,8 +39,8 @@ updated: 2026-10-13
 
 ## §3. 미해결 질문 (Open Questions)
 
-- [ ] Q1: 1-3 §7.4 성능·메모리 예산을 측정할 **기준 기기** → AskUserQuestion
-- [ ] Q2: Build Spec `READY` 승인(구현 착수) → AskUserQuestion
+- [x] Q1: 기준 기기 → **API 36 에뮬레이터(중급 사양)로 우선 측정**, 실기기가 정해지면 재측정. 에뮬레이터 수치는 참고값 → DECISIONS `2026-10-13 · 2-1 Build Spec READY`
+- [x] Q2: `READY` 승인(2026-10-13, 오너) — `(AI)` 세부값과 §7 편차(동의를 첫 프레임 뒤로) 포함
 
 > 기술적 세부(세션 기준 30분, 원격 값 클램프 범위, 타임아웃 등)는 AI가 정해 business-rules에 명시했다. 승인 시 함께 확정된다.
 
