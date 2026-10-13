@@ -137,3 +137,11 @@
 - **재확인:** 3-1 전까지 오너가 도메인 등록과 KIPRIS 상표 검색을 마친다. 등록할 수 없으면 첫 출시 **전에** 바꾼다(출시 후 applicationId 변경 불가).
 - **대안(탈락):** Yeomworks(개인 이름에 묶임), Kkoma(영어권 발음), TinyForge·PocketForge·DailyBit 등(도메인 이미 등록됨), 기존 하이퍼캐주얼 회사와 비슷한 이름(사칭·상표 위험).
 - **결정자:** 사용자 (AI 추천 승인)
+
+## 2026-10-13 · 도메인 smallmatter.app, applicationId `app.smallmatter.<slug>` (앞 항목 수정)
+- **결정:** 도메인은 `smallmatter.app`, 앱 `applicationId`는 `app.smallmatter.<slug>`로 한다. 앞 항목의 `com.smallmatter.<slug>`를 대체한다.
+- **근거:** `smallmatter.com`은 2005년부터 등록된 주차 도메인이다(whois: 네임서버 DomainAgents, 2026-10-13 확인). 운영 중인 동명 회사는 아니어서 브랜드는 유지하지만,
+  남의 도메인을 뒤집은 ID는 쓰지 않는다. `.app`은 HTTPS가 강제되어 개인정보처리방침 페이지 보안(1-3 §7.3)에 맞다.
+  앞 항목의 "미등록 추정"은 `dig` 결과를 잘못 해석한 것이었다 → 도메인 가용성은 등록 사이트 결과로만 판단한다.
+- **대안(탈락):** `smallmatter.dev`(개발자 도구 느낌), `smallmatter.co.kr`(영어권 출시와 덜 맞음), `.store`·`.xyz`(갱신비 급등·스팸 평판), `com.smallmatter` 유지(남의 도메인).
+- **결정자:** 사용자 (AI 추천 승인)
