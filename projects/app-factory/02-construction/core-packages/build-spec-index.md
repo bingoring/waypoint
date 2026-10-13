@@ -1,7 +1,7 @@
 ---
 build-spec: core-packages
 stage: 02-construction/01-core-packages
-status: READY
+status: IMPLEMENTED
 depth: comprehensive
 updated: 2026-10-13
 ---

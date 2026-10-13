@@ -322,6 +322,8 @@ Firebase Analytics 제약: 이벤트 이름 40자 이하, 영문으로 시작하
 | D2 | 보수적으로 시작: 최소 간격 90초, 세션당 5회, 첫 세션 없음 |
 | D3 | 보상형 광고를 불러오지 못하면 보상을 준다(앱이 placement마다 변경 가능) |
 
+> 계약 확장: 2-1에서 `AdService`에 `prepareRewarded()`·`onAppBackground()`를 추가했다 → [`../02-construction/core-packages/build-spec-index.md`](../02-construction/core-packages/build-spec-index.md) §7
+>
 > 계약 확장: 1-3 §8에서 AppConfig에 `permissions`, `firebase.projectId` 필드를 추가했다 → [`03-architecture-decision.md`](03-architecture-decision.md) §8
 
 ## 다음 단계

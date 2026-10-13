@@ -271,6 +271,8 @@ A1~A10과 §7 품질 기준은 제안대로 승인되었다. 상세 근거는 [`
 | F2 | GitHub Actions(Linux) + fastlane. 프로덕션 승격은 사람이 수행 |
 | F3 | §7.4 제안 수치로 시작하고 2-1에서 기준 기기 실측 후 조정 |
 
+> 조정됨(2026-10-13): §7.4 메모리 예산 → 2-1 승인 결과 G1(유틸리티 ≤ 200MB · 게임 ≤ 300MB + 코어 항목별 예산). → [`../02-construction/01-core-packages.md`](../02-construction/01-core-packages.md)
+
 ## 다음 단계
 
 승인 후 → `STATUS.md`에서 1-3 상태를 `HUMAN_APPROVED`로 업데이트 → Phase 2 스테이지 목록 확정 → Construction 시작

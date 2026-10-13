@@ -1,7 +1,7 @@
 ---
 phase: 02-construction
 stage: 01-core-packages
-status: AI_PROPOSED
+status: HUMAN_APPROVED
 updated: 2026-10-13
 ---
 
@@ -61,8 +61,15 @@ updated: 2026-10-13
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
 - [x] Build Spec이 `READY`로 승인되었는가? (구현 착수 승인)
-- [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
-- [ ] 메모리 예산 조정안(아래 G1)에 동의하는가?
+- [x] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
+- [x] 메모리 예산 조정안(아래 G1)에 동의하는가?
+
+### 승인 결과 (2026-10-13, 오너)
+
+| # | 답변 |
+|---|------|
+| 2-1 | 승인. Build Spec `IMPLEMENTED` |
+| G1 | AI 기본안대로: 앱 전체 PSS 유틸리티 ≤ 200MB · 게임 ≤ 300MB, 코어 항목별 예산 광고 객체 ≤ 20MB · 코어·UI 추가분 ≤ 40MB. 1-3 §7.4의 메모리 행을 대체한다 |
 
 ## 다음 단계
 
