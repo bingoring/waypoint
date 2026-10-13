@@ -36,6 +36,14 @@ updated: 2026-10-13
 ### 1.5 `factory size <slug>`
 `bundletool build-apks --bundle=… --output=…apks` → `get-size total --apks=…` → 최대값과 예산 비교(R-SIZE).
 
+### 1.6 `factory firebase <slug>`
+1. `firebase --version`, `firebase login:list`로 CLI·로그인 확인(R-FB-2).
+2. `app.yaml.firebase.projectId`가 없으면 `firebase projects:create <id> --display-name "<이름>"`(R-FB-1), 있으면 3으로.
+3. `firebase apps:list ANDROID --project <id>`에 `app.smallmatter.<slug>`가 없으면 `firebase apps:create ANDROID "<이름>" --package-name app.smallmatter.<slug> --project <id>`.
+4. `firebase apps:sdkconfig ANDROID <appId> --project <id> -o apps/<slug>/android/app/google-services.json`.
+5. `app.yaml`에 `firebase.projectId` 기입 → `codegen`.
+6. 안내: AdMob 앱을 이 Firebase 프로젝트에 연결(AdMob 콘솔, 수동), 프로젝트 수가 5개를 넘으면 Blaze 전환(1-3 §5).
+
 ## 2. 알고리즘
 
 ### 2.1 시드 색 선택

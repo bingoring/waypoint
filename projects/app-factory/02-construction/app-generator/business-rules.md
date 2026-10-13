@@ -32,6 +32,10 @@ updated: 2026-10-13
 | R-KEY-1 | `keystore <slug>`: `~/.smallmatter/keys/<slug>.jks`가 이미 있으면 덮어쓰지 않는다. 비밀번호는 무작위 32자, 파일 권한 600 | 실패 |
 | R-KEY-2 | 키·비밀번호를 표준 출력에 그대로 찍지 않는다. GitHub 시크릿 등록용 base64는 파일로 쓰고 경로만 출력한다 | — |
 | R-REL-1 | 릴리스 태그 `<slug>-v<x.y.z>`의 버전은 `app.yaml.version`과 같아야 한다 | 워크플로 실패 |
+| R-FB-1 | 프로젝트 ID = `smallmatter-<slug>`(`_`→`-`, 6~30자). 이미 쓰이면 `-2`, `-3`… 접미사 `(AI)` | — |
+| R-FB-2 | `firebase` CLI가 없거나 로그인되지 않았으면 아무것도 만들지 않고 안내와 함께 실패 | 종료 코드 1 |
+| R-FB-3 | `app.yaml.firebase.projectId`가 이미 있으면 새 프로젝트를 만들지 않고 설정 파일만 다시 받는다(멱등) | — |
+| R-FB-4 | `google-services.json`은 비밀이 아니지만(Firebase 공식 안내) 저장소가 비공개이므로 커밋한다. API 키 제한은 3-1 체크리스트에서 설정 | — |
 | R-REL-2 | 업로드 트랙은 **internal만**. 프로덕션 승격은 사람이 Play Console에서 한다 (1-3 §6, P5) | lane에 트랙 인자 없음 |
 
 ## 2. 검증 규칙 (`app.yaml` 스키마)

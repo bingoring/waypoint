@@ -22,7 +22,7 @@ updated: 2026-10-13
 ## 체크리스트
 
 - [x] Build Spec 작성 — [`app-generator/build-spec-index.md`](app-generator/build-spec-index.md) (standard)
-- [ ] Build Spec 미해결 질문 해소 → `READY` 승인
+- [x] Build Spec 미해결 질문 해소 → `READY` 승인 (2026-10-13)
 - [ ] 구현 (Build Spec §4)
 - [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
 
@@ -43,7 +43,7 @@ updated: 2026-10-13
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
-- [ ] Build Spec이 `READY`로 승인되었는가? (구현 착수 승인)
+- [x] Build Spec이 `READY`로 승인되었는가? (구현 착수 승인)
 - [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
 
 ## 다음 단계

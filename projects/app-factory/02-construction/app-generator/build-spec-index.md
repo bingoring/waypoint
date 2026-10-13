@@ -1,7 +1,7 @@
 ---
 build-spec: app-generator
 stage: 02-construction/02-app-generator
-status: QUESTIONS_OPEN
+status: READY
 depth: standard
 updated: 2026-10-13
 ---
@@ -9,7 +9,7 @@ updated: 2026-10-13
 # Build Spec — App Generator + Release Pipeline
 
 ## §0. 개요 & 범위
-- **목표(한 줄):** `factory_cli`(new·codegen·validate·keystore·size) + fastlane lane + `release.yml`로, 새 앱 생성부터 Play 내부 테스트 업로드 직전까지 자동화한다.
+- **목표(한 줄):** `factory_cli`(new·codegen·validate·keystore·size·firebase) + fastlane lane + `release.yml`로, 새 앱 생성부터 Play 내부 테스트 업로드 직전까지 자동화한다.
 - **SoT:** 1-2 §0·§2(AppConfig), 1-3 §3·§6·§7·§8, 2-1 Build Spec(`AppConfigValidator`, `core_demo`의 Gradle·매니페스트 구성), DECISIONS(Smallmatter, `app.smallmatter.<slug>`).
 - **규모/제약:** 앱 수십 개. 생성·검증은 오프라인으로 동작해야 하고, 업로드만 네트워크·자격 증명이 필요하다. Play 계정이 없는 지금은 업로드를 실행할 수 없다.
 - **깊이 티어 & 사유:** `standard` — 도구 코드이며 런타임 위험은 낮다. 다만 applicationId·서명은 비가역이므로 규칙(BR)을 촘촘히 둔다.
@@ -35,8 +35,9 @@ updated: 2026-10-13
 
 ## §3. 미해결 질문
 
-- [ ] Q1: 앱별 Firebase 프로젝트를 만드는 방법 → AskUserQuestion
-- [ ] Q2: Build Spec `READY` 승인 → AskUserQuestion
+- [x] Q1: Firebase 프로젝트 생성 → **firebase CLI 자동화**(`factory firebase <slug>`, 오너가 `firebase login` 1회). AI 기본안(콘솔 수동)과 다름 → DECISIONS
+- [x] Q2: 개인정보처리방침 → **GitHub Pages + `smallmatter.app`**(공개 저장소, 설정은 3-1). R-VAL-3 유지
+- [x] Q3: `READY` 승인 (2026-10-13, 오너)
 
 ## §4. 구현 체크리스트
 
@@ -48,6 +49,8 @@ updated: 2026-10-13
 - [ ] `validate`: 검증기 + 테스트 ID·권한·이벤트·store 골격 검사 (BR §1, BLM §1.3)
 - [ ] `keystore`: 앱별 업로드 키 생성, 저장소 밖 저장, base64 출력 (BLM §1.4)
 - [ ] `size`: bundletool로 다운로드 크기 측정, 예산 비교 (BR R-SIZE)
+- [ ] `firebase`: 프로젝트 생성·앱 등록·`google-services.json`·`app.yaml` 갱신 (BLM §1.6, BR R-FB)
+- [ ] 템플릿 Gradle: `google-services.json`이 있을 때만 google-services·Crashlytics 플러그인 적용
 - [ ] 템플릿 Gradle: `factory.properties` 읽기, R8, 서명 설정, 난독화 (BR R-BLD)
 - [ ] `fastlane/Fastfile` `internal` lane
 - [ ] `release.yml`, `ci.yml` 확장

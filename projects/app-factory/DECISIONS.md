@@ -145,3 +145,10 @@
   앞 항목의 "미등록 추정"은 `dig` 결과를 잘못 해석한 것이었다 → 도메인 가용성은 등록 사이트 결과로만 판단한다.
 - **대안(탈락):** `smallmatter.dev`(개발자 도구 느낌), `smallmatter.co.kr`(영어권 출시와 덜 맞음), `.store`·`.xyz`(갱신비 급등·스팸 평판), `com.smallmatter` 유지(남의 도메인).
 - **결정자:** 사용자 (AI 추천 승인)
+
+## 2026-10-13 · 2-2 Build Spec READY — Firebase CLI 자동화, 방침 페이지 GitHub Pages
+- **결정:** 앱별 Firebase 프로젝트는 `factory firebase <slug>`가 firebase CLI로 만든다(프로젝트 `smallmatter-<slug>`, 앱 등록, 설정 파일, `app.yaml` 갱신). 오너가 `firebase login`을 1회 한다.
+  개인정보처리방침은 공개 GitHub Pages 저장소에 앱별 페이지로 두고 `smallmatter.app`을 연결한다(3-1). versionCode는 `run_number + 1000`, `allowBackup=false`.
+- **근거:** 앱이 늘어날수록 콘솔 수동 작업은 누락과 오타(패키지명)가 생긴다(오너 선택). 방침 페이지는 무료이고 스튜디오 도메인 아래에 일관되게 둔다.
+- **대안(탈락):** 출시 직전 콘솔 수동 생성(AI 기본안), Notion 공개 페이지, 날짜 기반 versionCode.
+- **결정자:** 사용자
