@@ -7,8 +7,8 @@
 
 > ✅ **1-1 승인 (2026-10-13).** PRD v1.0 확정, P1~P6 채택, Q1~Q8 결정(조직 계정·한영 동시·Android 먼저·AdMob 단독·광고 제거 IAP 포함·Wave 1 순서 확정).
 > ⏳ **오너 선행 작업:** 사업자등록 → D-U-N-S → Play 조직 계정 개설, 스튜디오명 결정 (3-1 전까지).
-> 📝 **1-2 Domain Model 제안 → 승인 대기 (2026-10-13).** 코어/앱 경계 원칙(코어는 화면을 소유하지 않음), `app.yaml` 스키마,
-> 광고 정책(전면 빈도 판정·adFree 효과·테스트 ID 강제), 원격 설정 `core_`/`app_` 키, `key_action` 공통 지표, Wave 1 매핑. 미해결 질문 D1~D3.
+> ✅ **1-2 승인 (2026-10-13).** 코어/앱 경계·`app.yaml`·광고 정책·원격 설정·분석 계약 확정. 광고 제거 ₩2,500 / $1.99, 전면 광고 보수적 기본값, 보상형 실패 시 보상 지급.
+> 📝 **1-3 Architecture Decision ⚠️ 작성 중.**
 
 ---
 
@@ -17,8 +17,8 @@
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
 | 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | HUMAN_APPROVED |
-| 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | AI_PROPOSED |
-| 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | PENDING |
+| 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | HUMAN_APPROVED |
+| 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | IN_PROGRESS |
 
 ## Phase 2 — Construction (How)
 
