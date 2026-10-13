@@ -1,7 +1,7 @@
 ---
 phase: 02-construction
 stage: 01-core-packages
-status: IN_PROGRESS
+status: AI_PROPOSED
 updated: 2026-10-13
 ---
 
@@ -24,8 +24,8 @@ updated: 2026-10-13
 - [x] 메인 저장소 생성(`bingoring/app-factory`, 비공개), waypoint 서브모듈 연결 (2026-10-13)
 - [x] Build Spec 작성 — [`core-packages/build-spec-index.md`](core-packages/build-spec-index.md) (comprehensive)
 - [x] Build Spec 미해결 질문 해소 → `READY` 승인 (2026-10-13)
-- [ ] 구현 (Build Spec §4 체크리스트)
-- [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
+- [x] 구현 (Build Spec §4 체크리스트) — 저장소 `bingoring/app-factory` 커밋 `ac86cc3`까지
+- [x] 검증 (Build Spec §5) — 메모리 예산만 미달, 예산 조정 결정 대기 (Build Spec §6 측정 결과)
 
 ## AI 제안 (AI Proposal)
 
@@ -43,12 +43,26 @@ updated: 2026-10-13
 4. **CI 게이트 중 앱이 있어야 하는 검사**(권한 허용 목록, 다운로드 크기)는 2-2에서 `factory_cli validate`와 함께 추가한다.
    2-1의 CI는 format·analyze(경고 0)·test·커버리지·의존 방향·금지 import·비밀 스캔·OSV 스캔을 강제한다.
 
+### 구현 결과 요약 (2026-10-13)
+
+- 패키지 7개(`factory_lints`·`core`·`runtime`·`ads`·`firebase`·`iap`·`ui`) + 검증 앱 `examples/core_demo` + CI(품질·보안 2개 잡, GitHub에서 통과).
+- 테스트 124개(core 88 · runtime 12 · ads 7 · firebase 5 · iap 3 · ui 9 · 통합 1), `factory_core` 라인 커버리지 99%, 위젯 테스트 전체 누수 검사 0건.
+- 구현·검증 중 발견해 고친 결함 4건: 보상형 광고 직후 앱 오프닝 광고 연속 노출, 초기화 중 판정 오분류(`disabled`), 서비스 해제 누락(누수), 복원 안내 스낵바 누적. 모두 회귀 테스트 포함.
+- 편차 13건은 Build Spec §7에 기록했다.
+
+### 미해결 질문
+
+| # | 질문 | AI 기본안 |
+|---|------|----------|
+| G1 | 1-3 §7.4 메모리 예산 조정 | 앱 전체 PSS: 유틸리티 **≤ 200MB**, 게임 **≤ 300MB**(에뮬레이터 기준, 측정 173MB). 대신 코어가 통제하는 항목을 따로 예산화: 광고 객체 ≤ 20MB(측정 11MB), 코어·UI 추가분 ≤ 40MB(측정 36MB). 실기기 확보 시 재측정 |
+
 ## 검토 게이트 (Human Gate)
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
 - [x] Build Spec이 `READY`로 승인되었는가? (구현 착수 승인)
 - [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
+- [ ] 메모리 예산 조정안(아래 G1)에 동의하는가?
 
 ## 다음 단계
 
