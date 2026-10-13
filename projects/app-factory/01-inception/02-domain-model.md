@@ -81,7 +81,6 @@ AppDefinition (코드, 앱당 1개)  ──uses──▶  FactoryServices (코�
 | `version` | semver | 사람 관리. 빌드 번호는 파이프라인이 자동 증가 | `1.0.0` |
 | `admob.appId` | `{android, ios?}` | AdMob 앱 ID | `ca-app-pub-…~…` |
 | `admob.units` | map<placementId, `{android, ios?}`> | `AppDefinition.placements`의 모든 ID가 키로 존재해야 함(빌드 검증) | §4 참조 |
-| `ads.appOpen` | bool | 앱 오프닝 광고 사용 여부. 기본 `false` | `true`(D 카테고리) |
 | `iap.removeAds.productId` | string | 기본 `remove_ads` | `remove_ads` |
 | `design` | DesignTokens | 아래 표 | |
 | `links.privacyPolicyUrl` | url | 필수(스토어·UMP 요구) | |
@@ -142,7 +141,8 @@ AppDefinition (코드, 앱당 1개)  ──uses──▶  FactoryServices (코�
 ### 4. 광고 정책 모델
 
 **AdPlacement** `{ id, format, everyN? }`
-- `id` 명명: `<format>_<where>` — `banner_home`, `interstitial_result`, `rewarded_hint`, `app_open`.
+- `id` 명명: `<format>_<where>` — `banner_home`, `interstitial_result`, `rewarded_hint`. 앱당 하나만 존재하는 앱 오프닝 광고만 예외로 `app_open` 단독 이름을 쓴다.
+- 앱 오프닝 광고 사용 여부는 별도 플래그 없이 **`app_open` placement를 선언했는지**로 결정한다(단일 진실 공급원).
 - `format`: `banner` · `interstitial` · `rewarded` · `app_open`. (보상형 전면 광고는 Wave 1 범위에서 제외)
 - `everyN`: 전면 광고 전용. 해당 전환이 N번 일어날 때 한 번만 노출을 시도한다. 원격 키 `app_ads_<id>_every_n`으로 덮어쓴다.
 
@@ -153,7 +153,7 @@ AppDefinition (코드, 앱당 1개)  ──uses──▶  FactoryServices (코�
 | banner | 화면당 최대 1개, 하단 고정 적응형 배너 | 버튼·입력 요소와 8dp 미만 간격, 콘텐츠를 가리는 배치, 스크롤 목록 중간 삽입(Wave 1) |
 | interstitial | `onTransition` 호출 시 아래 **빈도 판정**을 모두 통과한 경우 | 앱 시작·종료 시점, 사용자가 입력 중일 때, 결과를 보여주기 **전**(결과 확인 → 다음 행동으로 넘어갈 때만) |
 | rewarded | 사용자가 보상 내용을 보고 직접 누른 경우에만 | 자동 재생, 보상 없는 보상형 광고 |
-| app_open | `ads.appOpen=true`이고, 백그라운드에서 `core_ads_app_open_min_background_sec` 이상 있다가 돌아온 경우 | 첫 세션, 광고·결제·공유·권한 화면에서 돌아온 경우, 콜드 스타트의 동의 폼 직후 |
+| app_open | `app_open` placement를 선언했고, 백그라운드에서 `core_ads_app_open_min_background_sec` 이상 있다가 돌아온 경우 | 첫 세션, 광고·결제·공유·권한 화면에서 돌아온 경우, 콜드 스타트의 동의 폼 직후 |
 
 **전면 광고 빈도 판정** (순수 함수로 구현하고 단위 테스트로 검증한다)
 
