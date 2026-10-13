@@ -9,7 +9,7 @@
 > ⏳ **오너 선행 작업:** 사업자등록 → D-U-N-S → Play 조직 계정 개설, 스튜디오명 결정 (3-1 전까지).
 > ✅ **1-2 승인 (2026-10-13).** 코어/앱 경계·`app.yaml`·광고 정책·원격 설정·분석 계약 확정. 광고 제거 ₩2,500 / $1.99, 전면 광고 보수적 기본값, 보상형 실패 시 보상 지급.
 > ✅ **1-3 승인 (2026-10-13) → Inception 완료.** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트·Firebase, GitHub Actions + fastlane, §7 품질 기준 확정.
-> 📝 **다음: 2-1 Core Packages** — 저장소 생성 + Build Spec(comprehensive) 작성 → 질문 해소 → 구현.
+> 🛠 **2-1 Core Packages 진행 중.** 저장소 `bingoring/app-factory`(비공개) 생성, Build Spec(comprehensive) 작성 → `QUESTIONS_OPEN`.
 
 ---
 
@@ -27,7 +27,7 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 2-1 Core Packages (저장소·workspace·lint·CI 게이트, factory_core~factory_ui) · comprehensive | (예정) | PENDING |
+| 2-1 Core Packages (저장소·workspace·lint·CI 게이트, factory_core~factory_ui) · comprehensive | [01-core-packages.md](02-construction/01-core-packages.md) · [Build Spec](02-construction/core-packages/build-spec-index.md) | IN_PROGRESS |
 | 2-2 App Generator + Release Pipeline · standard | (예정) | PENDING |
 | 2-3 로또 번호 생성기 · standard | (예정) | PENDING |
 | 2-4 연봉 실수령액 계산기 · standard | (예정) | PENDING |
