@@ -10,7 +10,7 @@
 > ✅ **1-2 승인 (2026-10-13).** 코어/앱 경계·`app.yaml`·광고 정책·원격 설정·분석 계약 확정. 광고 제거 ₩2,500 / $1.99, 전면 광고 보수적 기본값, 보상형 실패 시 보상 지급.
 > ✅ **1-3 승인 (2026-10-13) → Inception 완료.** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트·Firebase, GitHub Actions + fastlane, §7 품질 기준 확정.
 > ✅ **2-1 Core Packages 승인 (2026-10-13).** 패키지 7개·CI·검증 앱, 테스트 124개. 메모리 예산 조정(G1: 200/300MB + 코어 항목별).
-> 📝 **2-2 App Generator + Release Pipeline 진행 중.** Build Spec(standard) `READY` 승인 → 구현 중.
+> 📝 **2-2 App Generator + Release Pipeline 구현 완료 → 승인 대기 (2026-10-13).** factory_cli 6개 명령·템플릿·fastlane·release 워크플로, 리허설 통과.
 
 ---
 
@@ -29,7 +29,7 @@
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
 | 2-1 Core Packages (저장소·workspace·lint·CI 게이트, factory_core~factory_ui) · comprehensive | [01-core-packages.md](02-construction/01-core-packages.md) · [Build Spec](02-construction/core-packages/build-spec-index.md) | HUMAN_APPROVED |
-| 2-2 App Generator + Release Pipeline · standard | [02-app-generator.md](02-construction/02-app-generator.md) · [Build Spec](02-construction/app-generator/build-spec-index.md) | IN_PROGRESS |
+| 2-2 App Generator + Release Pipeline · standard | [02-app-generator.md](02-construction/02-app-generator.md) · [Build Spec](02-construction/app-generator/build-spec-index.md) | AI_PROPOSED |
 | 2-3 로또 번호 생성기 · standard | (예정) | PENDING |
 | 2-4 연봉 실수령액 계산기 · standard | (예정) | PENDING |
 | 2-5 소음 측정기 · standard | (예정) | PENDING |

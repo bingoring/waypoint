@@ -1,7 +1,7 @@
 ---
 phase: 02-construction
 stage: 02-app-generator
-status: IN_PROGRESS
+status: AI_PROPOSED
 updated: 2026-10-13
 ---
 
@@ -23,8 +23,8 @@ updated: 2026-10-13
 
 - [x] Build Spec 작성 — [`app-generator/build-spec-index.md`](app-generator/build-spec-index.md) (standard)
 - [x] Build Spec 미해결 질문 해소 → `READY` 승인 (2026-10-13)
-- [ ] 구현 (Build Spec §4)
-- [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
+- [x] 구현 (Build Spec §4) — 저장소 커밋 `af86e78`까지
+- [x] 검증 (Build Spec §5) → `IMPLEMENTED`
 
 ## AI 제안 (AI Proposal)
 
@@ -38,6 +38,13 @@ updated: 2026-10-13
    스토어 등록 문구도 **빈 골격**만 만든다(P4: 템플릿 치환 금지).
 3. **실제 업로드는 3-1에서 처음 실행한다.** Play 조직 계정이 아직 없으므로 2-2의 검증은 "서명된 릴리스 AAB 생성 → 권한·크기·테스트 ID 검사 → fastlane 업로드 직전"까지다.
 4. **앱별 비밀 값은 저장소 밖에 둔다.** 업로드 키는 `~/.smallmatter/keys/`(로컬)와 GitHub 암호화 시크릿, 원본은 오너의 비밀번호 관리자에 둔다(1-3 §6).
+
+### 구현 결과 요약 (2026-10-13)
+
+- `factory_cli` 명령 6개(`new`·`codegen`·`validate`·`keystore`·`size`·`firebase`) + 앱 템플릿 + fastlane `internal` lane + `release.yml` + CI 앱 검사.
+- 단위 테스트 22개. sandbox 앱 리허설로 생성 → 서명 AAB(난독화) → 권한·크기 검사(10.11MB/15MB)까지 실제 도구로 확인하고 정리했다.
+- 리허설에서 광고 SDK가 끌어오는 미사용 `FOREGROUND_SERVICE` 권한을 찾아 템플릿에서 제거했다.
+- 실제 Play 업로드와 `factory firebase` 실행은 계정·로그인이 필요해 각각 3-1, 2-3에서 처음 실행한다. 편차 8건은 Build Spec §7.
 
 ## 검토 게이트 (Human Gate)
 
