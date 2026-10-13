@@ -8,8 +8,8 @@
 > ✅ **1-1 승인 (2026-10-13).** PRD v1.0 확정, P1~P6 채택, Q1~Q8 결정(조직 계정·한영 동시·Android 먼저·AdMob 단독·광고 제거 IAP 포함·Wave 1 순서 확정).
 > ⏳ **오너 선행 작업:** 사업자등록 → D-U-N-S → Play 조직 계정 개설, 스튜디오명 결정 (3-1 전까지).
 > ✅ **1-2 승인 (2026-10-13).** 코어/앱 경계·`app.yaml`·광고 정책·원격 설정·분석 계약 확정. 광고 제거 ₩2,500 / $1.99, 전면 광고 보수적 기본값, 보상형 실패 시 보상 지급.
-> 📝 **1-3 Architecture Decision ⚠️ 제안 → 승인 대기 (2026-10-13).** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트, 기능별 코어 패키지,
-> Riverpod 3, 앱별 Firebase, GitHub Actions + fastlane, **§7 품질 기준(리뷰 기준선)**. 미해결 질문 F1~F3.
+> ✅ **1-3 승인 (2026-10-13) → Inception 완료.** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트·Firebase, GitHub Actions + fastlane, §7 품질 기준 확정.
+> 📝 **다음: 2-1 Core Packages** — 저장소 생성 + Build Spec(comprehensive) 작성 → 질문 해소 → 구현.
 
 ---
 
@@ -19,21 +19,21 @@
 |---------|------|------|
 | 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | HUMAN_APPROVED |
 | 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | HUMAN_APPROVED |
-| 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | AI_PROPOSED |
+| 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | HUMAN_APPROVED |
 
 ## Phase 2 — Construction (How)
 
-> 스테이지 목록은 1-3 승인 후 확정한다. 아래는 1-1 기준 예정안이다.
+> 1-3 §11에서 확정. 각 스테이지는 구현 전에 Build Spec을 쓴다(FRAMEWORK "구현 스펙").
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 2-1 Core Packages (ads·consent·analytics·remote_config·iap·rating·app_shell) | (예정) | PENDING |
-| 2-2 App Generator + Build Pipeline | (예정) | PENDING |
-| 2-3 Wave 1 · 로또 번호 생성기 | (예정) | PENDING |
-| 2-4 Wave 1 · 연봉 실수령액 계산기 | (예정) | PENDING |
-| 2-5 Wave 1 · 소음 측정기 | (예정) | PENDING |
-| 2-6 Wave 1 · 물 마시기 알림 | (예정) | PENDING |
-| 2-7 Game Kit + Wave 1 퍼즐 | (예정) | PENDING |
+| 2-1 Core Packages (저장소·workspace·lint·CI 게이트, factory_core~factory_ui) · comprehensive | (예정) | PENDING |
+| 2-2 App Generator + Release Pipeline · standard | (예정) | PENDING |
+| 2-3 로또 번호 생성기 · standard | (예정) | PENDING |
+| 2-4 연봉 실수령액 계산기 · standard | (예정) | PENDING |
+| 2-5 소음 측정기 · standard | (예정) | PENDING |
+| 2-6 물 마시기 알림 · standard | (예정) | PENDING |
+| 2-7 Game Kit + 퍼즐 · comprehensive | (예정) | PENDING |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
