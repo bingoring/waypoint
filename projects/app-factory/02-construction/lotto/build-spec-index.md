@@ -47,23 +47,23 @@ updated: 2026-10-14
 
 ## §4. 구현 체크리스트
 
-- [ ] `factory new lotto --category fun --name-ko "로또 번호 생성기"` → `app.yaml`(placements·이벤트·`audience.minAge: 18`·원격 기본값)
-- [ ] `factory firebase lotto` (첫 실제 실행)
-- [ ] domain: 생성기·회차·당첨 판정·통계 + 단위 테스트
-- [ ] data: 당첨 저장소(에셋 ∪ 원격)·이력 저장소·잠금 상태 + 단위 테스트
-- [ ] `tool/fetch_draws.dart` → `assets/draws.json` (1~1245회, 개수·연속성 검증)
-- [ ] `lotto-draws.yml` 자동 등록 워크플로 + 서비스 계정 시크릿(오너가 Firebase 콘솔에서 키 발급)
-- [ ] `tool/add_draw.dart` (Remote Config 갱신)
-- [ ] UI: 생성·내 번호·통계·설정, 공 위젯, 하단 내비게이션
-- [ ] 위젯 테스트 (핵심 흐름)
+- [x] `factory new lotto --category fun --name-ko "로또 번호 생성기"` → `app.yaml`(placements·이벤트·`audience.minAge: 18`·원격 기본값)
+- [x] `factory firebase lotto` (첫 실제 실행)
+- [x] domain: 생성기·회차·당첨 판정·통계 + 단위 테스트
+- [x] data: 당첨 저장소(에셋 ∪ 원격)·이력 저장소·잠금 상태 + 단위 테스트
+- [x] `tool/fetch_draws.dart` → `assets/draws.json` (1~1245회, 개수·연속성 검증)
+- [x] `lotto-draws.yml` 자동 등록 워크플로 + 서비스 계정 시크릿(오너가 Firebase 콘솔에서 키 발급)
+- [x] `tool/sync_draws.dart` (자동·수동 겸용, dry-run 검증) — ~~add_draw~~
+- [x] UI: 생성·내 번호·통계·설정, 공 위젯, 하단 내비게이션
+- [x] 위젯 테스트 (핵심 흐름)
 - [ ] store 문구(ko)·data-safety·개인정보처리방침 초안
 - [ ] 릴리스 리허설: 서명 AAB → `validate --release`(AdMob ID 외 통과) → `size`
 
 ## §5. 검증 계획
-- [ ] 분석·포맷·의존 검사·`validate` 통과
-- [ ] domain 테스트: 고정·제외 조합 경계, 결정적 시드로 분포, 회차 계산(KST 토요일 20:00 경계), 당첨 판정 5개 등수 + 보너스
-- [ ] 위젯 테스트: 생성 → 저장 → 내 번호에 표시, 통계 잠금 → 보상 → 열림, 누수 0
-- [ ] 에뮬레이터: 전 화면 수동 확인(스크린숏), 테스트 광고 표시
+- [x] 분석·포맷·의존 검사·`validate` 통과
+- [x] domain 테스트: 고정·제외 조합 경계, 결정적 시드로 분포, 회차 계산(KST 토요일 20:00 경계), 당첨 판정 5개 등수 + 보너스
+- [x] 위젯 테스트: 생성 → 저장 → 내 번호에 표시, 통계 잠금 → 보상 → 열림, 누수 0 — 앱 테스트 30개
+- [x] 에뮬레이터: 전 화면 수동 확인(스크린숏), 테스트 광고 표시 — FC §9, 보상형 광고 실제 시청·보상 지급 확인
 - [ ] 크기 ≤ 15MB, 콜드 스타트 ≤ 1.5초, PSS ≤ 200MB (2-1 G1)
 
 ## §6. NFR
@@ -74,3 +74,8 @@ N/A (standard). 2-1 G1·1-3 §7.4 예산을 §5에서 측정한다.
 | SoT | 실제 구현 | 사유 |
 |---|---|---|
 | 1-2 §10 로또 placements `banner_history` | 유지 | — |
+| BR L-UI·FC: 앱 문자열 | 한국어 전용 앱이라 화면 문자열을 코드에 직접 둠(ARB 없음) | Q2: 로또는 한국어 전용 |
+| FC §3.3 통계 대표 버튼 | 막대 위 겹침 → 하단 고정, 잠긴 상태에 결과 자리 미리보기 | 프롬프트 5단계 검사에서 발견 |
+| 시드 색 | 생성기 제안 #BF5677 → #2E3A59 | 공 다섯 색과 경쟁하지 않게 (FC §5) |
+| 당첨 데이터 | 엑셀 → 공식 결과 페이지 데이터 주소, `add_draw` → `sync_draws` | 오너 승인(자동 등록) |
+| `factory firebase` 첫 실제 실행 | 한글 표시 이름 거부 결함 발견·수정(생성기) | GCP 표시 이름은 한글 불가 |
