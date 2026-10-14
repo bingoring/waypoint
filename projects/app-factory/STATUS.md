@@ -2,7 +2,8 @@
 
 **Framework:** [Waypoint](https://github.com/bingoring/waypoint)
 **PRD:** [prd.md](prd.md) (v1.0 확정)
-**Decisions (audit):** [DECISIONS.md](DECISIONS.md)
+**Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
+**앱 디자인 프롬프트:** [APP_DESIGN_PROMPT.md](APP_DESIGN_PROMPT.md) (v1, 2-3 로또에 첫 적용 — 결과를 보고 계속 사용 여부 결정)
 **Last updated:** 2026-10-13
 
 > ✅ **1-1 승인 (2026-10-13).** PRD v1.0 확정, P1~P6 채택, Q1~Q8 결정(조직 계정·한영 동시·Android 먼저·AdMob 단독·광고 제거 IAP 포함·Wave 1 순서 확정).
