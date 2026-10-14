@@ -12,8 +12,8 @@
 > ✅ **1-3 승인 (2026-10-13) → Inception 완료.** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트·Firebase, GitHub Actions + fastlane, §7 품질 기준 확정.
 > ✅ **2-1 Core Packages 승인 (2026-10-13).** 패키지 7개·CI·검증 앱, 테스트 124개. 메모리 예산 조정(G1: 200/300MB + 코어 항목별).
 > ✅ **2-2 App Generator + Release Pipeline 승인 (2026-10-13).** factory_cli 6개 명령·템플릿·fastlane·release 워크플로.
-> ✅ **2-3 로또 번호 생성기 승인 (2026-10-14).** 출시 전 남은 일(3-1): AdMob↔Firebase 연결, `app-ads.txt`·방침 게시, 문구 검토 (AdMob 단위 완료). 10/18 첫 당첨 자동 등록 확인.
-> ✅ **2-4 연봉 실수령액 계산기 승인 (2026-10-14).** 메모리 예산 초과(219~237MB)는 1.1 메모리 점검에서. 코어 `BannerSlot` 자리 유지, 성능 측정 절차 채택. 출시 전 남은 일(3-1): AdMob↔Firebase 연결, `app-ads.txt`·방침 게시, 문구 검토 (업로드 키 시크릿·AdMob 단위 완료).
+> ✅ **2-3 로또 번호 생성기 승인 (2026-10-14).** 출시 전 남은 일(3-1): `app-ads.txt`·방침 게시(smallmatter.app DNS 대기), 문구 검토 (AdMob 단위 완료). 10/18 첫 당첨 자동 등록 확인.
+> ✅ **2-4 연봉 실수령액 계산기 승인 (2026-10-14).** 메모리 예산 초과(219~237MB)는 1.1 메모리 점검에서. 코어 `BannerSlot` 자리 유지, 성능 측정 절차 채택. 출시 전 남은 일(3-1): `app-ads.txt`·방침 게시(smallmatter.app DNS 대기), 문구 검토 (업로드 키 시크릿·AdMob 단위 완료).
 > 📝 **다음: 2-5 소음 측정기** (APP_DESIGN_PROMPT 1단계 조사부터).
 
 ---

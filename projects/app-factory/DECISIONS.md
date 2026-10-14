@@ -237,3 +237,8 @@
 - **근거:** 2-2 Q2(GitHub Pages) 이행. AdMob `app-ads.txt`는 스토어 등록정보의 개발자 웹사이트 최상위 경로에 있어야 한다. 앱 소스 저장소(비공개)를 공개하지 않으려 사이트만 분리한다.
 - **남은 일:** 가비아 DNS(A·AAAA·www CNAME), GitHub 도메인 소유 확인(TXT), HTTPS 강제 켜기. 방침은 아직 초안 표시 그대로 게시 — 3-1 오너 검토 뒤 다시 생성한다.
 - **결정자:** 사용자(진행 지시), AI(구성)
+
+## 2026-10-14 · Firebase 프로젝트는 GA 연결이 필수 (생성기 결함)
+- **결정:** 앱마다 Firebase 프로젝트를 만든 뒤 Google Analytics를 반드시 사용 설정하고(계정 Smallmatter, 위치 대한민국, 보관 기본 2개월), 그다음 AdMob↔Firebase를 AdMob 쪽에서 연결한다. `factory firebase`의 완료 안내에 이 순서를 넣었다. CLI로 자동화하는 것(Management API `addGoogleAnalytics`)은 1.1 후보.
+- **근거:** 로또·연봉 프로젝트가 GA 없이 만들어져 분석 이벤트가 수집되지 않았다(실행 로그 `Did not find measurement config`). AdMob 연결 화면에도 기존 앱이 나오지 않았다. 오너가 두 프로젝트에 GA를 연결한 뒤 AdMob 연결에 성공했고, 경고도 사라졌다(2026-10-14 에뮬레이터 확인).
+- **결정자:** AI (결함 수정), 오너 콘솔 작업
