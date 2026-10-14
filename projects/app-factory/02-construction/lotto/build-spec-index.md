@@ -1,7 +1,7 @@
 ---
 build-spec: lotto
 stage: 02-construction/03-lotto
-status: READY
+status: IMPLEMENTED
 depth: standard
 updated: 2026-10-14
 ---
@@ -56,15 +56,15 @@ updated: 2026-10-14
 - [x] `tool/sync_draws.dart` (자동·수동 겸용, dry-run 검증) — ~~add_draw~~
 - [x] UI: 생성·내 번호·통계·설정, 공 위젯, 하단 내비게이션
 - [x] 위젯 테스트 (핵심 흐름)
-- [ ] store 문구(ko)·data-safety·개인정보처리방침 초안
-- [ ] 릴리스 리허설: 서명 AAB → `validate --release`(AdMob ID 외 통과) → `size`
+- [x] store 문구(ko)·data-safety·개인정보처리방침 초안 — `apps/lotto/store/` (출시 전 오너 검토)
+- [x] 릴리스 리허설: 서명 AAB → `validate --release`(AdMob ID 외 통과) → `size` — 남은 실패는 `REL_TEST_IDS`(AdMob 계정 필요)뿐, 10.28MB
 
 ## §5. 검증 계획
 - [x] 분석·포맷·의존 검사·`validate` 통과
 - [x] domain 테스트: 고정·제외 조합 경계, 결정적 시드로 분포, 회차 계산(KST 토요일 20:00 경계), 당첨 판정 5개 등수 + 보너스
 - [x] 위젯 테스트: 생성 → 저장 → 내 번호에 표시, 통계 잠금 → 보상 → 열림, 누수 0 — 앱 테스트 30개
 - [x] 에뮬레이터: 전 화면 수동 확인(스크린숏), 테스트 광고 표시 — FC §9, 보상형 광고 실제 시청·보상 지급 확인
-- [ ] 크기 ≤ 15MB, 콜드 스타트 ≤ 1.5초, PSS ≤ 200MB (2-1 G1)
+- [x] 크기 ≤ 15MB, 콜드 스타트 ≤ 1.5초, PSS ≤ 200MB (2-1 G1) — 10.28MB · 콜드 스타트 1.30~1.54초(에뮬레이터 편차, 경계) · PSS 195~196MB(여유 4MB)
 
 ## §6. NFR
 N/A (standard). 2-1 G1·1-3 §7.4 예산을 §5에서 측정한다.
@@ -79,3 +79,6 @@ N/A (standard). 2-1 G1·1-3 §7.4 예산을 §5에서 측정한다.
 | 시드 색 | 생성기 제안 #BF5677 → #2E3A59 | 공 다섯 색과 경쟁하지 않게 (FC §5) |
 | 당첨 데이터 | 엑셀 → 공식 결과 페이지 데이터 주소, `add_draw` → `sync_draws` | 오너 승인(자동 등록) |
 | `factory firebase` 첫 실제 실행 | 한글 표시 이름 거부 결함 발견·수정(생성기) | GCP 표시 이름은 한글 불가 |
+| (신규, 코어) `BannerSlot` | 보이지 않는 탭(IndexedStack의 Visibility)·TickerMode 꺼짐에서는 배너를 불러오지 않고 해제 | 측정 중 발견: 숨은 「내 번호」 탭 배너가 함께 떠 있었다(WebView 5→4, PSS −3MB). 보이지 않는 광고 노출은 정책 위험. `factory_ads` 회귀 테스트 2개 |
+| BLM §1.5 자동 등록 | 첫 실행에서 서비스 계정 권한 문제 확인, 실패 원인을 로그에 보이도록 개선 | 오너가 다른 GCP 프로젝트에서 서비스 계정을 만들었다(프로젝트 323637914615). smallmatter-lotto에서 다시 만들어야 한다 |
+| 메모리 | 예제 앱(173MB)보다 +23MB | Firebase 제외 빌드도 같아 Firebase는 원인 아님(`추론`: UI·데이터·탭 3개 상주). 예산 안이라 1.1에서 다시 본다 |

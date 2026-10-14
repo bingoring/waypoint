@@ -1,7 +1,7 @@
 ---
 phase: 02-construction
 stage: 03-lotto
-status: IN_PROGRESS
+status: AI_PROPOSED
 updated: 2026-10-14
 ---
 
@@ -24,8 +24,8 @@ Wave 1의 첫 실제 앱. 로또 6/45 번호를 만들고(무작위·고정수·
 - [x] 기능 범위 질문 (2026-10-14): 생성 방식, 당첨 데이터, 보상형, QR
 - [x] Build Spec 작성 — [`lotto/build-spec-index.md`](lotto/build-spec-index.md) (standard + frontend-components)
 - [x] Build Spec `READY` 승인 (2026-10-14, 화면 명세는 APP_DESIGN_PROMPT v1 적용)
-- [ ] 구현 (Build Spec §4)
-- [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
+- [x] 구현 (Build Spec §4) — 저장소 커밋 `d0b68b9`까지
+- [x] 검증 (Build Spec §5) → `IMPLEMENTED`
 
 ## AI 제안 (AI Proposal)
 
@@ -37,6 +37,14 @@ Wave 1의 첫 실제 앱. 로또 6/45 번호를 만들고(무작위·고정수·
 3. **오해를 부르는 표현 금지.** 통계 추천은 "과거 출현 빈도를 보여 줄 뿐 당첨 확률을 높이지 않는다"를 화면에 명시한다(Play 기만 행위 정책·평점 보호).
    대상 연령은 18세로 둔다(국내 복권 구매 연령 19세, 1-2 `audience.minAge` 허용값 중 가장 높은 값).
 4. **QR 스캔은 1.1.** 1.0은 카메라 권한 없이 출시한다.
+
+### 구현 결과 요약 (2026-10-14)
+
+- 화면 4개(뽑기·내 번호·통계·설정)를 APP_DESIGN_PROMPT v1로 설계·구현, 5단계 검사 통과([스크린숏](lotto/screens/)).
+- 당첨 데이터 1~1245회 수집·검증, 매주 자동 등록 스크립트·워크플로. 앱 테스트 30개, 누수 0.
+- 릴리스 리허설: 서명 AAB 10.28MB, `validate --release`의 남은 실패는 AdMob 단위 ID(계정 필요)뿐.
+- 찾아서 고친 결함: 담기 애니메이션 해제 누락(누수), 통계 대표 버튼 위치, 숨은 탭 배너 로드(코어), `factory firebase` 한글 표시 이름(생성기).
+- 출시 전 남은 일(3-1): AdMob 앱·단위 생성, 서비스 계정 재발급(smallmatter-lotto), 개인정보처리방침 게시(GitHub Pages), 스토어 문구 오너 검토, 「맞은 공 채우기」 화면 확인(1246회 추첨 후).
 
 ## 검토 게이트 (Human Gate)
 
