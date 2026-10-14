@@ -1,7 +1,7 @@
 ---
 phase: 02-construction
 stage: 04-salary
-status: AI_PROPOSED
+status: HUMAN_APPROVED
 updated: 2026-10-14
 ---
 
@@ -54,7 +54,15 @@ Wave 1의 두 번째 앱. 연봉을 넣으면 급여명세서 형식으로 월 �
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
 - [x] Build Spec이 `READY`로 승인되었는가?
-- [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가? (메모리 예산 초과 포함)
+- [x] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가? (메모리 예산 초과 포함)
+
+### 승인 결과 (2026-10-14, 오너)
+
+| # | 답변 |
+|---|------|
+| 2-4 | 승인. 메모리 예산 초과(PSS 219~237MB)는 출시를 막지 않고 1.1 메모리 점검(로또와 함께)에서 예산 기준과 함께 다시 본다 |
+| 코어 | `BannerSlot` 자리 유지 확인 |
+| 절차 | 성능 측정 절차 채택 → 2-1 G1 후속 변경에 반영 |
 
 ## 다음 단계
 
