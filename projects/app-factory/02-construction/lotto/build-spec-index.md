@@ -32,7 +32,7 @@ updated: 2026-10-14
 | domain-entities | ✅ | [`domain-entities.md`](domain-entities.md) |
 | business-rules | ✅ | [`business-rules.md`](business-rules.md) |
 | business-logic-model | ✅ | [`business-logic-model.md`](business-logic-model.md) |
-| frontend-components | ✅ | [`frontend-components.md`](frontend-components.md) |
+| frontend-components | ✅ | [`frontend-components.md`](frontend-components.md) — APP_DESIGN_PROMPT v1 첫 적용 |
 
 ## §3. 미해결 질문
 
@@ -41,6 +41,7 @@ updated: 2026-10-14
 - [x] 보상형 → 통계 추천 열기(그날 하루). 패턴 필터는 범위 밖 (AI 해석, READY 승인 시 확정)
 - [x] QR 스캔 → 1.1
 - [ ] 동행복권 회차별 당첨번호 엑셀 파일 (오너 다운로드)
+- [x] 화면 설계를 APP_DESIGN_PROMPT v1로 다시 작성 (오너 「수정 후 승인」, 2026-10-14)
 - [ ] `READY` 승인
 
 ## §4. 구현 체크리스트
