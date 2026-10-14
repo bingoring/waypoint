@@ -1,7 +1,7 @@
 ---
 phase: 02-construction
 stage: 03-lotto
-status: AI_PROPOSED
+status: HUMAN_APPROVED
 updated: 2026-10-14
 ---
 
@@ -50,8 +50,14 @@ Wave 1의 첫 실제 앱. 로또 6/45 번호를 만들고(무작위·고정수·
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
-- [ ] Build Spec이 `READY`로 승인되었는가?
-- [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
+- [x] Build Spec이 `READY`로 승인되었는가?
+- [x] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
+
+### 승인 결과 (2026-10-14, 오너)
+
+| # | 답변 |
+|---|------|
+| 2-3 | 승인. 업로드 키는 오너 드라이브에 백업(비밀번호 관리자 이관 권장), 업로드 키·서비스 계정 시크릿 등록 완료 |
 
 ## 다음 단계
 
