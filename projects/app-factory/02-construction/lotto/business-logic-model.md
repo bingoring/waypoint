@@ -23,7 +23,10 @@ updated: 2026-10-14
 진입 → 잠금 확인(L-STAT-4) → 잠김이면 보상형 버튼 → `showRewarded('rewarded_analysis')` → `grants`면 오늘 날짜 저장 → 열림:
 최근 N회 번호별 출현 횟수 막대(1~45), 많이 나온 6개·적게 나온 6개, "통계로 생성" 버튼(L-STAT-2). `open_stats` 이벤트.
 
-### 1.5 당첨 데이터 갱신 (오너, 매주)
+### 1.5 당첨 데이터 갱신 (자동, 매주 — 실패 시 오너 수동)
+자동: `lotto-draws.yml`(일 00:30 KST = 토 15:30 UTC, 실패 시 일 09:00 KST 재시도) → `tool/fetch_draws.dart --latest`(`GET /lt645/selectPstLt645InfoNew.do?srchDir=center&srchLtEpsd=<다음 회차>`) →
+L-DATA-2·회차 연속성·추첨일이 토요일인지 검증 → Remote Config REST API(서비스 계정)로 `app_lotto_draws_v1` 갱신. 이미 있으면 아무것도 하지 않는다(멱등).
+수동(비상):
 `dart run tool/add_draw.dart <회차> n1 … n6 <보너스> [날짜]` →
 `firebase remoteconfig:get` → `app_lotto_draws_v1` JSON에 회차 추가(검증 L-DATA-2, 회차 연속성) → `firebase deploy --only remoteconfig`.
 앱은 다음 실행에서 활성화한다(1-2 §5). 새 버전 출시 때는 원격 회차를 에셋에 합치고 원격 값을 비운다.

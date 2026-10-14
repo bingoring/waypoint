@@ -1,7 +1,7 @@
 ---
 build-spec: lotto
 stage: 02-construction/03-lotto
-status: QUESTIONS_OPEN
+status: READY
 depth: standard
 updated: 2026-10-14
 ---
@@ -21,9 +21,10 @@ updated: 2026-10-14
 | `lib/domain/` | 번호 생성기, 회차 계산, 당첨 판정, 통계(빈도·가중 추첨) — 순수 Dart |
 | `lib/data/` | 당첨 회차 저장소(에셋 ∪ 원격), 내 번호 이력 저장소, 통계 잠금 상태 |
 | `lib/ui/` | 생성 · 내 번호 · 통계 · 설정 화면, 공 위젯 |
-| `assets/draws.json` | 1~1245회 당첨 번호 (엑셀 변환) |
-| `tool/import_draws.dart` | 엑셀 → `assets/draws.json` |
-| `tool/add_draw.dart` | 새 회차 → Remote Config `app_lotto_draws_v1` 추가 |
+| `assets/draws.json` | 1~1245회 당첨 번호 (공식 결과 페이지 데이터 주소에서 1회 수집) |
+| `tool/fetch_draws.dart` | 공식 결과 페이지 데이터 주소 → 회차 목록 (전체 수집·최신 회차) |
+| `tool/add_draw.dart` | 새 회차 → Remote Config `app_lotto_draws_v1` 추가 (자동 작업이 호출, 수동 비상용 겸용) |
+| `.github/workflows/lotto-draws.yml` | 매주 일요일 새벽 KST 자동 등록, 실패 시 워크플로 실패(메일) |
 
 ## §2. 아티팩트 인덱스
 
@@ -37,12 +38,12 @@ updated: 2026-10-14
 ## §3. 미해결 질문
 
 - [x] 생성 방식 → 무작위 + 고정수·제외수 (2026-10-14)
-- [x] 당첨 데이터 → 엑셀 1회 + 주 1회 CLI 입력 (비공식 조회 주소가 막혀 있음 확인)
+- [x] 당첨 데이터 → ~~엑셀 1회 + 주 1회 CLI 입력~~ **공식 결과 페이지 데이터 주소로 자동 수집·매주 자동 등록** (2026-10-14 오너 승인)
 - [x] 보상형 → 통계 추천 열기(그날 하루). 패턴 필터는 범위 밖 (AI 해석, READY 승인 시 확정)
 - [x] QR 스캔 → 1.1
-- [ ] 동행복권 회차별 당첨번호 엑셀 파일 (오너 다운로드)
+- [x] ~~동행복권 엑셀~~ 불필요해짐
 - [x] 화면 설계를 APP_DESIGN_PROMPT v1로 다시 작성 (오너 「수정 후 승인」, 2026-10-14)
-- [ ] `READY` 승인
+- [x] `READY` 승인 (2026-10-14)
 
 ## §4. 구현 체크리스트
 
@@ -50,7 +51,8 @@ updated: 2026-10-14
 - [ ] `factory firebase lotto` (첫 실제 실행)
 - [ ] domain: 생성기·회차·당첨 판정·통계 + 단위 테스트
 - [ ] data: 당첨 저장소(에셋 ∪ 원격)·이력 저장소·잠금 상태 + 단위 테스트
-- [ ] `tool/import_draws.dart` → `assets/draws.json` (1~1245회, 개수·연속성 검증)
+- [ ] `tool/fetch_draws.dart` → `assets/draws.json` (1~1245회, 개수·연속성 검증)
+- [ ] `lotto-draws.yml` 자동 등록 워크플로 + 서비스 계정 시크릿(오너가 Firebase 콘솔에서 키 발급)
 - [ ] `tool/add_draw.dart` (Remote Config 갱신)
 - [ ] UI: 생성·내 번호·통계·설정, 공 위젯, 하단 내비게이션
 - [ ] 위젯 테스트 (핵심 흐름)

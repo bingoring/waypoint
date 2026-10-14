@@ -12,7 +12,7 @@
 > ✅ **1-3 승인 (2026-10-13) → Inception 완료.** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트·Firebase, GitHub Actions + fastlane, §7 품질 기준 확정.
 > ✅ **2-1 Core Packages 승인 (2026-10-13).** 패키지 7개·CI·검증 앱, 테스트 124개. 메모리 예산 조정(G1: 200/300MB + 코어 항목별).
 > ✅ **2-2 App Generator + Release Pipeline 승인 (2026-10-13).** factory_cli 6개 명령·템플릿·fastlane·release 워크플로.
-> 📝 **2-3 로또 번호 생성기 진행 중.** Build Spec 작성 → `QUESTIONS_OPEN`(당첨번호 엑셀 대기).
+> 📝 **2-3 로또 번호 생성기 진행 중.** Build Spec `READY`(디자인 프롬프트 v1 적용, 당첨번호 매주 자동 등록) → 구현 중.
 
 ---
 
