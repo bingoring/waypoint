@@ -25,7 +25,7 @@ Wave 1의 두 번째 앱. 연봉을 넣으면 급여명세서 형식으로 월 �
 - [x] 계산 근거 조사 — [`salary/research-2026-10-14.md`](salary/research-2026-10-14.md)
 - [x] 기본값 질문 (2026-10-14): 입력, 근무, 전면 광고, 세액표 원본
 - [x] Build Spec 작성 — [`salary/build-spec-index.md`](salary/build-spec-index.md) (standard + frontend-components)
-- [ ] Build Spec `READY` 승인
+- [x] Build Spec `READY` 승인 (2026-10-14)
 - [ ] 구현 (Build Spec §4)
 - [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
 
@@ -44,7 +44,7 @@ Wave 1의 두 번째 앱. 연봉을 넣으면 급여명세서 형식으로 월 �
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
-- [ ] Build Spec이 `READY`로 승인되었는가?
+- [x] Build Spec이 `READY`로 승인되었는가?
 - [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
 
 ## 다음 단계
