@@ -7,12 +7,12 @@ updated: 2026-10-14
 
 # Domain Entities — 연봉 실수령액 계산기
 
-> 금액은 모두 `int` 원 단위다. 요율은 `int` 10만분율(pcm, 4.75% = 4750)로 들고, 부동소수점을 계산에 쓰지 않는다.
+> 금액은 모두 `int` 원 단위다. 요율은 `int` 100만분율(ppm, 4.75% = 47,500)로 들고, 부동소수점을 계산에 쓰지 않는다.
 
 | 엔티티 | 필드 | 비고 |
 |---|---|---|
 | `PayInput` | `annualSalary`(원), `nonTaxableMonthly`(원, 기본 200,000), `dependents`(1~11, 기본 1), `children`(8~20세 자녀 0~`dependents−1`, 기본 0), `withholding`(80·100·120, 기본 100), `severanceIncluded`(bool, 기본 false) | 사용자 입력. 기기에만 저장 (S-DATA-1) |
-| `InsuranceRates` | `from`(날짜), `npsPcm` 4750, `npsBaseMin` 410,000, `npsBaseMax` 6,590,000, `healthPcm` 3595, `healthMin` 10,080, `healthMax` 4,591,740, `ltcNumerator` 9448, `ltcDenominator` 71900, `employmentPcm` 900 | 기간별 행. 국민연금 상·하한은 7월, 나머지는 1월에 바뀐다 → 기간 행을 날짜로 고른다 |
+| `InsuranceRates` | `from`(날짜), `npsPpm` 47,500, `npsBaseMin` 410,000, `npsBaseMax` 6,590,000, `healthPpm` 35,950, `healthBaseMin` 280,528, `healthBaseMax` 127,725,730, `ltcPpm` 4,724, `employmentPpm` 9,000 | 기간별 행. 국민연금 상·하한은 7월, 나머지는 1월에 바뀐다 → 기간 행을 날짜로 고른다 |
 | `TaxTable` | `from` 2026-03-01, `rows: List<(lo, hi, taxes[11])>`(천 원), `at10000: taxes[11]`, `childCredit` (20,830 / 45,830 / +33,330) | 시행령 별표2. 초과 구간 6개 산식은 코드 상수 (S-TAX-3) |
 | `RateBook` | `insurance: List<InsuranceRates>`, `tax: List<TaxTable>`, `source`(bundled·remote) | 에셋 ∪ 원격 중 유효하고 더 새 것 (S-DATA-3) |
 | `Payslip` | `gross`(월 지급액), `nonTaxable`, `nps`, `health`, `ltc`, `employment`, `incomeTax`, `localTax`, `deductions`(합계), `net`(실지급액), `basis`(적용 요율 기간·세액표 시행일) | 급여명세서 순서 그대로 (조사 §5) |
