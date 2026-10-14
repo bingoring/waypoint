@@ -26,8 +26,8 @@ Wave 1의 두 번째 앱. 연봉을 넣으면 급여명세서 형식으로 월 �
 - [x] 기본값 질문 (2026-10-14): 입력, 근무, 전면 광고, 세액표 원본
 - [x] Build Spec 작성 — [`salary/build-spec-index.md`](salary/build-spec-index.md) (standard + frontend-components)
 - [x] Build Spec `READY` 승인 (2026-10-14)
-- [ ] 구현 (Build Spec §4)
-- [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
+- [x] 구현 (Build Spec §4) — 저장소 커밋 `e9ece18`까지
+- [x] 검증 (Build Spec §5) → `IMPLEMENTED` (메모리 예산 초과는 아래 요약·편차 로그)
 
 ## AI 제안 (AI Proposal)
 
@@ -40,12 +40,21 @@ Wave 1의 두 번째 앱. 연봉을 넣으면 급여명세서 형식으로 월 �
 4. **실시간 수입은 `now`의 순수 함수.** 누적 카운터를 두지 않아 앱 재시작·시간 변경에도 값이 어긋나지 않고, 화면이 보일 때만 1초 타이머가 돈다(로또의 숨은 탭 배너 교훈).
 5. **입력값은 기기 밖으로 나가지 않는다.** 분석 이벤트에도 금액을 넣지 않는다(Data Safety: 앱이 수집하는 개인 데이터 없음, 광고·분석 SDK 항목만).
 
+### 구현 결과 요약 (2026-10-14)
+
+- 화면 3개(명세서·비교·지금) + 설정을 APP_DESIGN_PROMPT v1로 구현, 5단계 검사 통과([스크린숏](salary/screens/)).
+- 정확도: 홈택스 간이세액표 조회 20건·4insure 모의계산 13건과 일치, 세액표 646행을 원본 Excel과 1:1 대조. 앱 테스트 62개, 누수 0.
+- 릴리스 리허설: 서명 AAB 11.21MB, `validate --release`의 남은 실패는 AdMob 단위 ID(계정 필요)뿐.
+- 찾아서 고친 결함: 장기요양·원천징수 비율의 계산 순서(공식 계산기와 10원 차이), 연봉 0의 보험 하한, 실지급액 위치·빈 화면 등 화면 4건, **배너 재로딩이 화면을 밀어 버튼 자리에 광고가 들어오는 문제(코어 `BannerSlot`)**.
+- ⚠️ **메모리:** PSS 219~237MB로 200MB 예산을 넘는다(로또보다 +12~15MB, 누수 아님). 로또도 탭을 다 열면 215~225MB다. 같은 부팅에서도 기준 앱이 173~198MB로 흔들려, 측정 절차와 예산 기준을 함께 보완하자고 제안한다(DECISIONS).
+- 출시 전 남은 일(3-1): AdMob 앱·단위, 업로드 키 시크릿 등록(`UPLOAD_KEY_SALARY_*`), 개인정보처리방침 게시, 스토어 문구 오너 검토, 실기기 콜드 스타트·프레임 확인.
+
 ## 검토 게이트 (Human Gate)
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
 - [x] Build Spec이 `READY`로 승인되었는가?
-- [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
+- [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가? (메모리 예산 초과 포함)
 
 ## 다음 단계
 
