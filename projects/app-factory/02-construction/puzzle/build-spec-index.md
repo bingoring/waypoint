@@ -1,7 +1,7 @@
 ---
 build-spec: puzzle
 stage: 02-construction/07-game-kit-puzzle
-status: QUESTIONS_OPEN
+status: READY
 depth: comprehensive
 updated: 2026-10-15
 ---
@@ -43,7 +43,7 @@ updated: 2026-10-15
 - [x] 이어하기 = 가장 많이 찬 줄 3개, 오늘의 판 = 보조 없음·첫 판, 레벨 목표 3종 (2026-10-15)
 - [x] 패키지 → `audioplayers` 6.8.1(2026-06-27) 정확히 고정(`flutter_soloud`는 5.2.x가 2주 미만이고 효과음 5개에 무겁다), `share_plus` 13.3.0
 - [ ] (권장, READY를 막지 않음) 「조각보」 상표 KIPRIS 확인(9·41류) — 이름이 `app.yaml`·스토어에 들어가기 전
-- [ ] `READY` 승인
+- [x] `READY` 승인 (2026-10-15)
 
 ## §4. 구현 체크리스트
 

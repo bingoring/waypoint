@@ -23,7 +23,7 @@ Wave 1의 게임(A) 앱이자 게임 키트의 첫 소비자. 8×8 판에 조각
 - [x] 장르 조사·결정 — [`puzzle/research-genre-2026-10-15.md`](puzzle/research-genre-2026-10-15.md)
 - [x] 기능 범위 질문 (2026-10-15)
 - [x] Build Spec 작성 — [`puzzle/build-spec-index.md`](puzzle/build-spec-index.md) (comprehensive)
-- [ ] Build Spec `READY` 승인
+- [x] Build Spec `READY` 승인 (2026-10-15)
 - [ ] 구현 (Build Spec §4)
 - [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
 
@@ -41,7 +41,7 @@ Wave 1의 게임(A) 앱이자 게임 키트의 첫 소비자. 8×8 판에 조각
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
-- [ ] Build Spec이 `READY`로 승인되었는가?
+- [x] Build Spec이 `READY`로 승인되었는가?
 - [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
 
 ## 다음 단계
