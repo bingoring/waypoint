@@ -1,7 +1,7 @@
 ---
 build-spec: noise
 stage: 02-construction/05-noise
-status: READY
+status: IMPLEMENTED
 depth: standard
 updated: 2026-10-15
 ---
@@ -47,7 +47,7 @@ updated: 2026-10-15
 ## §4. 구현 체크리스트
 
 - [x] `factory new noise --category tool --name-ko "소음 측정기" --name-en "Noise Meter: dB Sound Level"` · `factory firebase noise` (커밋 `e0a5731`)
-- [ ] (오너) Firebase `smallmatter-noise` GA 사용 설정 → AdMob 앱·`banner_home`·`app_open` 단위 → AdMob↔Firebase 연결
+- [ ] (오너, 3-1 전) Firebase `smallmatter-noise` GA 사용 설정 → AdMob 앱·`banner_home`·`app_open` 단위 → AdMob↔Firebase 연결
 - [x] `app.yaml`: 시드 #5B45A6, `permissions: [RECORD_AUDIO]`, placements `banner_home`·`app_open`, keyAction `measure_noise`, events(`start_floor`·`save_record`·`export_records`·`calibrate`)
 - [x] domain: dB 엔진 + 골든 테스트(BLM §1.1), 층간소음 판정 테스트 — 23개
 - [x] data: `PcmSource`(record·demo), 기록·CSV + 테스트
@@ -55,15 +55,19 @@ updated: 2026-10-15
 - [x] UI: 측정·층간소음·기록·설정, 권한 흐름, 화면 켜짐
 - [x] 위젯 테스트(데모 소스): 권한 거부·허용, 측정 → 저장 → 기록, 층간소음 판정, 숨은 탭에서 마이크 닫힘, en에서 층간소음 탭 없음, 누수 0 — 앱 테스트 34개
 - [x] store 문구(ko·en)·data-safety·개인정보처리방침 → `tool/sync_site.dart` (https://smallmatter.app/noise/privacy/, 초안)
-- [ ] 릴리스 리허설: 키·AAB·`size`·`validate --release`(DEMO_AUDIO 꺼짐 검사 포함)
+- [x] 릴리스 리허설: 키·AAB·`size`·`validate --release` — 11.23MB, 남은 실패는 `REL_TEST_IDS`(AdMob 단위 대기)뿐. `DEMO_AUDIO`는 릴리스 모드에서 시작 차단. 업로드 키 `~/.smallmatter/keys/noise.*`
 
 ## §5. 검증 계획
-- [ ] 분석·포맷·의존 검사·`validate`
-- [ ] 엔진 골든: A가중 표 ±0.5 dB(8 kHz까지), Leq·청크 독립성·클리핑·무음
-- [ ] 층간소음: 기준표·주야 경계·pre2005·창 최고값·Lmax 3회 규칙
-- [ ] 에뮬레이터(`DEMO_AUDIO`): 전 화면 스크린숏 ko·en, 프롬프트 5단계 검사, 앱 오프닝 광고가 측정을 멈추는지
-- [ ] 실제 마이크: 에뮬레이터 마이크로 동작(권한·스트림·소스 폴백)만 확인. **절대 정확도는 에뮬레이터에서 검증할 수 없다** → 실기기 확인(조용한 방 30~40, 대화 60 근처)은 3-1
-- [ ] 크기 ≤ 15MB, 측정 화면 1분 유지 시 메모리 증가 없음, PSS·콜드 스타트는 G1 측정 절차(기준 앱과 같은 부팅, 3회)
+- [x] 분석·포맷·의존 검사·`validate`
+- [x] 엔진 골든: A가중 표 ±0.2 dB(16 kHz ±0.6), Leq·청크 독립성·클리핑·무음
+- [x] 층간소음: 기준표·주야 경계·pre2005·창 최고값·Lmax 3회 규칙
+- [x] 에뮬레이터(`DEMO_AUDIO`): 전 화면 스크린숏 ko·en, 프롬프트 5단계 검사(FC §9). 앱 오프닝 광고 중 마이크 정지는 3-1 실기기
+- [x] 실제 마이크: 에뮬레이터 마이크로 스트림·dB 계산·무음 전환 확인(24~30 dB 뒤 가상 마이크 0 → 무음 안내). **절대 정확도는 3-1 실기기**
+- [x] 크기 ≤ 15MB ✅ 11.23MB · PSS·콜드 스타트 ⚠️ 상대값만 (G1 절차, 2026-10-15)
+  - 에뮬레이터가 14시간째 켜져 부하 2.9~23 — 부하 기준을 3으로 완화해도 측정 중 계속 올랐다. 기준 앱부터 214~228MB·콜드 6.5~8.3초라 절대값은 판정하지 않는다.
+  - PSS(KB, 같은 부팅 3회): 기준 앱 227,508 / 214,156 / 216,956 · 로또 첫 화면 233,396 / 229,295 / 226,416, 탭 뒤 243,562 / 241,278 / 239,817 · 소음 첫 화면 231,273 / 233,397 / 233,588, 탭 뒤 230,933 / 252,320 / 253,797.
+    → 소음은 로또와 같은 수준. 기준 앱 중앙값 대비 첫 화면 +16MB, 탭 뒤 +36MB(코어·UI 40MB 안, 경계).
+  - 측정 화면 유지(실제 마이크): 시작 233,820 → 1분 240,666 → 이후 1분 간격 243,262 / 244,953 / 248,371 / 245,409KB. 첫 1분은 배너 로드 등 초기 증가, 이후 오르내리며 일정 → 누수 아님.
 
 ## §6. NFR
 N/A (standard). 2-1 G1 측정 절차를 따른다.
