@@ -47,7 +47,7 @@ updated: 2026-10-15
 ## §4. 구현 체크리스트
 
 - [x] `factory new noise --category tool --name-ko "소음 측정기" --name-en "Noise Meter: dB Sound Level"` · `factory firebase noise` (커밋 `e0a5731`)
-- [ ] (오너, 3-1 전) Firebase `smallmatter-noise` GA 사용 설정 → AdMob 앱·`banner_home`·`app_open` 단위 → AdMob↔Firebase 연결
+- [x] (오너) AdMob 앱·`banner_home`·`app_open` 단위 → AdMob↔Firebase 연결 (2026-10-15). GA 측정 설정 경고는 3-1 전 재확인
 - [x] `app.yaml`: 시드 #5B45A6, `permissions: [RECORD_AUDIO]`, placements `banner_home`·`app_open`, keyAction `measure_noise`, events(`start_floor`·`save_record`·`export_records`·`calibrate`)
 - [x] domain: dB 엔진 + 골든 테스트(BLM §1.1), 층간소음 판정 테스트 — 23개
 - [x] data: `PcmSource`(record·demo), 기록·CSV + 테스트
