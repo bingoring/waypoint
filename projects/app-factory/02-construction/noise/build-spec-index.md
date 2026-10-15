@@ -49,7 +49,7 @@ updated: 2026-10-15
 - [x] `factory new noise --category tool --name-ko "소음 측정기" --name-en "Noise Meter: dB Sound Level"` · `factory firebase noise` (커밋 `e0a5731`)
 - [ ] (오너) Firebase `smallmatter-noise` GA 사용 설정 → AdMob 앱·`banner_home`·`app_open` 단위 → AdMob↔Firebase 연결
 - [ ] `app.yaml`: 시드 #5B45A6, `permissions: [RECORD_AUDIO]`, placements `banner_home`·`app_open`, keyAction `measure_noise`, events(`start_floor`·`save_record`·`export_records`·`calibrate`)
-- [ ] domain: dB 엔진 + 골든 테스트(BLM §1.1), 층간소음 판정 테스트
+- [x] domain: dB 엔진 + 골든 테스트(BLM §1.1), 층간소음 판정 테스트 — 23개
 - [ ] data: `PcmSource`(record·demo), 기록·CSV + 테스트
 - [ ] l10n: ARB ko·en, 화면 문자열은 ARB만
 - [ ] UI: 측정·층간소음·기록·설정, 권한 흐름, 화면 켜짐
@@ -75,3 +75,4 @@ N/A (standard). 2-1 G1 측정 절차를 따른다.
 | 1-3 §4 소음 패키지 후보 `noise_meter` 6.0.0 또는 `record` | `record` 7.1.1 + 자체 dB 엔진 | `noise_meter`는 DEFAULT 소스 고정, SPL·RMS·A가중이 아니고 상한 약 90 dB(조사 §5) |
 | 생성기 템플릿(앱 문자열) | 앱에 ARB·gen-l10n을 직접 추가 | 템플릿에 2개 언어 앱 문자열 체계가 없다. 결과를 보고 생성기에 넣을지 2-6에서 정한다 |
 | 시드 색 | 생성기 제안 → #5B45A6 | FC §5 |
+| BLM §1.1 A가중 설계 | 쌍일차 변환 + 48 kHz 고주파 보정(극점 0.83배, 영점 z=−0.1) | 단순 변환은 8 kHz −0.6 dB·16 kHz −6.5 dB 오차. 보정 뒤 공칭값 0.2 dB 이내 |
