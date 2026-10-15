@@ -16,7 +16,7 @@
 > ✅ **2-4 연봉 실수령액 계산기 승인 (2026-10-14).** 메모리 예산 초과(219~237MB)는 1.1 메모리 점검에서. 코어 `BannerSlot` 자리 유지, 성능 측정 절차 채택. 출시 전 남은 일(3-1): `app-ads.txt`·방침 게시(smallmatter.app DNS 대기), 문구 검토 (업로드 키 시크릿·AdMob 단위 완료).
 > ✅ **2-5 소음 측정기 승인 (2026-10-15).** 첫 ko·en 앱, 자체 dB 엔진. AdMob·업로드 키 완료. 3-1 실기기: 정확도·앱 오프닝 광고 중 마이크 정지·GA 경고.
 > ⏸ **2-6 물 마시기 알림 보류 (2026-10-15, 오너).**
-> 📝 **진행: 2-7 Game Kit + 퍼즐** — 퍼즐 종류 조사부터.
+> 📝 **진행: 2-7 Game Kit + 조각보 블록 퍼즐** — Build Spec 작성, READY 승인 대기.
 
 ---
 
@@ -40,7 +40,7 @@
 | 2-4 연봉 실수령액 계산기 · standard | [04-salary.md](02-construction/04-salary.md) · [Build Spec](02-construction/salary/build-spec-index.md) | HUMAN_APPROVED |
 | 2-5 소음 측정기 · standard | [05-noise.md](02-construction/05-noise.md) · [Build Spec](02-construction/noise/build-spec-index.md) | HUMAN_APPROVED |
 | 2-6 물 마시기 알림 · standard | (보류, DECISIONS 2026-10-15) | DEFERRED |
-| 2-7 Game Kit + 퍼즐 · comprehensive | (예정) | PENDING |
+| 2-7 Game Kit + 조각보 블록 퍼즐 · comprehensive | [07-game-kit-puzzle.md](02-construction/07-game-kit-puzzle.md) · [Build Spec](02-construction/puzzle/build-spec-index.md) | AI_PROPOSED |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
