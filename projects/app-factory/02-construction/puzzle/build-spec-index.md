@@ -1,7 +1,7 @@
 ---
 build-spec: puzzle
 stage: 02-construction/07-game-kit-puzzle
-status: READY
+status: IMPLEMENTED
 depth: comprehensive
 updated: 2026-10-15
 ---
@@ -47,23 +47,26 @@ updated: 2026-10-15
 
 ## §4. 구현 체크리스트
 
-- [ ] `factory_game_kit` 패키지 + 테스트(골든 난수·저장 버전·보상 게이트·전환) + `check_deps` 규칙
-- [ ] `factory new bojagi --category game --name-ko "조각보 블록 퍼즐" --name-en "Bojagi Block Puzzle"` · `factory firebase bojagi`
-- [ ] `app.yaml`: 시드 #A8432A, placements `banner_menu`·`interstitial_round_end`(everyN 2)·`rewarded_continue`·`rewarded_refresh`, keyAction `finish_round`, events
-- [ ] domain: 판·조각 37개·배분·놓기·지우기·점수·이어하기·레벨 목표 + 골든·속성 테스트(BLM §1.3)
-- [ ] `tool/gen_sfx.dart` → `assets/sfx/*.wav`
-- [ ] `tool/build_levels.dart` → `assets/levels.json`(100, 모두 봇 클리어) + 결정성 테스트
-- [ ] data: 상태 저장·복원(수마다), 레벨 진행, 오늘의 판 기록
-- [ ] UI: 메뉴·게임판(끌어 놓기)·결과·레벨 지도·설정, ko·en
-- [ ] 위젯 테스트: 끌어 놓기 → 줄 지우기 → 점수, 게임 끝 → 결과 → 이어하기, 다시 하기에서만 전면 광고 판정, 오늘의 판 보조 없음, 앱 재시작 뒤 판 복원, 누수 0
-- [ ] store 문구(ko·en)·data-safety·개인정보처리방침 → `sync_site`
-- [ ] 릴리스 리허설: 키·AAB·`size`·`validate --release`
+> 저장소 커밋: `7081aaf`(키트) · `5dae533`(골격·도메인) · `f9173da`(효과음·레벨) · `c2da121`(저장·화면) · `2c08881`(에뮬레이터 수정) · `4ca90c2`(P-ADS-2 테스트) · `e3c09b7`(이어하기 버튼).
+
+- [x] `factory_game_kit` 패키지 + 테스트(골든 난수·저장 버전·보상 게이트·전환·미리 불러오기) + `check_deps` K-DEP-1 — 테스트 11개, 라인 96.2%. 도구용 순수 Dart 진입점 `rng.dart` 추가
+- [x] `factory new bojagi …` · `factory firebase bojagi` (smallmatter-bojagi)
+- [x] `app.yaml`: 시드 #A8432A, placements 4개, keyAction `finish_round`, events 6개
+- [x] domain: 판·조각 37개·배분·놓기·지우기·점수·이어하기(매듭 보존)·레벨 목표 + 골든·속성 테스트(BLM §1.3) 14개
+- [x] `tool/gen_sfx.dart` → `assets/sfx/*.wav` 5개(6~19KB, 결정적)
+- [x] `tool/build_levels.dart` → `assets/levels.json`(100개, 모두 봇 기록, 생성 6초) + 형식·결정성·봇 재현 테스트 3개
+- [x] data: 상태 저장·복원(수마다), 레벨 진행, 오늘의 판 첫 기록, 힌트 — 테스트 5개
+- [x] UI: 메뉴·게임판(끌어 놓기)·결과 시트·레벨 지도·설정, ko·en
+- [x] 위젯 테스트 7개: 끌어 놓기 → 점수·저장·복원·트레이 복귀, 줄 지우기 움직임·미리보기·소리, 게임 끝 → 결과 → 이어하기(광고 실패 시 기본 지급), 다시 하기에서만 전면 광고(P-ADS-2), 오늘의 판 보조 없음·첫 판 기록·공유·연습, 레벨 지도·잠김, 효과음 끄기 — 누수 0. 앱 전체 29개, 라인 89.3%
+- [x] store 문구(ko·en)·data-safety·개인정보처리방침 → `sync_site` (smallmatter-site `5174903`)
+- [x] 릴리스 리허설: 키 생성, AAB 57.5MB → 최대 다운로드 10.89MB / 25MB, `validate --release`는 AdMob 단위만 남음(오너 작업)
 
 ## §5. 검증 계획
-- [ ] 분석·포맷·의존 검사·`validate`, 코어 패키지 커버리지 게이트(라인 ≥ 90%)
-- [ ] 규칙 골든·속성(공정 배분 1,000판), 오늘의 판 결정성, 레벨 100 봇 기록
-- [ ] 에뮬레이터(재부팅·`-gpu host`): 전 화면 ko·en, 프롬프트 5단계 검사, 드래그 중 프레임(§6)
-- [ ] G1 측정 절차: PSS ≤ 300MB, 콜드 스타트, 다운로드 ≤ 25MB
+- [x] 분석·포맷·의존 검사·`validate`, 코어 패키지 커버리지 게이트(키트 96.2%)
+- [x] 규칙 골든·속성(공정 배분 1,000판: 강제 배분 실패 0), 오늘의 판 결정성, 레벨 100 봇 기록
+- [x] 에뮬레이터(`-gpu host`, 프로파일 빌드): 전 화면 ko·en·다크·글자 130%, 프롬프트 5단계 검사(FC §9), 강제 종료 뒤 복원, 비행기 모드
+- [ ] 드래그 중 프레임(§6): Flutter가 자체 표면에 그려 `gfxinfo`에 잡히지 않음 → 3-1 실기기 DevTools
+- [ ] G1 측정 절차(PSS·콜드 스타트): **릴리스 빌드는 테스트 광고 단위가 있으면 시작을 거부(R-ADS-3)** 하므로 오너가 AdMob 단위를 등록한 뒤 잰다. 다운로드 10.89MB는 통과
 - [ ] 실기기(3-1): 드래그 손맛·지연, 효과음 지연
 
 ## §6. NFR
@@ -86,3 +89,9 @@ updated: 2026-10-15
 | 1-2 §10 퍼즐 `rewarded_hint` | `rewarded_refresh`(조각 다시 받기) | 블록 퍼즐에서 힌트보다 쓰임새가 분명하다(DECISIONS 2026-10-15) |
 | 1-1 Q6 순서(물 마시기 → 퍼즐) | 퍼즐 먼저, 물 마시기 보류 | DECISIONS 2026-10-15 |
 | 시드 색 | 생성기 제안 → #A8432A | FC §5 |
+| BLM §2.1 점수 곡선 300→2,500 | 300→1,500 | 봇 기준 2,000점 이상 레벨이 120조각(사람 5분 이상)을 넘어 한 레벨로 너무 길다. 줄·매듭 곡선과 여유 배율은 예시 그대로 |
+| BLM §2.3 봇 (빔 탐색) | 빔 폭 8, 잎에서만 「놓일 조각 가중치」, 흔들림 5회 중 3회 이상 깨야 채택, `maxPieces` = 중앙값 기준 | 1-ply 탐욕 봇은 빈 판 생존 중앙값 65조각으로 너무 약했다(빔 탐색 256조각). 한 번의 운 좋은 기록으로 제한을 정하면 9조각 레벨 같은 이상값이 생겼다 |
+| DE §1 `GameFeedback.init`이 효과음을 미리 불러온 뒤 완료 | 설정만 읽고 완료, 미리 불러오기는 뒤에서(`preloaded`) | 에뮬레이터에서 효과음 5개 준비에 10초 넘게 걸려 메뉴가 막혔다 |
+| FC §2 첫 실행 힌트(손가락이 조각을 끌어 보임) | 트레이 위 한 줄 문구 + 아이콘, 첫 놓기에서 사라짐 | 움직이는 손가락 그림은 1.1 후보. 힌트 자리는 늘 비워 판이 움직이지 않게 |
+| FC §3.1 오른쪽 위 일시정지 | 뒤로(메뉴) + 설정 아이콘 | 판은 수마다 저장되므로 따로 멈출 상태가 없다 |
+| FC §3.3 「레벨 23(지도 미리보기 띠)」, 「이어서 하기(판 미리보기)」 | 레벨 번호·모드·점수 글자만 | 1.1 후보 |
