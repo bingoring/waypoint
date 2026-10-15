@@ -1,7 +1,7 @@
 ---
 phase: 02-construction
 stage: 05-noise
-status: AI_PROPOSED
+status: HUMAN_APPROVED
 updated: 2026-10-15
 ---
 
@@ -51,7 +51,13 @@ Wave 1의 세 번째 앱이자 첫 센서 앱·첫 2개 언어(ko·en) 앱. 마�
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
 - [x] Build Spec이 `READY`로 승인되었는가?
-- [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
+- [x] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
+
+### 승인 결과 (2026-10-15, 오너)
+
+| # | 답변 |
+|---|------|
+| 2-5 | 승인. 실기기 정확도·앱 오프닝 광고 중 마이크 정지·GA 측정 설정 경고 재확인은 3-1 |
 
 ## 다음 단계
 
