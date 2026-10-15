@@ -123,6 +123,16 @@ updated: 2026-10-16
   ④ 화면 녹화 3초로 무엇을 하는지 전달되는가
 - **통과한 컨셉** → 2-9 Build Spec (comprehensive). **모두 탈락하면** 탈락 사유를 기록하고 후보를 다시 발굴한다.
 
+### 7. 프로토타입 결과 (2026-10-16)
+
+| 컨셉 | 판정 | 기록 |
+|---|---|---|
+| C1 하품 릴레이 | **통과** (오너) — 이모지 대신 캐릭터 선제작 조건 | [`hypercasual/yawn-relay-prototype-2026-10-16.md`](hypercasual/yawn-relay-prototype-2026-10-16.md) |
+| C2 새떼 그림 | 프로토타입 예정 | — |
+| C3 번짐 | 대기 | — |
+| 샴페인 타워 | 대기 | — |
+| 눈꽃 가위 | 대기 | — |
+
 ### 출처
 - Jewel Coloring: [App Store](https://apps.apple.com/app/id6759081967), [app-liv.jp 리뷰](https://app-liv.jp/5354492/), [Jewel Art: Sort Puzzle](https://appgoblin.info/apps/6760294787)
 - Kingshot: [Felix Braberg 분석](https://felixbraberg.substack.com/p/kingshots-insane-genre-mix-explained-5c2), [FoxData](https://foxdata.com/en/blogs/kingshot-a-remastered-survival-strategy-game-poised-to-dominate-mobile-in-2025/), [Tony Reviews Things](https://www.tonyreviewsthings.com/kingshot-ios-review-2025/), [marlvel.ai](https://marlvel.ai/apps/kingshot)
