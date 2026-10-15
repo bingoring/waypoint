@@ -48,13 +48,13 @@ updated: 2026-10-15
 
 - [x] `factory new noise --category tool --name-ko "소음 측정기" --name-en "Noise Meter: dB Sound Level"` · `factory firebase noise` (커밋 `e0a5731`)
 - [ ] (오너) Firebase `smallmatter-noise` GA 사용 설정 → AdMob 앱·`banner_home`·`app_open` 단위 → AdMob↔Firebase 연결
-- [ ] `app.yaml`: 시드 #5B45A6, `permissions: [RECORD_AUDIO]`, placements `banner_home`·`app_open`, keyAction `measure_noise`, events(`start_floor`·`save_record`·`export_records`·`calibrate`)
+- [x] `app.yaml`: 시드 #5B45A6, `permissions: [RECORD_AUDIO]`, placements `banner_home`·`app_open`, keyAction `measure_noise`, events(`start_floor`·`save_record`·`export_records`·`calibrate`)
 - [x] domain: dB 엔진 + 골든 테스트(BLM §1.1), 층간소음 판정 테스트 — 23개
-- [ ] data: `PcmSource`(record·demo), 기록·CSV + 테스트
-- [ ] l10n: ARB ko·en, 화면 문자열은 ARB만
-- [ ] UI: 측정·층간소음·기록·설정, 권한 흐름, 화면 켜짐
-- [ ] 위젯 테스트(데모 소스): 권한 거부·허용, 측정 → 저장 → 기록, 층간소음 판정, 숨은 탭에서 마이크 닫힘, en에서 층간소음 탭 없음, 누수 0
-- [ ] store 문구(ko·en)·data-safety·개인정보처리방침 → `tool/sync_site.dart`
+- [x] data: `PcmSource`(record·demo), 기록·CSV + 테스트
+- [x] l10n: ko·en 문구 — ARB 대신 코어와 같은 손으로 쓴 클래스(편차 로그)
+- [x] UI: 측정·층간소음·기록·설정, 권한 흐름, 화면 켜짐
+- [x] 위젯 테스트(데모 소스): 권한 거부·허용, 측정 → 저장 → 기록, 층간소음 판정, 숨은 탭에서 마이크 닫힘, en에서 층간소음 탭 없음, 누수 0 — 앱 테스트 34개
+- [x] store 문구(ko·en)·data-safety·개인정보처리방침 → `tool/sync_site.dart` (https://smallmatter.app/noise/privacy/, 초안)
 - [ ] 릴리스 리허설: 키·AAB·`size`·`validate --release`(DEMO_AUDIO 꺼짐 검사 포함)
 
 ## §5. 검증 계획
@@ -76,3 +76,12 @@ N/A (standard). 2-1 G1 측정 절차를 따른다.
 | 생성기 템플릿(앱 문자열) | 앱에 ARB·gen-l10n을 직접 추가 | 템플릿에 2개 언어 앱 문자열 체계가 없다. 결과를 보고 생성기에 넣을지 2-6에서 정한다 |
 | 시드 색 | 생성기 제안 → #5B45A6 | FC §5 |
 | BLM §1.1 A가중 설계 | 쌍일차 변환 + 48 kHz 고주파 보정(극점 0.83배, 영점 z=−0.1) | 단순 변환은 8 kHz −0.6 dB·16 kHz −6.5 dB 오차. 보정 뒤 공칭값 0.2 dB 이내 |
+| 생성기 템플릿(앱 문자열) | ARB·gen-l10n 대신 `lib/ui/strings.dart`(추상 클래스 + ko·en 구현) | 코어 `FactoryLocalizations`와 같은 방식, 빠뜨린 문구는 컴파일 오류, 의존성(`intl`) 추가 없음 |
+| 생성기 템플릿(`app.dart`) | `localeResolutionCallback`: 지원하지 않는 언어는 영어로 | 템플릿은 첫 항목(ko)으로 떨어져 일본어 등 해외 기기에서 한국어가 보인다. 2-6 전에 템플릿에 반영 |
+| BR N-DEV-1 「`validate --release`가 실패」 | 릴리스 모드에서 `DEMO_AUDIO`가 있으면 `main`이 시작하지 않는다 | 빌드할 때 넣는 값이라 `validate`가 알 수 없다 |
+| BR N-RUN-1 「앱 오프닝 광고가 떠 있으면」 | 별도 신호 없이 생명주기 `onHide`로 처리 | 광고는 별도 Activity라 Flutter가 숨김을 알린다. 코어에 광고 표시 상태 API를 만들지 않았다 |
+| BLM §3 CSV 임시 파일 | `share_plus`의 `XFile.fromData`(라이브러리가 캐시에 쓰고 정리) | `path_provider` 직접 의존을 늘리지 않는다 |
+| BLM §2 권한 흐름 | `record.hasPermission` 대신 `MainActivity` 채널(`micPermission`·`requestMic`·`openAppSettings`) | `record`는 영구 거부를 구분하지 못한다 |
+| (구현 중 발견) 세션 정지 순서 | 입력 정지·화면 켜짐 해제·「멈춤」 표시를 구독 취소보다 먼저 | 위젯 테스트: 구독 취소가 늦게 끝나 숨은 탭에서도 입력이 돌았다 |
+| FC §3.1 측정 화면 | 바늘을 띠 안쪽 짧은 막대로, 띠 이름을 아크 밖으로, 사례 이름은 왼쪽·기준선 이름은 오른쪽, 그래프가 남는 높이를 채움(작은 화면은 스크롤) | 5단계 검사(바늘이 숫자를 가림·이름 겹침·아래 빈 공간)와 테스트(800×600 넘침) |
+| FC §3.2 층간소음 화면 | 링 170dp, 그래프 120dp 고정(스크롤), 최고소음도 줄은 이름·규칙 두 줄 | 5단계 검사: 배너가 뜨면 그래프가 납작해졌고 줄이 어색하게 줄바꿈 |
