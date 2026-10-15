@@ -17,7 +17,8 @@
 > ✅ **2-5 소음 측정기 승인 (2026-10-15).** 첫 ko·en 앱, 자체 dB 엔진. AdMob·업로드 키 완료. 3-1 실기기: 정확도·앱 오프닝 광고 중 마이크 정지·GA 경고.
 > ⏸ **2-6 물 마시기 알림 보류 (2026-10-15, 오너).**
 > ⏸ **2-7 조각보 블록 퍼즐 보류 (2026-10-16, 오너).** 구현 완료(`IMPLEMENTED`) 상태로 멈춤. 재개 시 남은 일: AdMob 단위 4개·업로드 키 시크릿(오너) → 릴리스 G1 측정, 드래그 손맛은 3-1 실기기.
-> 📝 **진행: 2-8 하이퍼캐주얼 신작 컨셉 — 제안 → 승인 대기 (2026-10-16).** 신규성 기준 N1~N6, 후보 6개 탈락 사유, 최종 3개(하품 릴레이·새떼 그림·번짐) 유사작 검색. 다음: 오너가 고른 컨셉의 HTML 플레이 프로토타입 → 재미 판정.
+> ✅ **2-8 하이퍼캐주얼 신작 컨셉 승인 (2026-10-16).** 5종 모두 개발: 하품 릴레이 → 새떼 그림 → 번짐 → 샴페인 타워 → 눈꽃 가위. 컨셉마다 HTML 프로토타입 → 오너 재미 판정 → Flutter.
+> 📝 **진행: 하품 릴레이 HTML 프로토타입.**
 > 📌 **3-1 공통:** 네 앱 모두 런처 아이콘이 아직 Flutter 기본 아이콘이다.
 
 ---
@@ -43,7 +44,7 @@
 | 2-5 소음 측정기 · standard | [05-noise.md](02-construction/05-noise.md) · [Build Spec](02-construction/noise/build-spec-index.md) | HUMAN_APPROVED |
 | 2-6 물 마시기 알림 · standard | (보류, DECISIONS 2026-10-15) | DEFERRED |
 | 2-7 Game Kit + 조각보 블록 퍼즐 · comprehensive | [07-game-kit-puzzle.md](02-construction/07-game-kit-puzzle.md) · [Build Spec](02-construction/puzzle/build-spec-index.md) (보류, DECISIONS 2026-10-16) | DEFERRED |
-| 2-8 하이퍼캐주얼 신작 컨셉 · 조사·결정 | [08-hypercasual-concept.md](02-construction/08-hypercasual-concept.md) | AI_PROPOSED |
+| 2-8 하이퍼캐주얼 신작 컨셉 · 조사·결정 | [08-hypercasual-concept.md](02-construction/08-hypercasual-concept.md) | HUMAN_APPROVED |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
