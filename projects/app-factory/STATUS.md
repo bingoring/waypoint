@@ -4,7 +4,7 @@
 **PRD:** [prd.md](prd.md) (v1.0 확정)
 **Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
 **앱 디자인 프롬프트:** [APP_DESIGN_PROMPT.md](APP_DESIGN_PROMPT.md) (v1, 2-3 로또에 첫 적용 — 결과를 보고 계속 사용 여부 결정)
-**Last updated:** 2026-10-14
+**Last updated:** 2026-10-16
 
 > ✅ **1-1 승인 (2026-10-13).** PRD v1.0 확정, P1~P6 채택, Q1~Q8 결정(조직 계정·한영 동시·Android 먼저·AdMob 단독·광고 제거 IAP 포함·Wave 1 순서 확정).
 > ⏳ **오너 선행 작업:** 사업자등록 → D-U-N-S → Play 조직 계정 개설, KIPRIS 상표 확인 (3-1 전까지). `smallmatter.app` 결제 완료(2026-10-13, 가비아) — 레지스트리 반영은 3-1 전 재확인. 스튜디오명 Smallmatter, 앱 ID `app.smallmatter.<slug>` 확정.
@@ -16,7 +16,8 @@
 > ✅ **2-4 연봉 실수령액 계산기 승인 (2026-10-14).** 메모리 예산 초과(219~237MB)는 1.1 메모리 점검에서. 코어 `BannerSlot` 자리 유지, 성능 측정 절차 채택. 출시 전 남은 일(3-1): `app-ads.txt`·방침 게시(smallmatter.app DNS 대기), 문구 검토 (업로드 키 시크릿·AdMob 단위 완료).
 > ✅ **2-5 소음 측정기 승인 (2026-10-15).** 첫 ko·en 앱, 자체 dB 엔진. AdMob·업로드 키 완료. 3-1 실기기: 정확도·앱 오프닝 광고 중 마이크 정지·GA 경고.
 > ⏸ **2-6 물 마시기 알림 보류 (2026-10-15, 오너).**
-> 📝 **진행: 2-7 Game Kit + 조각보 블록 퍼즐** — Build Spec `IMPLEMENTED`(2026-10-15), 오너 승인 대기. 남은 일: AdMob 단위 4개·업로드 키 시크릿(오너) → 릴리스 G1 측정, 드래그 손맛은 3-1 실기기.
+> ⏸ **2-7 조각보 블록 퍼즐 보류 (2026-10-16, 오너).** 구현 완료(`IMPLEMENTED`) 상태로 멈춤. 재개 시 남은 일: AdMob 단위 4개·업로드 키 시크릿(오너) → 릴리스 G1 측정, 드래그 손맛은 3-1 실기기.
+> 📝 **진행: 2-8 하이퍼캐주얼 신작 컨셉 — 제안 → 승인 대기 (2026-10-16).** 신규성 기준 N1~N6, 후보 6개 탈락 사유, 최종 3개(하품 릴레이·새떼 그림·번짐) 유사작 검색. 다음: 오너가 고른 컨셉의 HTML 플레이 프로토타입 → 재미 판정.
 > 📌 **3-1 공통:** 네 앱 모두 런처 아이콘이 아직 Flutter 기본 아이콘이다.
 
 ---
@@ -41,7 +42,8 @@
 | 2-4 연봉 실수령액 계산기 · standard | [04-salary.md](02-construction/04-salary.md) · [Build Spec](02-construction/salary/build-spec-index.md) | HUMAN_APPROVED |
 | 2-5 소음 측정기 · standard | [05-noise.md](02-construction/05-noise.md) · [Build Spec](02-construction/noise/build-spec-index.md) | HUMAN_APPROVED |
 | 2-6 물 마시기 알림 · standard | (보류, DECISIONS 2026-10-15) | DEFERRED |
-| 2-7 Game Kit + 조각보 블록 퍼즐 · comprehensive | [07-game-kit-puzzle.md](02-construction/07-game-kit-puzzle.md) · [Build Spec](02-construction/puzzle/build-spec-index.md) | AI_PROPOSED |
+| 2-7 Game Kit + 조각보 블록 퍼즐 · comprehensive | [07-game-kit-puzzle.md](02-construction/07-game-kit-puzzle.md) · [Build Spec](02-construction/puzzle/build-spec-index.md) (보류, DECISIONS 2026-10-16) | DEFERRED |
+| 2-8 하이퍼캐주얼 신작 컨셉 · 조사·결정 | [08-hypercasual-concept.md](02-construction/08-hypercasual-concept.md) | AI_PROPOSED |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
