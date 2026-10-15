@@ -23,7 +23,7 @@ Wave 1의 세 번째 앱이자 첫 센서 앱·첫 2개 언어(ko·en) 앱. 마�
 - [x] 기능 범위 질문 (2026-10-14·15)
 - [x] 근거 조사 — [`noise/research-2026-10-14.md`](noise/research-2026-10-14.md)
 - [x] Build Spec 작성 — [`noise/build-spec-index.md`](noise/build-spec-index.md)
-- [ ] Build Spec `READY` 승인
+- [x] Build Spec `READY` 승인 (2026-10-15)
 - [ ] 구현 (Build Spec §4)
 - [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
 
@@ -41,7 +41,7 @@ Wave 1의 세 번째 앱이자 첫 센서 앱·첫 2개 언어(ko·en) 앱. 마�
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
-- [ ] Build Spec이 `READY`로 승인되었는가?
+- [x] Build Spec이 `READY`로 승인되었는가?
 - [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
 
 ## 다음 단계

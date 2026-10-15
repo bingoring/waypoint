@@ -1,7 +1,7 @@
 ---
 build-spec: noise
 stage: 02-construction/05-noise
-status: QUESTIONS_OPEN
+status: READY
 depth: standard
 updated: 2026-10-15
 ---
@@ -42,7 +42,7 @@ updated: 2026-10-15
 - [x] 보정 → 이번에 넣음 (2026-10-15)
 - [x] 내보내기 → 공유 시트 CSV (2026-10-15)
 - [x] 패키지 → `record` 7.1.1(2026-06-29, 7.1.2는 2주 미만) · `share_plus` 13.3.0(2026-07-23), 정확히 고정. `noise_meter`는 SPL·A가중이 아니라 탈락(조사 §5). 화면 켜짐은 패키지 없이 채널
-- [ ] `READY` 승인
+- [x] `READY` 승인 (2026-10-15)
 
 ## §4. 구현 체크리스트
 
