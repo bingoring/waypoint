@@ -14,7 +14,7 @@
 > ✅ **2-2 App Generator + Release Pipeline 승인 (2026-10-13).** factory_cli 6개 명령·템플릿·fastlane·release 워크플로.
 > ✅ **2-3 로또 번호 생성기 승인 (2026-10-14).** 출시 전 남은 일(3-1): `app-ads.txt`·방침 게시(smallmatter.app DNS 대기), 문구 검토 (AdMob 단위 완료). 10/18 첫 당첨 자동 등록 확인.
 > ✅ **2-4 연봉 실수령액 계산기 승인 (2026-10-14).** 메모리 예산 초과(219~237MB)는 1.1 메모리 점검에서. 코어 `BannerSlot` 자리 유지, 성능 측정 절차 채택. 출시 전 남은 일(3-1): `app-ads.txt`·방침 게시(smallmatter.app DNS 대기), 문구 검토 (업로드 키 시크릿·AdMob 단위 완료).
-> 📝 **다음: 2-5 소음 측정기** (APP_DESIGN_PROMPT 1단계 조사부터).
+> 📝 **진행: 2-5 소음 측정기** — Build Spec 작성, READY 승인 대기.
 
 ---
 
@@ -36,7 +36,7 @@
 | 2-2 App Generator + Release Pipeline · standard | [02-app-generator.md](02-construction/02-app-generator.md) · [Build Spec](02-construction/app-generator/build-spec-index.md) | HUMAN_APPROVED |
 | 2-3 로또 번호 생성기 · standard | [03-lotto.md](02-construction/03-lotto.md) · [Build Spec](02-construction/lotto/build-spec-index.md) | HUMAN_APPROVED |
 | 2-4 연봉 실수령액 계산기 · standard | [04-salary.md](02-construction/04-salary.md) · [Build Spec](02-construction/salary/build-spec-index.md) | HUMAN_APPROVED |
-| 2-5 소음 측정기 · standard | (예정) | PENDING |
+| 2-5 소음 측정기 · standard | [05-noise.md](02-construction/05-noise.md) · [Build Spec](02-construction/noise/build-spec-index.md) | AI_PROPOSED |
 | 2-6 물 마시기 알림 · standard | (예정) | PENDING |
 | 2-7 Game Kit + 퍼즐 · comprehensive | (예정) | PENDING |
 
