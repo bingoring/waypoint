@@ -21,6 +21,7 @@ updated: 2026-10-16
 
 - [x] 조사: 출시 게임의 적응형 난이도·절차적 레벨 사례, 학술 연구, 정책·개인정보 — [`adaptive/research-2026-10-16.md`](adaptive/research-2026-10-16.md)
 - [x] 설계 제안: 층 구조(커리큘럼·실력 모델·난이도 목표·상황 신호·생성/검증·원격 조정), 게임 인터페이스, 시뮬레이션 방법
+- [x] Build Spec 작성 — [`adaptive/build-spec-index.md`](adaptive/build-spec-index.md) (comprehensive, `QUESTIONS_OPEN`)
 - [ ] 오너 승인 → 하품 릴레이 Build Spec(2-9)에 반영
 
 ## AI 제안 (AI Proposal)
@@ -67,4 +68,4 @@ Rovio(CHI PLAY 2020)의 가상 플레이어 모델(실력·끈기·지루함, �
 
 ## 다음 단계
 
-승인 → `factory_adaptive` Build Spec → 2-9 하품 릴레이와 함께 구현
+Build Spec([`adaptive/build-spec-index.md`](adaptive/build-spec-index.md), `QUESTIONS_OPEN`) 승인 → 2-9 하품 릴레이와 함께 구현
