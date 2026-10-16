@@ -34,8 +34,8 @@ updated: 2026-10-16
 - 없음. Q1 BigQuery 연결(오너, 출시 전)·Q2 초기 수치는 DECISIONS 2026-10-16 「적응형 난이도 초기 수치와 BigQuery 연결」로 해소 → `READY`.
 
 ## §4. 구현 체크리스트
-- [ ] 패키지 생성 + `check_deps` 규칙
-- [ ] core: 인터페이스·Director·커리큘럼·목표·예측·Glicko-2 + 단위 테스트(BLM §7)
+- [x] 패키지 생성 + `check_deps` 규칙 A-DEP (메인 `25f1da1`)
+- [x] core: 인터페이스·Director·커리큘럼·목표·예측·Glicko-2 + 단위 테스트 21개, 라인 96% (Glicko-2 Glickman 2012 골든 일치)
 - [ ] flutter: isolate 실행기, 저장(`adaptive.<game>.v1`), 원격 설정 키, 분석 이벤트 `adaptive_result`, 상황 신호, `AdaptiveTile`(ko·en)
 - [ ] 하품 릴레이 어댑터: `generate`(구성형 생성기, 프로토타입 `gen2.js` 방식 이식) · `measure`(풀이기) · 소개 판 = 프로토타입 역
 - [ ] `pool.json` 도구: 기믹 묶음별 검증된 판 미리 생성
