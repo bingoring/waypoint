@@ -27,7 +27,7 @@ updated: 2026-10-16
 - [x] Claude Design 요청서 초안 — [`yawn-relay/design-brief-2026-10-16.md`](yawn-relay/design-brief-2026-10-16.md)
 - [x] 미해결 질문 해소 → Build Spec `READY` (2026-10-16)
 - [x] Claude Design 핸드오프 수령 → `frontend-components` §7 매핑 (2026-10-16, `inputs/design-handoff-yawn-relay_v1/`)
-- [ ] 구현 (Build Spec §4)
+- [x] 구현 1차 (Build Spec §4) — 화면·효과음·스토어 문서 (2026-10-16). **이어서 할 일: [`yawn-relay/handoff-2026-10-16.md`](yawn-relay/handoff-2026-10-16.md)**
 - [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
 
 ## AI 제안 (AI Proposal)
