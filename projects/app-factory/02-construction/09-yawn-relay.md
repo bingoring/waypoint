@@ -5,7 +5,7 @@ status: AI_PROPOSED
 updated: 2026-10-16
 ---
 
-# [Stage 2-9] 하품 릴레이 (가칭)
+# [Stage 2-9] Yawn! (구 가칭 하품 릴레이)
 
 ## 목적
 
@@ -25,8 +25,8 @@ updated: 2026-10-16
 
 - [x] Build Spec 작성 — [`yawn-relay/build-spec-index.md`](yawn-relay/build-spec-index.md) (comprehensive, `QUESTIONS_OPEN`)
 - [x] Claude Design 요청서 초안 — [`yawn-relay/design-brief-2026-10-16.md`](yawn-relay/design-brief-2026-10-16.md)
-- [ ] 미해결 질문 해소 → Build Spec `READY`
-- [ ] Claude Design 핸드오프 수령 → `frontend-components` 갱신
+- [x] 미해결 질문 해소 → Build Spec `READY` (2026-10-16)
+- [x] Claude Design 핸드오프 수령 → `frontend-components` §7 매핑 (2026-10-16, `inputs/design-handoff-yawn-relay_v1/`)
 - [ ] 구현 (Build Spec §4)
 - [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
 

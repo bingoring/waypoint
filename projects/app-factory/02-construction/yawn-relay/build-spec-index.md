@@ -1,17 +1,17 @@
 ---
 build-spec: yawn-relay
 stage: 02-construction/09-yawn-relay
-status: QUESTIONS_OPEN
+status: READY
 depth: comprehensive
 updated: 2026-10-16
 ---
 
-# Build Spec — 하품 릴레이 (가칭)
+# Build Spec — Yawn! (구 가칭 하품 릴레이)
 
 ## §0. 개요 & 범위
-- **목표(한 줄):** 시선을 따라 하품이 옮는 퍼즐 `apps/yawn`(가칭)을 ko·en으로 출시한다. 툭 한두 번으로 지하철 한 칸을 모두 재운다.
+- **목표(한 줄):** 시선을 따라 하품이 옮는 퍼즐 `apps/yawn`을 ko·en으로 출시한다. 툭 한두 번으로 지하철 한 칸을 모두 재운다.
 - **SoT:** ① 규칙 = 메인 저장소 `prototypes/yawn-relay/index.html` `#engine`(오너 재미 판정 통과, 2026-10-16) — **1:1 이식, 판정 규칙 변경 금지** ② 레벨 지표 = `prototypes/yawn-relay/solver.js`(프로토타입 기록 §2 표를 재현) ③ 화면·캐릭터 = Claude Design 핸드오프(수령 예정, [`design-brief-2026-10-16.md`](design-brief-2026-10-16.md)).
-- **규모:** 화면 4개 + 판 위 카드 2개, 역 N개(Q1), 승객 종류 5, 판 최대 6×6.
+- **규모:** 화면 4개 + 판 위 카드 2개, 역 끝없이 생성(2-10), 승객 종류 5, 판 최대 6×6.
 - **깊이 티어:** `comprehensive` — 2-8 §6 결정. 레벨 생성기·풀이기, 박자 엔진, 캐릭터 에셋 파이프라인이 있다.
 
 ## §1. 분해
@@ -44,13 +44,13 @@ updated: 2026-10-16
 
 - [x] Q1 1차 출시 범위 → 2-10 적응형 생성(역 끝없이, 노선 선택)으로 해소 (DECISIONS 2026-10-16)
 - [x] Q2 잠버릇 도감 → 1.1 (DECISIONS 2026-10-16)
-- [ ] **Q6 이름 (남은 유일한 질문):** 오너가 「하품 릴레이」를 다시 정하기로 함(2026-10-16). 이전 문구 — 「하품 릴레이 / Yawn Relay」 확정 여부와 상표 확인. 요청서는 가칭으로 보낸다(로고 작업 없음).
+- [x] Q6 이름 → 「Yawn!」, 부제 ko 「하품 전염 퍼즐」 / en 「Contagious Yawn Puzzle」, slug `yawn` (DECISIONS 2026-10-16)
 
 ## §4. 구현 체크리스트
-- [ ] `factory new yawn --category game` (slug·이름은 Q6), `factory firebase`
+- [ ] `factory new yawn --category game` (slug `yawn`, 이름 「Yawn!」), `factory firebase`
 - [ ] `app.yaml`: placements `banner_map`·`interstitial_station`·`rewarded_extra_tap`·`rewarded_hint`, keyAction `clear_station`, events
 - [ ] domain 엔진 이식 + BLM §4 골든 테스트 (solver.js 출력 16개 수치 일치)
-- [ ] 풀이기·생성기·`levels.json` (Q1 역 수) + 결정성 테스트
+- [ ] 풀이기·생성기·소개 역 `levels.json` + 2-10 생성기 + 결정성 테스트
 - [ ] 효과음 합성 5종
 - [ ] 캐릭터 스프라이트 파이프라인: 핸드오프 SVG → @2x·@3x 아틀라스 + 프레임 표
 - [ ] UI: 노선도·객차·카드·설정 (핸드오프 기준), ko·en
