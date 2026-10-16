@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Gaegu:wght@700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e6e1d7;font-family:'IBM Plex Sans KR',system-ui,sans-serif;color:#1d1f27;-webkit-font-smoothing:antialiased}
+a{color:#1d1f27}a:hover{color:#5a5e6b}
+button{font-family:inherit}
+@keyframes yr-blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
+@keyframes yr-yawn{0%{transform:scale(1,1)}30%{transform:scale(.88,1.3)}62%{transform:scale(1.1,.86)}82%{transform:scale(.97,1.04)}100%{transform:scale(1,1)}}
+@keyframes yr-yawnloop{0%{transform:scale(1,1)}10%{transform:scale(.88,1.3)}20%{transform:scale(1.1,.86)}26%,100%{transform:scale(1,1)}}
+@keyframes yr-tap{0%{transform:scale(1,1)}45%{transform:scale(1.1,.84)}100%{transform:scale(1,1)}}
+@keyframes yr-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px) rotate(-4deg)}45%{transform:translateX(5px) rotate(4deg)}70%{transform:translateX(-3px)}85%{transform:translateX(2px)}}
+@keyframes yr-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.97)}}
+@keyframes yr-z{0%{opacity:0;transform:translate(0,4px) scale(.6)}25%{opacity:1}100%{opacity:0;transform:translate(7px,-14px) scale(1.15)}}
+@keyframes yr-snot{0%,100%{transform:scale(.35)}55%{transform:scale(1.15)}}
+@keyframes yr-drool{0%,100%{transform:scaleY(.6)}50%{transform:scaleY(1.25)}}
+@keyframes yr-tearL{0%,25%{opacity:0;transform:translate(0,0)}45%{opacity:1}100%{opacity:0;transform:translate(-8px,-6px)}}
+@keyframes yr-tearR{0%,25%{opacity:0;transform:translate(0,0)}45%{opacity:1}100%{opacity:0;transform:translate(8px,-6px)}}
+@keyframes yr-bubble{0%{opacity:0;transform:scale(.3) translateY(8px)}22%{opacity:1;transform:scale(1.18)}35%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes yr-draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+@keyframes yr-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:.55}}
+@keyframes yr-ping{0%{transform:scale(1);opacity:.55}100%{transform:scale(2.2);opacity:0}}
+@keyframes yr-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes yr-drop{from{transform:translateY(-110%)}to{transform:translateY(0)}}
+@keyframes yr-sheet{from{transform:translateY(105%)}to{transform:translateY(0)}}
+@keyframes yr-enter{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
+@keyframes yr-fade{from{opacity:0}to{opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-wrap:wrap;gap:48px;padding:40px;box-sizing:border-box;align-items:flex-start;justify-content:center">
+  <div style="flex:none">
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ deviceDark }}" hint-size="412px,892px">
+      <div style="{{ themeVars }}">
+        <div style="position:relative;height:100%;overflow:hidden;font-family:'IBM Plex Sans KR',system-ui,sans-serif;background:var(--paper,#f3efe6);color:var(--ink,#1d1f27)">
+
+          <sc-if value="{{ isMap }}" hint-placeholder-val="{{ true }}">
+            <div data-screen-label="01 노선도" style="position:absolute;inset:0;display:flex;flex-direction:column;animation:yr-fade 250ms both">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 4px 20px">
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <div style="font-size:calc(22px * var(--ts,1));font-weight:700;letter-spacing:-0.02em">노선도</div>
+                  <div style="font-size:calc(13px * var(--ts,1));color:var(--muted,#5a5e6b)">고른 노선 · {{ mapCur.lineName }}</div>
+                </div>
+                <button onClick="{{ openSettings }}" aria-label="설정" style="width:48px;height:48px;border:0;background:transparent;border-radius:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink,#1d1f27)" style-hover="background:var(--hair,rgba(29,31,39,.08))">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"></circle><path d="M12 2.5v2.6M12 18.9v2.6M4.6 4.6l1.9 1.9M17.5 17.5l1.9 1.9M2.5 12h2.6M18.9 12h2.6M4.6 19.4l1.9-1.9M17.5 6.5l1.9-1.9"></path></svg>
+                </button>
+              </div>
+              <sc-if value="{{ hasToast }}">
+                <div style="position:absolute;left:16px;right:16px;top:64px;z-index:3;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:16px;background:var(--surface,#fff);box-shadow:0 8px 24px rgba(0,0,0,.18);animation:yr-drop 380ms cubic-bezier(.2,.8,.2,1) both">
+                  <div style="{{ toastChip }}">{{ toast.n }}</div>
+                  <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                    <div style="font-weight:700;font-size:calc(15px * var(--ts,1))">새 노선 개통 · {{ toast.name }}</div>
+                    <div style="font-size:calc(13px * var(--ts,1));color:var(--muted,#5a5e6b);text-wrap:pretty">{{ toast.label }}</div>
+                  </div>
+                </div>
+              </sc-if>
+              <div ref="{{ mapRef }}" style="flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:0 16px 16px;min-height:0">{{ mapEl }}</div>
+              <div style="display:flex;flex-direction:column;gap:12px;padding:8px 16px 12px;border-top:1px solid var(--hair,rgba(29,31,39,.1))">
+                <button onClick="{{ playNext }}" disabled="{{ nextDisabled }}" style="height:60px;border:0;border-radius:18px;background:var(--pri,#ffc94a);color:#1d1f27;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 12px 0 22px;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.16)" style-active="transform:translateY(2px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.16)">
+                  <span style="font-size:calc(18px * var(--ts,1));font-weight:700">{{ nextLabel }}</span>
+                  <span style="display:flex;align-items:center;gap:8px;background:rgba(29,31,39,.1);border-radius:12px;padding:6px 10px;font-size:calc(13px * var(--ts,1));font-weight:600;white-space:nowrap"><span style="font-family:'IBM Plex Mono',monospace">{{ mapCur.num }}</span>{{ mapCur.name }}</span>
+                </button>
+                <div style="height:56px;border:1.5px dashed var(--hair2,rgba(29,31,39,.25));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted,#5a5e6b)">배너 광고 자리 · 320×50</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCar }}">
+            <div data-screen-label="02 객차" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#1b1f28;color:#e9e6dd;animation:yr-enter 350ms cubic-bezier(.2,.8,.2,1) both;transform-origin:50% 70%">
+              <div style="display:flex;align-items:center;gap:4px;padding:8px 8px 8px 14px">
+                <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:10px;min-width:0;background:#f3efe6;color:#1d1f27;border-radius:12px;padding:6px 14px 6px 6px;box-shadow:0 2px 0 rgba(0,0,0,.35)">
+                    <div style="{{ carChip }}">{{ carCur.num }}</div>
+                    <div style="display:flex;flex-direction:column;min-width:0">
+                      <div style="font-weight:700;font-size:calc(17px * var(--ts,1));line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ carCur.name }}</div>
+                      <div style="font-size:calc(11px * var(--ts,1));color:#5a5e6b;white-space:nowrap">{{ carCur.lineName }}</div>
+                    </div>
+                  </div>
+                </div>
+                <button onClick="{{ retry }}" aria-label="다시" style="width:48px;height:48px;border:0;background:transparent;border-radius:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#e9e6dd" style-hover="background:rgba(255,255,255,.08)">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"></path><path d="M4 4v4.5h4.5"></path></svg>
+                </button>
+                <button onClick="{{ pause }}" aria-label="일시정지" style="width:48px;height:48px;border:0;background:transparent;border-radius:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#e9e6dd" style-hover="background:rgba(255,255,255,.08)">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.5"></rect><rect x="14" y="5" width="4" height="14" rx="1.5"></rect></svg>
+                </button>
+              </div>
+              <sc-if value="{{ hasHint }}">
+                <div style="margin:2px 20px 0;align-self:center;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);font-size:calc(14px * var(--ts,1));color:#e9e6dd;text-wrap:pretty;text-align:center">{{ carCur.hint }}</div>
+              </sc-if>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:12px;min-height:0">{{ boardEl }}</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 0 22px">
+                <div style="display:flex;gap:12px">
+                  <sc-for list="{{ tapList }}" as="t" hint-placeholder-count="1">
+                    <div style="{{ t.style }}">
+                      <svg width="36" height="36" viewBox="0 0 32 32"><path d="M13 6.5a2.5 2.5 0 0 1 5 0V15l5.2.9a3 3 0 0 1 2.5 3.4l-.9 5.6A5 5 0 0 1 19.9 29h-5.4a5 5 0 0 1-4-2L6.2 21.6a2.2 2.2 0 0 1 3.2-3L13 21.5V6.5z" fill="#f0c6a0" stroke="#17151d" stroke-width="2" stroke-linejoin="round"></path><path d="M18 16v4.5M21.6 16.6v4" stroke="#17151d" stroke-width="1.6" stroke-linecap="round"></path><path d="M9.5 3.5l1.6 1.6M21.5 3.5l-1.6 1.6M15.5 .8v2" stroke="#ffcf5a" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:calc(12px * var(--ts,1));color:#a9adb8;letter-spacing:.04em">툭 {{ tapsLeft }} / {{ tapsMax }}</div>
+              </div>
+              <div style="{{ dimStyle }}"></div>
+
+              <sc-if value="{{ isWin }}">
+                <div style="position:absolute;left:0;right:0;top:0;background:#0e1117;border-bottom:2px solid #ffcf5a;padding:14px 18px;display:flex;align-items:center;gap:10px;animation:yr-drop 400ms cubic-bezier(.2,.8,.2,1) both;z-index:5">
+                  <span style="flex:none;font-size:11px;font-weight:700;color:#0e1117;background:#ffcf5a;border-radius:4px;padding:2px 6px">안내</span>
+                  <span style="font-size:calc(14px * var(--ts,1));color:#ffcf5a;line-height:1.4;text-wrap:pretty">{{ announce }}</span>
+                </div>
+                <div data-screen-label="03 도착 카드" style="position:absolute;left:0;right:0;bottom:0;background:var(--surface,#fff);color:var(--ink,#1d1f27);border-radius:28px 28px 0 0;padding:24px 20px 20px;display:flex;flex-direction:column;gap:6px;animation:yr-sheet 380ms 150ms cubic-bezier(.2,.8,.2,1) both;z-index:5;box-shadow:0 -10px 40px rgba(0,0,0,.35)">
+                  <div style="font-size:calc(13px * var(--ts,1));color:var(--muted,#5a5e6b);font-weight:600">도착</div>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="{{ carChip }}">{{ carCur.num }}</div>
+                    <div style="font-size:calc(28px * var(--ts,1));font-weight:700;letter-spacing:-0.02em">{{ carCur.name }}</div>
+                  </div>
+                  <div style="font-size:calc(14px * var(--ts,1));color:var(--muted,#5a5e6b);margin-bottom:14px">{{ winSub }}</div>
+                  <button onClick="{{ winPrimary }}" style="height:56px;border:0;border-radius:16px;background:var(--pri,#ffc94a);color:#1d1f27;font-size:calc(18px * var(--ts,1));font-weight:700;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.16)" style-active="transform:translateY(2px)">{{ winPrimaryLabel }}</button>
+                  <sc-if value="{{ notLast }}">
+                    <button onClick="{{ goMap }}" style="height:48px;border:0;background:transparent;color:var(--ink,#1d1f27);font-size:calc(15px * var(--ts,1));font-weight:600;cursor:pointer;border-radius:12px" style-hover="background:var(--hair,rgba(29,31,39,.08))">노선도</button>
+                  </sc-if>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isLose }}">
+                <div data-screen-label="04 패배 카드" style="position:absolute;left:0;right:0;bottom:0;background:var(--surface,#fff);color:var(--ink,#1d1f27);border-radius:28px 28px 0 0;padding:20px 20px 20px;display:flex;flex-direction:column;gap:10px;animation:yr-sheet 380ms cubic-bezier(.2,.8,.2,1) both;z-index:5;box-shadow:0 -10px 40px rgba(0,0,0,.35)">
+                  <div style="display:flex;justify-content:space-between;align-items:center">
+                    <button onClick="{{ goMap }}" style="height:40px;border:0;background:transparent;color:var(--muted,#5a5e6b);font-size:calc(13px * var(--ts,1));font-weight:600;cursor:pointer;padding:0 8px;margin-left:-8px;border-radius:10px;display:flex;align-items:center;gap:4px" style-hover="background:var(--hair,rgba(29,31,39,.08))">‹ 노선도</button>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted,#5a5e6b)">{{ failLabel }}</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:16px">
+                    <div style="flex:none;display:flex;gap:4px;background:#1b1f28;border-radius:20px;padding:10px">{{ loseFaces }}</div>
+                    <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                      <div style="font-size:calc(22px * var(--ts,1));font-weight:700;letter-spacing:-0.02em;line-height:1.25;text-wrap:pretty">{{ loseTitle }}</div>
+                      <div style="font-size:calc(14px * var(--ts,1));color:var(--muted,#5a5e6b);text-wrap:pretty">{{ loseSub }}</div>
+                    </div>
+                  </div>
+                  <div style="height:6px"></div>
+                  <sc-if value="{{ nearMiss }}">
+                    <button onClick="{{ moreTap }}" style="height:60px;border:0;border-radius:16px;background:var(--rew,#23262f);color:var(--rewInk,#fff);display:flex;align-items:center;gap:12px;padding:0 14px 0 12px;cursor:pointer" style-active="transform:translateY(2px)">
+                      <span style="flex:none;width:32px;height:32px;border-radius:16px;background:#ffc94a;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M4 2.5l7 4.5-7 4.5z" fill="#1d1f27"></path></svg></span>
+                      <span style="flex:1;text-align:left;font-size:calc(16px * var(--ts,1));font-weight:700">광고 보고 한 번 더 툭</span>
+                      <span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;border:1.5px solid currentColor;border-radius:8px;padding:3px 7px">+1 툭</span>
+                    </button>
+                    <button onClick="{{ retry }}" style="height:48px;border:0;background:transparent;color:var(--ink,#1d1f27);font-size:calc(15px * var(--ts,1));font-weight:600;cursor:pointer;border-radius:12px" style-hover="background:var(--hair,rgba(29,31,39,.08))">다시</button>
+                  </sc-if>
+                  <sc-if value="{{ notNearMiss }}">
+                    <button onClick="{{ retry }}" style="height:56px;border:0;border-radius:16px;background:var(--pri,#ffc94a);color:#1d1f27;font-size:calc(18px * var(--ts,1));font-weight:700;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.16)" style-active="transform:translateY(2px)">다시</button>
+                  </sc-if>
+                  <sc-if value="{{ showHintAd }}">
+                    <button onClick="{{ hintAd }}" style="height:52px;border:1.5px solid var(--ink,#1d1f27);border-radius:16px;background:transparent;color:var(--ink,#1d1f27);display:flex;align-items:center;gap:10px;padding:0 14px 0 10px;cursor:pointer">
+                      <span style="flex:none;width:28px;height:28px;border-radius:14px;background:#ffc94a;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 14 14"><path d="M4 2.5l7 4.5-7 4.5z" fill="#1d1f27"></path></svg></span>
+                      <span style="flex:1;text-align:left;font-size:calc(15px * var(--ts,1));font-weight:600">광고 보고 힌트</span>
+                      <span style="flex:none;font-size:12px;color:var(--muted,#5a5e6b)">첫 툭 자리 표시</span>
+                    </button>
+                  </sc-if>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isPause }}">
+                <div style="position:absolute;inset:0;background:rgba(8,10,14,.55);z-index:6;animation:yr-fade 200ms both" onClick="{{ resume }}"></div>
+                <div style="position:absolute;left:0;right:0;bottom:0;background:var(--surface,#fff);color:var(--ink,#1d1f27);border-radius:28px 28px 0 0;padding:24px 20px 20px;display:flex;flex-direction:column;gap:8px;z-index:7;animation:yr-sheet 300ms cubic-bezier(.2,.8,.2,1) both">
+                  <div style="font-size:calc(20px * var(--ts,1));font-weight:700;margin-bottom:10px">잠깐 멈춤</div>
+                  <button onClick="{{ resume }}" style="height:56px;border:0;border-radius:16px;background:var(--pri,#ffc94a);color:#1d1f27;font-size:calc(18px * var(--ts,1));font-weight:700;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.16)">계속</button>
+                  <button onClick="{{ goMap }}" style="height:48px;border:0;background:transparent;color:var(--ink,#1d1f27);font-size:calc(15px * var(--ts,1));font-weight:600;cursor:pointer;border-radius:12px">노선도</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isSettings }}">
+            <div data-screen-label="05 설정" style="position:absolute;inset:0;display:flex;flex-direction:column;background:var(--paper,#f3efe6);animation:yr-fade 200ms both">
+              <div style="display:flex;align-items:center;gap:4px;padding:8px 8px 8px 4px">
+                <button onClick="{{ closeSettings }}" aria-label="뒤로" style="width:48px;height:48px;border:0;background:transparent;border-radius:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink,#1d1f27)">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+                </button>
+                <div style="font-size:calc(22px * var(--ts,1));font-weight:700">설정</div>
+              </div>
+              <div style="flex:1;overflow-y:auto;padding:0 0 24px">
+                <div style="padding:16px 20px 6px;font-size:calc(13px * var(--ts,1));font-weight:600;color:var(--muted,#5a5e6b)">구매</div>
+                <div style="display:flex;flex-direction:column;padding:12px 20px;min-height:56px;justify-content:center;gap:2px">
+                  <div style="font-size:calc(16px * var(--ts,1))">광고 제거</div>
+                  <div style="font-size:calc(14px * var(--ts,1));color:var(--muted,#5a5e6b)">₩3,300 · 배너와 전면 광고를 끕니다</div>
+                </div>
+                <div style="display:flex;align-items:center;padding:12px 20px;min-height:56px;font-size:calc(16px * var(--ts,1))">구매 복원</div>
+                <div style="height:1px;background:var(--hair,rgba(29,31,39,.1));margin:8px 20px"></div>
+                <div style="padding:12px 20px 6px;font-size:calc(13px * var(--ts,1));font-weight:600;color:var(--muted,#5a5e6b)">소리와 진동</div>
+                <div onClick="{{ toggleSfx }}" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;min-height:56px;cursor:pointer">
+                  <div style="font-size:calc(16px * var(--ts,1))">효과음</div>
+                  <div style="{{ sfxTrack }}"><div style="{{ sfxThumb }}"></div></div>
+                </div>
+                <div onClick="{{ toggleVib }}" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;min-height:56px;cursor:pointer">
+                  <div style="font-size:calc(16px * var(--ts,1))">진동</div>
+                  <div style="{{ vibTrack }}"><div style="{{ vibThumb }}"></div></div>
+                </div>
+                <div style="height:1px;background:var(--hair,rgba(29,31,39,.1));margin:8px 20px"></div>
+                <div style="padding:12px 20px 6px;font-size:calc(13px * var(--ts,1));font-weight:600;color:var(--muted,#5a5e6b)">일반</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;min-height:56px">
+                  <div style="font-size:calc(16px * var(--ts,1))">언어</div>
+                  <div style="font-size:calc(14px * var(--ts,1));color:var(--muted,#5a5e6b)">한국어</div>
+                </div>
+                <div style="display:flex;flex-direction:column;padding:12px 20px;min-height:56px;justify-content:center;gap:2px">
+                  <div style="font-size:calc(16px * var(--ts,1))">개인정보 옵션</div>
+                  <div style="font-size:calc(14px * var(--ts,1));color:var(--muted,#5a5e6b)">광고 맞춤 설정</div>
+                </div>
+                <div style="display:flex;align-items:center;padding:12px 20px;min-height:56px;font-size:calc(16px * var(--ts,1))">문의하기</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;min-height:56px">
+                  <div style="font-size:calc(16px * var(--ts,1))">버전</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--muted,#5a5e6b)">1.0.0</div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ adOn }}">
+            <div style="position:absolute;inset:0;background:#08090c;color:#fff;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;animation:yr-fade 150ms both">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;color:#9aa0ad">광고 (시뮬레이션)</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:56px;font-weight:600">{{ adCount }}</div>
+              <div style="font-size:14px;color:#c9ccd4">{{ adLabel }}</div>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <aside style="flex:1 1 420px;max-width:600px;display:flex;flex-direction:column;gap:24px;padding-top:8px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5a5e6b;letter-spacing:.06em">YAWN RELAY · 시안 v2 · 2026-10-16</div>
+      <div style="font-size:32px;font-weight:700;letter-spacing:-0.03em;line-height:1.15">하품 릴레이 — 플레이 가능한 시안</div>
+      <div style="font-size:15px;line-height:1.6;color:#3d404b;text-wrap:pretty">왼쪽 휴대폰에서 실제로 플레이됩니다. 노선 5개 · 역 10개. 열린 노선 띠를 눌러 노선을 고르면 「다음 역」이 그 노선의 다음 역으로 바뀝니다. 「안개」를 깨면 4호선이 그려지며 개통됩니다. 오른쪽 위 Tweaks에서 시작 역, 다크 모드, 글자 130%, 슬로모션(×3)을 바꿀 수 있습니다.</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:.02em">캐릭터 시트 — 부품 조합 (몸 · 머리 · 헤어 · 소품 · 표정)</div>
+      <div style="background:#1b1f28;border-radius:16px;padding:16px;overflow-x:auto">{{ sheetEl }}</div>
+      <div style="background:#1b1f28;border-radius:16px;padding:16px;overflow-x:auto">{{ kindsEl }}</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:.02em">후보 승객·타일 — 프로토타입 시험용 (통과한 것만 출시)</div>
+      <div style="background:#1b1f28;border-radius:16px;padding:16px">{{ candEl }}</div>
+      <div style="font-size:13px;line-height:1.6;color:#3d404b;text-wrap:pretty">코골이는 잠든 뒤 「드르렁」+진동선, 깬 이웃은 화들짝. 아기는 깨어 있으면 울음 파동, 잠들면 평온. 잠꼬대는 낙서 말풍선. 마스크는 하품 때 크게 부풂. 기둥은 시선이 양옆으로 갈라지고, 출입문은 남은 박자를 노란 배지로.</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.6;color:#3d404b">
+      <div style="font-size:13px;font-weight:700;color:#1d1f27">규칙 해석 — 오너 확인 필요</div>
+      <div>· 커피 승객은 승리 조건에서 빠집니다(영영 안 자므로). 커피를 툭 치면 거절만 하고 툭은 줄지 않습니다.</div>
+      <div>· 말똥말똥: 첫 하품은 반쯤 감기기만 하고 퍼뜨리지 않음. 두 번째에 하품하며 잠듦. 같은 사람을 두 번 툭 쳐도 됩니다.</div>
+      <div>· 두리번: 하품이 번지는 박자마다만 시계 방향으로 회전(가만히 있을 땐 고정).</div>
+      <div>· 잠든 사람도 시선을 가립니다(처음 마주치는 한 사람).</div>
+      <div>· 디자인 시스템 프로젝트가 비어 있어 자체 팔레트 사용: 밤 객차 네이비 + 하품 노랑 #FFC94A. 본문 IBM Plex Sans KR, 숫자 Plex Mono, 말풍선 Gaegu.</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.6;color:#3d404b">
+      <div style="font-size:13px;font-weight:700;color:#1d1f27">영어 문구 길이 체크</div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:4px 16px;font-size:13px">
+        <span>다음 역</span><span>Next stop</span>
+        <span>다시</span><span>Retry</span>
+        <span>딱 한 명이 안 자요</span><span>Just one still awake</span>
+        <span>광고 보고 한 번 더 툭</span><span>Watch ad for +1 tap (가장 긴 버튼 — 60dp 높이 안에 들어감)</span>
+        <span>광고 보고 힌트</span><span>Watch ad for a hint</span>
+      </div>
+    </div>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;표시&quot;},&quot;textScale&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;100%&quot;,&quot;130%&quot;],&quot;default&quot;:&quot;100%&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;표시&quot;},&quot;slowMo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;움직임&quot;},&quot;startStation&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:10,&quot;step&quot;:1,&quot;default&quot;:5,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;진행&quot;}}">
+const h = React.createElement;
+const INK = '#17151d';
+const DIRS = { u: [-1, 0], d: [1, 0], l: [0, -1], r: [0, 1] };
+const CW = { u: 'r', r: 'd', d: 'l', l: 'u' };
+const MIR = { '/': { r: 'u', u: 'r', l: 'd', d: 'l' }, '\\': { r: 'd', d: 'r', l: 'u', u: 'l' } };
+const ARCH = [
+  { id: 'office', name: '직장인', skin: '#f0c6a0', hair: '#2a2420', hs: 'side', outfit: '#3d4a66', outfit2: '#2e3850', acc: 'tie', glasses: true, quirk: 'drool' },
+  { id: 'student', name: '학생', skin: '#f3cfae', hair: '#1c1a1e', hs: 'bob', outfit: '#5e6b5a', outfit2: '#4a5547', acc: 'collar', quirk: 'bubble' },
+  { id: 'grandma', name: '할머니', skin: '#e9bf9c', hair: '#cfcac4', hs: 'bun', outfit: '#7a5c7e', outfit2: '#5f4763', acc: 'brooch', glasses: true, quirk: 'glasses' },
+  { id: 'hiker', name: '등산복 아저씨', skin: '#d9a07a', hair: '#3a2a20', hs: 'cap', cap: '#c9b58a', cap2: '#a8946a', outfit: '#c2563f', outfit2: '#9c4332', acc: 'zip', quirk: 'open' },
+  { id: 'college', name: '대학생', skin: '#f1c9a4', hair: '#4a3426', hs: 'messy', outfit: '#4f6f78', outfit2: '#3c565e', acc: 'hood', quirk: 'bubble' },
+  { id: 'parent', name: '아이 엄마', skin: '#e4b08c', hair: '#2b211c', hs: 'pony', outfit: '#8a7a5a', outfit2: '#6d6046', acc: 'strap', quirk: 'drool' },
+];
+const LINES = [
+  { n: 1, name: '첫차선', color: '#3f8a86', intro: 'B', label: '기본 승객' },
+  { n: 2, name: '야근선', color: '#b8892a', intro: 'P', label: '새 승객 · 휴대폰' },
+  { n: 3, name: '새벽선', color: '#c25e4b', intro: 'C', label: '새 승객 · 커피' },
+  { n: 4, name: '졸음선', color: '#5b6fa8', intro: 'M', label: '새 승객 · 말똥말똥' },
+  { n: 5, name: '주말선', color: '#78843a', intro: 'S', label: '새 승객 · 두리번' },
+];
+const LV = [
+  { name: '첫차', line: 0, taps: 1, sol: 0, rows: ['Bl Bl Bl', 'Bu .. Bu'], hint: '승객을 툭 — 그 사람을 보던 승객이 따라 하품해요' },
+  { name: '환승통로', line: 0, taps: 1, sol: 1, rows: ['Br Bd Bl', 'Bu .. Bu', 'Br Bu Bl'] },
+  { name: '퇴근길', line: 0, taps: 1, sol: 0, rows: ['Bl Bl \\', '.. Br Bu', 'Bu Bl Bl'], hint: '창문에 비치면 시선이 꺾여요' },
+  { name: '막차대기', line: 1, taps: 1, sol: 1, rows: ['Br Pd Bl', 'Bu .. Bu', 'Bu Bl Bu'], hint: '휴대폰 보는 사람은 아무도 안 봐요' },
+  { name: '야근', line: 1, taps: 2, sol: 0, rows: ['Pd Bl .. Bu', 'Bu .. .. Bu', 'Bu Bl Br Bu'] },
+  { name: '새벽', line: 2, taps: 1, sol: 7, rows: ['Bd Cd Bd', 'Br Bd Bl', 'Bu Br Bl'], hint: '커피 마신 사람은 하품이 안 옮아요' },
+  { name: '안개', line: 2, taps: 2, sol: 0, rows: ['Bl Bl Cl Bl', 'Bu .. .. Bu', 'Br Br Br Bu'] },
+  { name: '졸음쉼터', line: 3, taps: 2, sol: 0, rows: ['Bd Bl Bl', 'Mu .. Bu', 'Bu Bl Bl'], hint: '눈이 말똥말똥한 사람은 하품을 두 번 봐야 자요' },
+  { name: '아침잠', line: 3, taps: 3, sol: 5, rows: ['Ml Bl Bl', 'Bu .. Mu', 'Br Br Bu'] },
+  { name: '장보기길', line: 4, taps: 1, sol: 3, rows: ['Br Bd Bd', 'Br Sl Bl', 'Bu Bu Bl'], hint: '두리번거리는 사람은 박자마다 고개를 돌려요' },
+];
+const LINE_IDX = LINES.map((_, k) => LV.map((l, i) => i).filter(i => LV[i].line === k));
+const lineOpen = (k, cl) => k === 0 || (k < LINES.length && LINE_IDX[k - 1].length > 0 && !!cl[LINE_IDX[k - 1][LINE_IDX[k - 1].length - 1]]);
+const nextOf = (k, cl) => { const a = LINE_IDX[k] || []; for (const i of a) if (!cl[i]) return i; return -1; };
+const openLines = cl => LINES.map((_, k) => k).filter(k => lineOpen(k, cl));
+const POS = { d: { el: [26, 26], er: [38, 26], m: [32, 33] }, l: { el: [20.5, 25.5], er: [28.5, 25.5], m: [21, 32.5] }, r: { el: [35.5, 25.5], er: [43.5, 25.5], m: [43, 32.5] } };
+
+function trace(i, cells, R, C) {
+  let r = Math.floor(i / C), c = i % C, d = cells[i].dir;
+  const pts = [[r, c]];
+  for (let n = 0; n < 60; n++) {
+    r += DIRS[d][0]; c += DIRS[d][1];
+    if (r < 0 || c < 0 || r >= R || c >= C) return { t: -1, pts };
+    const k = r * C + c, cell = cells[k];
+    if (cell.t === 'w') { d = MIR[cell.m][d]; pts.push([r, c]); continue; }
+    if (cell.t === 'p') { pts.push([r, c]); return { t: k, pts }; }
+  }
+  return { t: -1, pts };
+}
+
+function P(o) {
+  const a = o.a || 0, A = ARCH[a % ARCH.length], kind = o.kind || 'B', st = o.st || 'awake', size = o.size || 64;
+  const uid = (o.uid || 'p') + '-' + a, sf = o.sf || 1, side = o.side || 1, exp = o.exp || 0;
+  const frontal = st === 'yawn' || st === 'asleep' || st === 'refuse' || st === 'glare' || st === 'startle' || kind === 'P';
+  const fd = frontal ? 'd' : (o.dir || 'd');
+  const skin = A.skin, hair = A.hair;
+  const S = { stroke: INK, strokeWidth: 2, strokeLinejoin: 'round', strokeLinecap: 'round' };
+  const back = [], body = [], hd = [], F = [], front = [], top = [];
+  const lift = st === 'yawn' ? 'translate(0px,-4px)' : 'none';
+
+  if (st === 'yawn') {
+    back.push(h('path', { key: 'a1', d: 'M17 47 L9 14 M47 47 L55 14', stroke: INK, strokeWidth: 9, strokeLinecap: 'round', fill: 'none' }));
+    back.push(h('path', { key: 'a2', d: 'M17 47 L9 14 M47 47 L55 14', stroke: A.outfit, strokeWidth: 5.5, strokeLinecap: 'round', fill: 'none' }));
+    back.push(h('circle', { key: 'a3', cx: 9, cy: 12, r: 4, fill: skin, ...S, strokeWidth: 1.8 }));
+    back.push(h('circle', { key: 'a4', cx: 55, cy: 12, r: 4, fill: skin, ...S, strokeWidth: 1.8 }));
+  }
+  if (A.acc === 'hood') back.push(h('ellipse', { key: 'hd', cx: 32, cy: 37, rx: 17, ry: 8, fill: A.outfit2, ...S }));
+
+  body.push(h('path', { key: 'b', d: 'M10 63 C10 47 18 40.5 32 40.5 C46 40.5 54 47 54 63 Z', fill: A.outfit, ...S }));
+  if (A.acc === 'tie') {
+    body.push(h('path', { key: 'sh', d: 'M25.5 41.5 L32 50 L38.5 41.5 Z', fill: '#efeae0', ...S, strokeWidth: 1.4 }));
+    body.push(h('path', { key: 'ti', d: 'M30.6 42.5 L33.4 42.5 L32.8 45 L34.2 54 L32 57 L29.8 54 L31.2 45 Z', fill: '#9a4040', ...S, strokeWidth: 1.2 }));
+  } else if (A.acc === 'collar') {
+    body.push(h('path', { key: 'co', d: 'M25 41.5 L32 48.5 L39 41.5 L36 40.8 L32 44.5 L28 40.8 Z', fill: '#efeae0', ...S, strokeWidth: 1.4 }));
+  } else if (A.acc === 'brooch') {
+    body.push(h('path', { key: 'cd', d: 'M32 42 L32 63', stroke: INK, strokeWidth: 1.3 }));
+    body.push(h('circle', { key: 'br', cx: 39, cy: 49, r: 2.2, fill: '#e2bd55', ...S, strokeWidth: 1.2 }));
+  } else if (A.acc === 'zip') {
+    body.push(h('path', { key: 'z', d: 'M32 41 L32 63 M26 41.5 Q32 45 38 41.5', stroke: INK, strokeWidth: 1.4, fill: 'none' }));
+  } else if (A.acc === 'hood') {
+    body.push(h('path', { key: 'hs', d: 'M29 44 L28.5 52 M35 44 L35.5 52', stroke: '#efeae0', strokeWidth: 1.6, strokeLinecap: 'round' }));
+  } else if (A.acc === 'strap') {
+    body.push(h('path', { key: 'st', d: 'M13 52 L45 41.5', stroke: '#5a4632', strokeWidth: 4.5, strokeLinecap: 'round' }));
+  }
+
+  if (kind === 'P') {
+    front.push(h('ellipse', { key: 'pg', cx: 32, cy: 44, rx: 11, ry: 6, fill: '#9fd0ff', opacity: 0.3 }));
+    front.push(h('rect', { key: 'ph', x: 27, y: 43.5, width: 10, height: 7, rx: 1.5, fill: '#d3ecff', ...S, strokeWidth: 1.5 }));
+    front.push(h('circle', { key: 'h1', cx: 26.5, cy: 49, r: 3.2, fill: skin, ...S, strokeWidth: 1.5 }));
+    front.push(h('circle', { key: 'h2', cx: 37.5, cy: 49, r: 3.2, fill: skin, ...S, strokeWidth: 1.5 }));
+  }
+  if (kind === 'C') {
+    front.push(h('rect', { key: 'cu', x: 41, y: 43, width: 9, height: 11, rx: 2, fill: '#f3eee3', ...S, strokeWidth: 1.5 }));
+    front.push(h('rect', { key: 'cs', x: 41.8, y: 46.5, width: 7.4, height: 3.5, fill: '#8a5a3c' }));
+    front.push(h('rect', { key: 'cl', x: 40.3, y: 41.5, width: 10.4, height: 2.6, rx: 1, fill: '#3a3030', ...S, strokeWidth: 1.2 }));
+    front.push(h('circle', { key: 'ch', cx: 40.5, cy: 51, r: 3.2, fill: skin, ...S, strokeWidth: 1.5 }));
+    if (st === 'awake') front.push(h('path', { key: 'stm', d: 'M44 39 q-2 -3 0 -6 M47.5 39 q-2 -3 0 -6', stroke: '#cfd6e4', strokeWidth: 1.3, fill: 'none', strokeLinecap: 'round', opacity: 0.7 }));
+  }
+  if (kind === 'Y') {
+    front.push(h('ellipse', { key: 'yb', cx: 32, cy: 53, rx: 13, ry: 8, fill: '#e9dcc4', ...S }));
+    front.push(h('path', { key: 'yf', d: 'M21 50 Q32 55 43 50', stroke: '#b9a887', strokeWidth: 1.3, fill: 'none' }));
+    front.push(h('circle', { key: 'yh', cx: 24, cy: 49, r: 6.5, fill: '#f7d9be', ...S, strokeWidth: 1.6 }));
+    front.push(h('path', { key: 'yc', d: 'M17.6 47.5 Q24 39.5 30.4 47.5 Z', fill: '#bfd4e6', ...S, strokeWidth: 1.4 }));
+    const ln = (k, d, w) => h('path', { key: k, d, stroke: INK, strokeWidth: w, fill: 'none', strokeLinecap: 'round' });
+    if (st === 'asleep') {
+      front.push(ln('ye', 'M20.8 49.8 q1.3 1.2 2.6 0 M25 49.8 q1.3 1.2 2.6 0', 1.3), ln('ym', 'M23 52.6 q1 .8 2 0', 1.2));
+    } else {
+      front.push(ln('ye', 'M20.6 48.6 l2.6 1.2 M27.6 48.6 l-2.6 1.2', 1.4));
+      front.push(h('ellipse', { key: 'ym', cx: 24, cy: 52.6, rx: 2.3, ry: 2, fill: '#6a1f2c', ...S, strokeWidth: 1 }));
+      front.push(h('g', { key: 'yw', style: { animation: 'yr-pulse .7s ease-in-out infinite', transformBox: 'fill-box', transformOrigin: 'right' } }, ln('w', 'M14 44 q-3.5 5 0 10 M9.5 41.5 q-5.5 7.5 0 15', 1.8)));
+    }
+    front.push(h('circle', { key: 'yhd', cx: 44, cy: 52, r: 3.2, fill: skin, ...S, strokeWidth: 1.5 }));
+  }
+  if (st === 'refuse') {
+    front.push(h('path', { key: 'ra', d: 'M17 47 L9 29', stroke: INK, strokeWidth: 9, strokeLinecap: 'round' }));
+    front.push(h('path', { key: 'ra2', d: 'M17 47 L9 29', stroke: A.outfit, strokeWidth: 5.5, strokeLinecap: 'round' }));
+    front.push(h('ellipse', { key: 'rp', cx: 8, cy: 25, rx: 4.5, ry: 5.5, fill: skin, ...S, strokeWidth: 1.8 }));
+    front.push(h('path', { key: 'rm', d: 'M1 19 Q-1.5 25 1 31 M-3 21 Q-5 25 -3 29', stroke: '#e9e6dd', strokeWidth: 1.4, fill: 'none', strokeLinecap: 'round' }));
+  }
+
+  // head
+  const hc = 'hc-' + uid;
+  const hairShapes = [];
+  const base = { d: [['e', 32, 13, 17, 8.5]], l: [['e', 42, 19, 12, 13], ['e', 30, 12, 16, 6]], r: [['e', 22, 19, 12, 13], ['e', 34, 12, 16, 6]], u: [['r']] }[fd];
+  base.forEach((b, j) => hairShapes.push(b[0] === 'e' ? h('ellipse', { key: 'hb' + j, cx: b[1], cy: b[2], rx: b[3], ry: b[4], fill: hair }) : h('rect', { key: 'hb' + j, x: 0, y: 0, width: 64, height: 64, fill: hair })));
+  if (A.hs === 'bob') ({ d: [[16, 12, 5.5, 22], [42.5, 12, 5.5, 22]], l: [[36, 12, 12, 24]], r: [[16, 12, 12, 24]], u: [] })[fd].forEach((q, j) => hairShapes.push(h('rect', { key: 'bb' + j, x: q[0], y: q[1], width: q[2], height: q[3], fill: hair })));
+  if (A.hs === 'cap') hairShapes.push(h('ellipse', { key: 'cap', cx: 32, cy: fd === 'u' ? 22 : 13, rx: 18, ry: fd === 'u' ? 16 : 9.5, fill: A.cap }));
+  if (fd === 'u') {
+    hd.push(h('circle', { key: 'e1', cx: 17.8, cy: 27, r: 3.2, fill: skin, ...S, strokeWidth: 1.6 }));
+    hd.push(h('circle', { key: 'e2', cx: 46.2, cy: 27, r: 3.2, fill: skin, ...S, strokeWidth: 1.6 }));
+  }
+  if (A.hs === 'pony') { const pp = { d: [45, 13], l: [46.5, 27], r: [17.5, 27], u: [32, 41] }[fd]; hd.push(h('ellipse', { key: 'po', cx: pp[0], cy: pp[1], rx: 4.2, ry: 7, fill: hair, ...S })); }
+  hd.push(h('circle', { key: 'hf', cx: 32, cy: 25, r: 14, fill: skin }));
+  hd.push(h('g', { key: 'hr', clipPath: `url(#${hc})` }, hairShapes));
+  hd.push(h('circle', { key: 'ho', cx: 32, cy: 25, r: 14, fill: 'none', ...S, strokeWidth: 2.2 }));
+  if (A.hs === 'bun') hd.push(h('circle', { key: 'bun', cx: 32, cy: 9.5, r: 5.5, fill: hair, ...S, style: { transform: lift } }));
+  if (A.hs === 'messy') hd.push(h('path', { key: 'mess', d: 'M20.5 15 L22 7.5 L26.5 12 L30 4.5 L34 11 L39 6 L42.5 14', fill: hair, ...S, strokeWidth: 1.8 }));
+  if (A.hs === 'cap') { const v = { d: [32, 15.5, 13, 3.6], l: [16.5, 16, 7, 3], r: [47.5, 16, 7, 3], u: [32, 9.5, 11, 3] }[fd]; hd.push(h('ellipse', { key: 'vis', cx: v[0], cy: v[1], rx: v[2], ry: v[3], fill: A.cap2, ...S, strokeWidth: 1.6, style: { transform: lift } })); }
+
+  // face
+  let glassesY = 0, glassesRot = 0;
+  if (fd !== 'u') {
+    const p = POS[fd], el = p.el, er = p.er, m = p.m;
+    const line = (k, d, w) => h('path', { key: k, d, stroke: INK, strokeWidth: w || 1.9, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' });
+    if (st === 'yawn') {
+      F.push(line('br', 'M22 19 Q25.5 16.5 29 18.5 M35 18.5 Q38.5 16.5 42 19', 1.8));
+      F.push(line('ey', 'M22.5 22.5 L28 25.5 L22.5 27.5 M41.5 22.5 L36 25.5 L41.5 27.5', 2.1));
+      if (kind !== 'K') {
+        F.push(h('ellipse', { key: 'mo', cx: 32, cy: 39, rx: 8.5, ry: 13, fill: '#6a1f2c', ...S }));
+        F.push(h('ellipse', { key: 'to', cx: 32, cy: 47, rx: 5.5, ry: 4, fill: '#e2787f' }));
+      }
+      F.push(h('path', { key: 't1', d: 'M19 23 q-2.2 3 0 4.6 q2.2 -1.6 0 -4.6', fill: '#8fd3ff', ...S, strokeWidth: 1, style: o.loop ? {} : { animation: `yr-tearL ${520 * sf}ms both` } }));
+      F.push(h('path', { key: 't2', d: 'M45 23 q-2.2 3 0 4.6 q2.2 -1.6 0 -4.6', fill: '#8fd3ff', ...S, strokeWidth: 1, style: o.loop ? {} : { animation: `yr-tearR ${520 * sf}ms both` } }));
+      glassesY = -5;
+    } else if (st === 'asleep') {
+      F.push(line('ey', 'M22.5 26 Q25.5 28.5 28.5 26 M35.5 26 Q38.5 28.5 41.5 26', 2));
+      const q = kind === 'K' ? 'none' : kind === 'N' ? 'snore' : A.quirk;
+      if (q === 'snore') F.push(h('circle', { key: 'sn', cx: 38, cy: 30, r: 6, fill: '#bfe9ff', fillOpacity: 0.9, ...S, strokeWidth: 1.2, style: { animation: 'yr-snot 1.3s ease-in-out infinite', transformBox: 'fill-box', transformOrigin: 'left' } }));
+      if (q === 'open' || q === 'glasses' || q === 'snore') F.push(h('ellipse', { key: 'mo', cx: 32, cy: 33.5, rx: 3, ry: 3.6, fill: '#6a1f2c', ...S, strokeWidth: 1.6 }));
+      else F.push(line('mo', 'M29 33 Q32 35 35 33', 1.8));
+      if (q === 'drool') F.push(h('path', { key: 'dr', d: 'M34.5 34 q1.8 4 0 6.5 q-1.8 -2.5 0 -6.5', fill: '#9fd8ff', ...S, strokeWidth: 1, style: { animation: 'yr-drool 2.6s ease-in-out infinite', transformBox: 'fill-box', transformOrigin: 'top' } }));
+      if (q === 'bubble') F.push(h('circle', { key: 'sb', cx: 36.5, cy: 30, r: 4, fill: '#bfe9ff', fillOpacity: 0.85, ...S, strokeWidth: 1, style: { animation: 'yr-snot 2.6s ease-in-out infinite', transformBox: 'fill-box', transformOrigin: 'left' } }));
+      glassesY = 5; glassesRot = 14;
+    } else if (st === 'refuse') {
+      F.push(line('br', 'M22 20 L29 22.5 M42 20 L35 22.5', 2.2));
+      F.push(h('circle', { key: 'e1', cx: 26, cy: 26.5, r: 2, fill: INK }), h('circle', { key: 'e2', cx: 38, cy: 26.5, r: 2, fill: INK }));
+      F.push(line('mo', 'M28.5 34.5 Q32 31.5 35.5 34.5', 2));
+    } else if (st === 'glare') {
+      F.push(line('br', 'M19.5 16.5 L29 20.5 M44.5 16.5 L35 20.5', 2.6));
+      F.push(h('circle', { key: 'e1', cx: 25.5, cy: 26, r: 6, fill: '#fff', ...S, strokeWidth: 1.8 }), h('circle', { key: 'e2', cx: 38.5, cy: 26, r: 6, fill: '#fff', ...S, strokeWidth: 1.8 }));
+      F.push(h('circle', { key: 'p1', cx: 25.5, cy: 26, r: 1.5, fill: INK }), h('circle', { key: 'p2', cx: 38.5, cy: 26, r: 1.5, fill: INK }));
+      F.push(line('vn', 'M20.5 24 L22.5 25 M43.5 24 L41.5 25', 0.9));
+      F.push(line('mo', 'M26.5 35.5 L28.5 34 L30.5 35.5 L32.5 34 L34.5 35.5 L36.5 34', 1.8));
+      F.push(h('path', { key: 'sw', d: 'M47 13 q-2.5 3.5 0 5.2 q2.5 -1.7 0 -5.2', fill: '#8fd3ff', ...S, strokeWidth: 1 }));
+    } else if (st === 'startle') {
+      F.push(line('br', 'M19.5 15.5 Q24.5 11.5 29.5 14.5 M34.5 14.5 Q39.5 11.5 44.5 15.5', 2));
+      F.push(h('circle', { key: 'e1', cx: 25.5, cy: 25, r: 5.2, fill: '#fff', ...S, strokeWidth: 1.7 }), h('circle', { key: 'e2', cx: 38.5, cy: 25, r: 5.2, fill: '#fff', ...S, strokeWidth: 1.7 }));
+      F.push(h('circle', { key: 'p1', cx: 25.5, cy: 25, r: 1.2, fill: INK }), h('circle', { key: 'p2', cx: 38.5, cy: 25, r: 1.2, fill: INK }));
+      F.push(h('ellipse', { key: 'mo', cx: 32, cy: 34.5, rx: 2.8, ry: 3.6, fill: '#6a1f2c', ...S, strokeWidth: 1.6 }));
+    } else if (kind === 'P') {
+      F.push(h('ellipse', { key: 'gl', cx: 32, cy: 30, rx: 12, ry: 9, fill: '#a9d6ff', opacity: 0.32 }));
+      F.push(h('ellipse', { key: 'e1', cx: el[0], cy: el[1] + 1.5, rx: 2.2, ry: 1.4, fill: INK }), h('ellipse', { key: 'e2', cx: er[0], cy: er[1] + 1.5, rx: 2.2, ry: 1.4, fill: INK }));
+      F.push(line('ld', `M${el[0] - 3} ${el[1] - 0.2} L${el[0] + 3} ${el[1] - 0.2} M${er[0] - 3} ${er[1] - 0.2} L${er[0] + 3} ${er[1] - 0.2}`, 1.5));
+      F.push(line('mo', 'M30.5 34 L33.5 34', 1.6));
+    } else if (kind === 'M') {
+      const off = { d: [0, 1], l: [-1.2, 0], r: [1.2, 0] }[fd];
+      [el, er].forEach((e, j) => {
+        F.push(h('circle', { key: 'w' + j, cx: e[0], cy: e[1], r: 3.9, fill: '#fff', ...S, strokeWidth: 1.5 }));
+        F.push(h('circle', { key: 'q' + j, cx: e[0] + off[0], cy: e[1] + off[1] + (st === 'drowsy' ? 1.4 : 0), r: 1.9, fill: INK }));
+        if (st === 'drowsy') F.push(h('path', { key: 'lid' + j, d: `M${e[0] - 3.9} ${e[1] + 0.3} A3.9 3.9 0 0 1 ${e[0] + 3.9} ${e[1] + 0.3} Z`, fill: skin, ...S, strokeWidth: 1.5 }));
+      });
+      F.push(st === 'drowsy' ? line('mo', `M${m[0] - 2.5} ${m[1] + 0.5} Q${m[0]} ${m[1] + 2} ${m[0] + 2.5} ${m[1] + 0.5}`, 1.7) : line('mo', `M${m[0] - 2} ${m[1]} L${m[0] + 2} ${m[1]}`, 1.8));
+    } else {
+      const blink = { animation: `yr-blink ${3.2 + (a % 3) * 0.7}s ${(a % 4) * 0.4}s infinite`, transformBox: 'fill-box', transformOrigin: 'center' };
+      F.push(h('g', { key: 'ey', style: blink }, h('ellipse', { cx: el[0], cy: el[1], rx: 2.2, ry: 2.7, fill: INK }), h('ellipse', { cx: er[0], cy: er[1], rx: 2.2, ry: 2.7, fill: INK })));
+      if (kind === 'C') {
+        F.push(line('br', `M${el[0] - 3} ${el[1] - 4.8} L${el[0] + 3} ${el[1] - 3.6} M${er[0] - 3} ${er[1] - 3.6} L${er[0] + 3} ${er[1] - 4.8}`, 1.8));
+        F.push(line('mo', `M${m[0] - 3} ${m[1]} Q${m[0] + 1} ${m[1] + 1.6} ${m[0] + 3.5} ${m[1] - 1}`, 1.8));
+      } else F.push(line('mo', `M${m[0] - 2.4} ${m[1]} L${m[0] + 2.4} ${m[1]}`, 1.8));
+    }
+    if (kind === 'K') {
+      if (st === 'yawn') {
+        F.push(h('path', { key: 'ml', d: 'M19.5 27 L22 34 M44.5 27 L42 34', stroke: INK, strokeWidth: 1.2 }));
+        F.push(h('ellipse', { key: 'mk', cx: 32, cy: 38.5, rx: 13, ry: 12, fill: '#eef1f4', ...S }));
+        F.push(line('mf', 'M22.5 35 Q32 38.5 41.5 35 M22 41 Q32 44.5 42 41', 1.2));
+      } else {
+        const mx = fd === 'l' ? 24 : fd === 'r' ? 40 : 32;
+        F.push(h('g', { key: 'mk', clipPath: `url(#${hc})` }, h('rect', { x: mx - 12, y: 28.5, width: 24, height: 12, rx: 4, fill: '#eef1f4', ...S, strokeWidth: 1.6 }), h('path', { d: `M${mx - 8} 32.5 L${mx + 8} 32.5 M${mx - 8} 36 L${mx + 8} 36`, stroke: '#b9c0c9', strokeWidth: 1 })));
+        if (fd === 'd' || st !== 'awake') F.push(line('el', 'M20 31 L18.5 26 M44 31 L45.5 26', 1.2));
+      }
+    }
+    if (fd === 'l') F.push(line('no', 'M18.6 27 q-2.4 1.3 0 2.6', 1.6));
+    if (fd === 'r') F.push(line('no', 'M45.4 27 q2.4 1.3 0 2.6', 1.6));
+    if (A.glasses && st !== 'glare') {
+      const gy = (st === 'yawn' || st === 'asleep' || st === 'refuse') ? 26 : el[1];
+      const ex = (st === 'yawn' || st === 'asleep' || st === 'refuse') ? [25.5, 38.5] : [el[0], er[0]];
+      F.push(h('g', { key: 'gls', style: { transform: `translate(0px,${glassesY}px) rotate(${glassesRot}deg)`, transformOrigin: '32px 26px' } },
+        h('circle', { cx: ex[0], cy: gy, r: 4.6, fill: 'rgba(255,255,255,.18)', stroke: INK, strokeWidth: 1.6 }),
+        h('circle', { cx: ex[1], cy: gy, r: 4.6, fill: 'rgba(255,255,255,.18)', stroke: INK, strokeWidth: 1.6 }),
+        h('path', { d: `M${ex[0] + 4.6} ${gy} L${ex[1] - 4.6} ${gy}`, stroke: INK, strokeWidth: 1.6 })));
+    }
+  }
+
+  if (st !== 'asleep' && kind === 'M') {
+    const left = Math.max(0, 2 - exp);
+    top.push(h('g', { key: 'bdg' }, h('rect', { x: 47, y: 1, width: 15, height: 11, rx: 5.5, fill: '#f4f1ea', stroke: INK, strokeWidth: 1.3 }),
+      h('circle', { cx: 51.5, cy: 6.5, r: 2, fill: left >= 1 ? INK : 'none', stroke: INK, strokeWidth: 1.1 }),
+      h('circle', { cx: 57.5, cy: 6.5, r: 2, fill: left >= 2 ? INK : 'none', stroke: INK, strokeWidth: 1.1 })));
+  }
+  if (st !== 'asleep' && kind === 'S') {
+    top.push(h('g', { key: 'bdg' }, h('circle', { cx: 55, cy: 7, r: 6.5, fill: '#f4f1ea', stroke: INK, strokeWidth: 1.3 }),
+      h('path', { d: 'M51.6 7.5 A3.5 3.5 0 1 1 55 10.5', stroke: INK, strokeWidth: 1.4, fill: 'none', strokeLinecap: 'round' }),
+      h('path', { d: 'M49.8 6.2 L51.6 8.6 L53.6 6.6', stroke: INK, strokeWidth: 1.3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' })));
+  }
+  if (st === 'startle') {
+    top.push(h('text', { key: 'ex', x: 50, y: 11, fontSize: 20, style: { fontFamily: 'Gaegu, cursive', fontWeight: 700, fill: '#ffcf5a', stroke: INK, strokeWidth: 1, paintOrder: 'stroke' } }, '!'));
+    top.push(h('path', { key: 'sh', d: 'M9 6 l4 4 M4 15 l5 1.5 M55 18 l5 -1', stroke: '#e9e6dd', strokeWidth: 1.6, strokeLinecap: 'round' }));
+  }
+  if (st === 'asleep' && kind === 'N') {
+    top.push(h('g', { key: 'vib', style: { animation: 'yr-pulse .6s ease-in-out infinite', transformBox: 'fill-box', transformOrigin: 'center' } }, h('path', { d: 'M9 21 q-3 4 0 8 M4.5 18 q-5 7 0 14 M55 21 q3 4 0 8 M59.5 18 q5 7 0 14', stroke: '#e9e6dd', strokeWidth: 1.6, fill: 'none', strokeLinecap: 'round' })));
+    top.push(h('text', { key: 'snt', x: 32, y: -2, textAnchor: 'middle', fontSize: 14, style: { fontFamily: 'Gaegu, cursive', fontWeight: 700, fill: '#fffaf0', stroke: INK, strokeWidth: 1, paintOrder: 'stroke' } }, '드르렁'));
+  }
+  if (st === 'asleep' && kind === 'T') {
+    top.push(h('g', { key: 'tk', style: { animation: 'yr-pulse 2s ease-in-out infinite', transformBox: 'fill-box', transformOrigin: 'left bottom' } },
+      h('path', { d: 'M38 -9 h22 a6 6 0 0 1 6 6 v4 a6 6 0 0 1 -6 6 h-14 l-6 5 l1 -5 h-3 a6 6 0 0 1 -6 -6 v-4 a6 6 0 0 1 6 -6 z', fill: '#fffaf0', stroke: INK, strokeWidth: 1.4, strokeLinejoin: 'round' }),
+      h('path', { d: 'M38 -1 q2 -4 4 0 t4 0 t4 0 M53 -4 l3 3 m0 -3 l-3 3 M58.5 -3.5 q2 -2 3 0 q-1 2 -3 3', stroke: INK, strokeWidth: 1.3, fill: 'none', strokeLinecap: 'round' })));
+  }
+  if (st === 'asleep' && kind !== 'N' && kind !== 'T') {
+    const zs = { fontFamily: 'Gaegu, cursive', fontWeight: 700, fill: '#eef2ff', stroke: INK, strokeWidth: 0.9, paintOrder: 'stroke' };
+    top.push(h('text', { key: 'z1', x: side > 0 ? 6 : 48, y: 12, fontSize: 13, style: { ...zs, animation: 'yr-z 2.6s linear infinite', transformBox: 'fill-box' } }, 'z'));
+    top.push(h('text', { key: 'z2', x: side > 0 ? 2 : 54, y: 4, fontSize: 9, style: { ...zs, animation: 'yr-z 2.6s 1.3s linear infinite', transformBox: 'fill-box' } }, 'z'));
+  }
+
+  let ht = 'none';
+  if (st === 'asleep') ht = `translate(${side * 3}px,5px) rotate(${side * 26}deg)`;
+  else if (kind === 'P') ht = 'translate(0px,2.5px)';
+  const headG = h('g', { key: 'head', style: { transform: ht, transformOrigin: '32px 40px', transition: `transform ${200 * sf}ms cubic-bezier(.5,-0.4,.6,1.5)` } }, hd, F);
+
+  let ws = {};
+  if (st === 'yawn') ws = { animation: o.loop ? 'yr-yawnloop 2.4s infinite' : `yr-yawn ${520 * sf}ms both`, transformOrigin: '32px 63px' };
+  else if (st === 'refuse') ws = { animation: `yr-shake ${350 * sf}ms`, transformOrigin: '32px 63px' };
+  else if (st === 'startle') ws = { transform: 'translateY(-3px) scale(1.04,1.04)', transformOrigin: '32px 63px' };
+  else if (st === 'asleep') ws = { animation: 'yr-breathe 2.6s ease-in-out infinite', transformOrigin: '32px 63px' };
+
+  const outer = h('g', { key: 't' + (o.tapK || 0), style: (o.tapK ? { animation: `yr-tap ${120 * sf}ms`, transformOrigin: '32px 63px' } : {}) },
+    h('g', { style: ws }, back, body, headG, front), top);
+  return h('svg', { width: size, height: size, viewBox: '0 0 64 64', x: o.x, y: o.y, style: { overflow: 'visible', display: 'block' } },
+    h('defs', null, h('clipPath', { id: hc }, h('circle', { cx: 32, cy: 25, r: 14 }))), outer);
+}
+
+class Component extends DCLogic {
+  mapRef = React.createRef();
+  timers = [];
+  state = this.initState();
+
+  initState() {
+    const p = Math.max(0, Math.min(LV.length, (this.props && this.props.startStation) ?? 5));
+    const cleared = {}; for (let i = 0; i < p; i++) cleared[i] = true;
+    const ol = openLines(cleared);
+    return { screen: 'map', cleared, selLine: ol[ol.length - 1], justOpened: null, lv: Math.min(p, LV.length - 1), cells: [], R: 0, C: 0, taps: 0, phase: 'idle', lit: {}, bubbles: [], card: null, fails: 0, hint: null, ad: null, pause: false, sfx: true, vib: true };
+  }
+  sf() { return this.props.slowMo ? 3 : 1; }
+  later(fn, ms) { const id = setTimeout(() => { this.timers = this.timers.filter(x => x !== id); fn(); }, ms * this.sf()); this.timers.push(id); }
+  clearTimers() { this.timers.forEach(clearTimeout); this.timers = []; }
+  componentDidMount() { this.scrollMap(); }
+  componentWillUnmount() { this.clearTimers(); clearInterval(this.adInt); }
+  componentDidUpdate(pp, ps) {
+    if (pp.startStation !== this.props.startStation) { this.clearTimers(); this.setState(this.initState()); return; }
+    if (this.state.screen === 'map' && ps.screen !== 'map') {
+      this.scrollMap();
+      if (this.state.justOpened != null) { clearTimeout(this.toastT); this.toastT = setTimeout(() => this.setState({ justOpened: null }), 3400); }
+    }
+  }
+  scrollMap() {
+    setTimeout(() => {
+      const el = this.mapRef.current; if (!el) return;
+      const cur = el.querySelector('[data-cur="1"]');
+      if (cur) el.scrollTop = Math.max(0, parseFloat(cur.getAttribute('data-y')) - el.clientHeight * 0.5);
+    }, 30);
+  }
+  load(lv) {
+    this.clearTimers();
+    const grid = LV[lv].rows.map(r => r.split(' '));
+    const R = grid.length, C = grid[0].length, cells = [];
+    grid.forEach((row, r) => row.forEach((tk, c) => {
+      if (tk === '..') cells.push({ t: 'e' });
+      else if (tk === '/' || tk === '\\') cells.push({ t: 'w', m: tk });
+      else cells.push({ t: 'p', kind: tk[0], dir: tk[1], a: (r * 5 + c * 3 + lv * 2) % 6, st: 'awake', exp: 0, tapK: 0, yawnK: 0, side: (c + r) % 2 ? 1 : -1 });
+    }));
+    return { lv, cells, R, C, taps: LV[lv].taps, phase: 'idle', lit: {}, bubbles: [], card: null, hint: null, pause: false };
+  }
+  play(lv) { this.setState(s => ({ ...this.load(lv), screen: 'car', selLine: LV[lv].line, fails: lv === s.lv ? s.fails : 0 })); }
+  tap(i) {
+    const s = this.state;
+    if (s.phase !== 'idle' || s.card || s.pause) return;
+    const cells = s.cells.map(x => ({ ...x })), c = cells[i];
+    if (c.t !== 'p' || c.st === 'asleep') return;
+    if (c.kind === 'C') {
+      if (c.st === 'refuse') return;
+      c.st = 'refuse'; this.setState({ cells });
+      this.later(() => this.setState(st => ({ cells: st.cells.map((x, k) => k === i && x.st === 'refuse' ? { ...x, st: 'awake' } : x) })), 380);
+      return;
+    }
+    if (s.taps <= 0) return;
+    c.tapK++;
+    const ys = []; this.expose(c, i, ys);
+    this.setState({ cells, taps: s.taps - 1, phase: 'run', hint: null });
+    this.later(() => { if (ys.length) this.yawn(ys); else this.finish(); }, 120);
+  }
+  expose(c, i, ys) { if (c.kind === 'M') { c.exp++; if (c.exp >= 2) ys.push(i); else c.st = 'drowsy'; } else ys.push(i); }
+  yawn(ys) {
+    const words = ['하아암', '하아아암', '하암~'];
+    this.setState(s => ({
+      cells: s.cells.map((x, k) => ys.includes(k) ? { ...x, st: 'yawn', yawnK: x.yawnK + 1 } : x),
+      bubbles: [...s.bubbles, ...ys.map((k, j) => ({ id: k + '-' + Date.now(), i: k, text: words[(k + j) % 3] }))],
+    }));
+    this.later(() => this.setState(s => ({ cells: s.cells.map((x, k) => ys.includes(k) && x.st === 'yawn' ? { ...x, st: 'asleep' } : x) })), 520);
+    this.later(() => this.setState(s => ({ bubbles: s.bubbles.filter(b => !ys.includes(b.i)) })), 900);
+    this.later(() => this.beat(ys), 450);
+  }
+  beat(front) {
+    const s = this.state;
+    const cells = s.cells.map(x => ({ ...x })), lit = { ...s.lit }, ys = [];
+    s.cells.forEach((c, i) => {
+      if (c.t !== 'p' || c.kind === 'C' || c.kind === 'P' || c.st === 'asleep' || c.st === 'yawn') return;
+      const tr = trace(i, s.cells, s.R, s.C);
+      if (tr.t >= 0 && front.includes(tr.t)) { lit[i] = tr.pts; this.expose(cells[i], i, ys); }
+    });
+    cells.forEach((c, i) => { if (c.t === 'p' && c.kind === 'S' && c.st === 'awake' && !ys.includes(i)) c.dir = CW[c.dir]; });
+    this.setState({ cells, lit });
+    if (ys.length) this.later(() => this.yawn(ys), 200);
+    else this.later(() => this.finish(), 250);
+  }
+  finish() {
+    const s = this.state;
+    const awake = s.cells.filter(c => c.t === 'p' && c.kind !== 'C' && c.st !== 'asleep');
+    if (!awake.length) {
+      this.setState({ phase: 'won' });
+      this.later(() => this.setState(st => {
+        const cl = { ...st.cleared, [st.lv]: true }, k = LV[st.lv].line + 1;
+        const fresh = k < LINES.length && !lineOpen(k, st.cleared) && lineOpen(k, cl);
+        return { card: 'win', cleared: cl, justOpened: fresh ? k : st.justOpened };
+      }), 500);
+    } else if (s.taps > 0) this.setState({ phase: 'idle' });
+    else {
+      this.setState({ phase: 'lost', fails: s.fails + 1, cells: s.cells.map(c => c.t === 'p' && c.kind !== 'C' && c.st !== 'asleep' ? { ...c, prev: c.st, st: 'glare' } : c) });
+      this.later(() => this.setState({ card: 'lose' }), 600);
+    }
+  }
+  runAd(kind, grant) {
+    clearInterval(this.adInt);
+    this.setState({ ad: { kind, count: 3 } });
+    this.adInt = setInterval(() => {
+      const n = (this.state.ad ? this.state.ad.count : 1) - 1;
+      if (n <= 0) { clearInterval(this.adInt); this.setState({ ad: null }); grant(); }
+      else this.setState({ ad: { kind, count: n } });
+    }, 550);
+  }
+
+  board() {
+    const s = this.state;
+    if (!s.cells.length) return null;
+    const { R, C } = s, cs = C <= 4 ? 72 : 58, W = C * cs, H = R * cs, sf = this.sf();
+    const ctr = ([r, c]) => [c * cs + cs / 2, r * cs + cs / 2];
+    const path = (pts) => {
+      let p = pts.map(ctr);
+      const mv = (a, b, d) => { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1; return [a[0] + dx / L * d, a[1] + dy / L * d]; };
+      p[0] = mv(p[0], p[1], cs * 0.3); p[p.length - 1] = mv(p[p.length - 1], p[p.length - 2], cs * 0.3);
+      const dx = Math.sign(p[1][0] - p[0][0]), dy = Math.sign(p[1][1] - p[0][1]);
+      p = p.map(q => [q[0] - dy * 4, q[1] + dx * 4]);
+      let len = 0; for (let k = 1; k < p.length; k++) len += Math.hypot(p[k][0] - p[k - 1][0], p[k][1] - p[k - 1][1]);
+      return { p, len, d: 'M' + p.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L') };
+    };
+    const lines = [];
+    s.cells.forEach((c, i) => {
+      if (c.t !== 'p') return;
+      if (s.lit[i]) {
+        const pp = path(s.lit[i]); const rev = pp.p.slice().reverse();
+        const dr = 'M' + rev.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L');
+        lines.push(h('path', { key: 'lit' + i, d: dr, fill: 'none', stroke: '#ffcf5a', strokeWidth: 3, strokeLinecap: 'round', strokeLinejoin: 'round', style: { '--len': pp.len, strokeDasharray: pp.len, animation: `yr-draw ${200 * sf}ms ease-out both`, filter: 'drop-shadow(0 0 4px rgba(255,207,90,.8))' } }));
+        return;
+      }
+      if (c.kind === 'P' || c.kind === 'C' || c.st === 'asleep' || c.st === 'yawn') return;
+      const tr = trace(i, s.cells, R, C);
+      if (tr.t < 0) return;
+      const pp = path(tr.pts), end = pp.p[pp.p.length - 1];
+      lines.push(h('g', { key: 'sl' + i + c.dir },
+        h('path', { d: pp.d, fill: 'none', stroke: 'rgba(236,228,205,.45)', strokeWidth: 2, strokeDasharray: '2 5', strokeLinecap: 'round', strokeLinejoin: 'round' }),
+        h('circle', { cx: end[0], cy: end[1], r: 2.6, fill: 'rgba(236,228,205,.6)' })));
+    });
+    const kids = [];
+    s.cells.forEach((c, i) => {
+      const r = Math.floor(i / C), col = i % C, x = col * cs, y = r * cs;
+      if (c.t === 'p') kids.push(h('div', { key: 'seat' + i, style: { position: 'absolute', left: x + 5, top: y + 8, width: cs - 10, height: cs - 12, borderRadius: 12, background: '#323b4e', boxShadow: 'inset 0 -6px 0 #28303f, 0 1px 0 rgba(255,255,255,.04)' } }));
+      if (c.t === 'w') kids.push(h('div', { key: 'win' + i, style: { position: 'absolute', left: x + 4, top: y + 4, width: cs - 8, height: cs - 8, borderRadius: 8, background: 'linear-gradient(135deg,#2e5a6e,#1c3341)', border: '1.5px solid rgba(160,215,235,.5)', boxShadow: '0 0 18px rgba(140,210,235,.18), inset 0 0 12px rgba(160,220,240,.15)', overflow: 'hidden' } },
+        h('svg', { width: cs - 8, height: cs - 8, viewBox: '0 0 10 10', preserveAspectRatio: 'none', style: { display: 'block' } },
+          c.m === '/' ? h('path', { d: 'M1 9 L9 1 M3.5 9.5 L9.5 3.5', stroke: '#c7ecf7', strokeWidth: 0.5, opacity: 0.85, vectorEffect: 'non-scaling-stroke', style: { strokeWidth: 3 } }) : h('path', { d: 'M1 1 L9 9 M3.5 0.5 L9.5 6.5', stroke: '#c7ecf7', opacity: 0.85, vectorEffect: 'non-scaling-stroke', style: { strokeWidth: 3 } }))));
+    });
+    kids.push(h('svg', { key: 'lines', width: W, height: H, style: { position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none' } }, lines));
+    s.cells.forEach((c, i) => {
+      if (c.t !== 'p') return;
+      const r = Math.floor(i / C), col = i % C;
+      kids.push(h('div', { key: 'p' + i, onClick: () => this.tap(i), role: 'button', 'aria-label': '승객', style: { position: 'absolute', left: col * cs, top: r * cs, width: cs, height: cs, cursor: c.st === 'asleep' ? 'default' : 'pointer', zIndex: c.st === 'yawn' ? 3 : 1 } },
+        P({ a: c.a, kind: c.kind, dir: c.dir, st: c.st, size: cs, uid: 'b' + i, sf, side: c.side, tapK: c.tapK, exp: c.exp })));
+    });
+    if (s.hint != null) {
+      const r = Math.floor(s.hint / C), col = s.hint % C;
+      kids.push(h('div', { key: 'hint', style: { position: 'absolute', left: col * cs - 4, top: r * cs - 4, width: cs + 8, height: cs + 8, borderRadius: '50%', border: '3px dashed #ffcf5a', boxSizing: 'border-box', animation: 'yr-pulse 1.2s ease-in-out infinite', pointerEvents: 'none', zIndex: 4 } }));
+    }
+    s.bubbles.forEach(b => {
+      const r = Math.floor(b.i / C), col = b.i % C;
+      kids.push(h('div', { key: 'bb' + b.id, style: { position: 'absolute', left: col * cs + cs / 2, top: r * cs - 4, transform: 'translate(-50%,-100%)', zIndex: 6, pointerEvents: 'none' } },
+        h('div', { style: { animation: `yr-bubble ${900 * sf}ms both`, background: '#fffaf0', color: INK, border: `2px solid ${INK}`, borderRadius: 14, padding: '0 10px 2px', fontFamily: 'Gaegu, cursive', fontWeight: 700, fontSize: 22, whiteSpace: 'nowrap', boxShadow: `2px 2px 0 ${INK}`, transformOrigin: '50% 100%' } }, b.text)));
+    });
+    const wall = (side) => h('div', { key: 'wall' + side, style: { position: 'absolute', top: 10, bottom: 10, [side]: 4, width: 8, borderRadius: 4, background: 'repeating-linear-gradient(180deg,#34465a 0 30px,#171b23 30px 38px)', opacity: 0.9 } });
+    return h('div', { style: { position: 'relative', padding: '22px 26px', borderRadius: 22, background: 'repeating-linear-gradient(90deg,#252a35 0 24px,#232833 24px 48px)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.05), 0 20px 50px rgba(0,0,0,.35)' } },
+      wall('left'), wall('right'),
+      h('div', { style: { position: 'relative', width: W, height: H } }, kids));
+  }
+
+  mapSvg(ts) {
+    const s = this.state, cl = s.cleared, W = 380, ROW = 150, TOP = 84;
+    const ol = openLines(cl);
+    const vis = ol.map(k => ({ k, teaser: false })).concat([{ k: ol[ol.length - 1] + 1, teaser: true }]);
+    const out = [], rails = [];
+    let prevEnd = null;
+    vis.forEach(({ k, teaser }, vi) => {
+      const L = LINES[k] || { n: k + 1, name: '???', color: '#9a968c', intro: null, label: '???' };
+      const color = teaser ? '#a8a395' : L.color;
+      const sel = !teaser && k === s.selLine, fresh = !teaser && s.justOpened === k && s.screen === 'map';
+      const nx = teaser ? -1 : nextOf(k, cl);
+      const y = TOP + vi * ROW;
+      let st = teaser ? [{ ph: true }, { ph: true }, { ph: true }] : LV.map((l, i) => ({ i, l })).filter(x => x.l.line === k);
+      if (!teaser && k === LINES.length - 1) st = st.concat([{ ph: true, more: true }, { ph: true, more: true }]);
+      const n = st.length, ltr = vi % 2 === 0;
+      const xs = st.map((_, j) => { const t = n > 1 ? j / (n - 1) : 0; return ltr ? 56 + t * (W - 112) : W - 56 - t * (W - 112); });
+      const g = [], rg = [], sw = sel ? 10 : 7;
+      const draw = (d0) => fresh ? { pathLength: 1, strokeDasharray: 1, style: { '--len': 1, animation: `yr-draw 600ms ${d0}ms cubic-bezier(.4,0,.2,1) both` } } : {};
+      if (prevEnd) rg.push(h('path', { key: 'cn', d: `M${prevEnd[0]} ${prevEnd[1]} L${xs[0]} ${y}`, stroke: color, strokeWidth: sw, strokeLinecap: 'round', strokeDasharray: teaser ? '2 12' : null, ...draw(200) }));
+      rg.push(h('path', { key: 'rail', d: `M${xs[0]} ${y} L${xs[n - 1]} ${y}`, stroke: color, strokeWidth: sw, strokeLinecap: 'round', strokeDasharray: teaser ? '2 12' : null, ...draw(750) }));
+      rails.push(h('g', { key: 'rl' + vi, style: teaser ? { opacity: 0.55, filter: 'blur(1.2px)' } : {} }, rg));
+      if (!teaser) {
+        g.push(h('rect', { key: 'band', x: 4, y: y - 80, width: W - 8, height: 120, rx: 20, fill: sel ? color : 'transparent', fillOpacity: sel ? 0.1 : 0, stroke: sel ? color : 'none', strokeOpacity: 0.45, strokeWidth: 1.5, onClick: () => this.setState({ selLine: k }), style: { cursor: 'pointer' } }));
+      }
+      const hx = ltr ? (vi === 0 ? 16 : 84) : 16;
+      g.push(h('rect', { key: 'chip', x: hx, y: y - 64, width: 26, height: 22, rx: 6, fill: color, style: { pointerEvents: 'none' } }));
+      g.push(h('text', { key: 'cn2', x: hx + 13, y: y - 48.5, textAnchor: 'middle', style: { pointerEvents: 'none', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13, fill: '#fff' } }, teaser ? '?' : L.n));
+      g.push(h('text', { key: 'nm', x: hx + 34, y: y - 48, style: { pointerEvents: 'none', fontWeight: 700, fontSize: 16 * ts, fill: 'var(--ink,#1d1f27)' } }, teaser ? '다음 노선' : L.name));
+      const fx = ltr ? W - 16 - 34 : W - 84 - 34;
+      if (teaser) {
+        g.push(h('circle', { key: 'sil1', cx: fx + 17, cy: y - 60, r: 8, fill: '#a8a395' }), h('path', { key: 'sil2', d: `M${fx + 4} ${y - 38} q13 -16 26 0 Z`, fill: '#a8a395' }));
+        g.push(h('text', { key: 'lb', x: fx - 6, y: y - 48, textAnchor: 'end', style: { fontSize: 12 * ts, fill: 'var(--muted,#5a5e6b)' } }, '누가 탈까요?'));
+      } else {
+        g.push(h('g', { key: 'face', style: { pointerEvents: 'none' } }, P({ a: k * 2 + 1, kind: L.intro, dir: 'd', size: 34, x: fx, y: y - 76, uid: 'm' + k })));
+        g.push(h('text', { key: 'lb', x: fx - 6, y: y - 48, textAnchor: 'end', style: { pointerEvents: 'none', fontSize: 12 * ts, fill: 'var(--muted,#5a5e6b)' } }, L.label));
+      }
+      st.forEach((x, j) => {
+        const sx = xs[j], key = 'st' + j;
+        if (x.ph) { g.push(h('circle', { key, cx: sx, cy: y, r: 6, fill: 'var(--paper,#f3efe6)', stroke: '#b9b4a8', strokeWidth: 3 })); if (x.more) g.push(h('text', { key: key + 't', x: sx, y: y + 30, textAnchor: 'middle', style: { fontSize: 12 * ts, fill: 'var(--muted,#5a5e6b)' } }, '곧 개통')); return; }
+        const i = x.i, cleared = !!cl[i], isNext = i === nx, isCur = isNext && sel, transfer = j === n - 1 && k < LINES.length - 1;
+        const items = [h('circle', { key: 'hit', cx: sx, cy: y, r: 26, fill: 'transparent' })];
+        if (isCur) {
+          items.push(h('circle', { key: 'ping', cx: sx, cy: y, r: 12, fill: color, style: { animation: 'yr-ping 1.8s ease-out infinite', transformBox: 'fill-box', transformOrigin: 'center' } }));
+          items.push(h('circle', { key: 'c', cx: sx, cy: y, r: 12, fill: 'var(--paper,#f3efe6)', stroke: color, strokeWidth: 6 }));
+          items.push(h('g', { key: 'train', style: { animation: 'yr-bob 1.6s ease-in-out infinite' } },
+            h('rect', { x: sx - 15, y: y - 44, width: 30, height: 20, rx: 7, fill: color, stroke: INK, strokeWidth: 2 }),
+            h('rect', { x: sx - 10, y: y - 40, width: 8, height: 7, rx: 2, fill: '#f3efe6', stroke: INK, strokeWidth: 1.3 }),
+            h('rect', { x: sx + 2, y: y - 40, width: 8, height: 7, rx: 2, fill: '#f3efe6', stroke: INK, strokeWidth: 1.3 }),
+            h('circle', { cx: sx - 8, cy: y - 28, r: 1.6, fill: '#ffcf5a' }), h('circle', { cx: sx + 8, cy: y - 28, r: 1.6, fill: '#ffcf5a' })));
+        } else if (isNext) {
+          items.push(h('circle', { key: 'c', cx: sx, cy: y, r: 10, fill: 'var(--paper,#f3efe6)', stroke: color, strokeWidth: 4 }));
+        } else if (transfer) {
+          items.push(h('circle', { key: 'c', cx: sx, cy: y, r: 12, fill: 'var(--paper,#f3efe6)', stroke: cleared ? INK : '#b9b4a8', strokeWidth: 3 }));
+          items.push(h('circle', { key: 'c2', cx: sx, cy: y, r: 6, fill: cleared ? color : 'transparent' }));
+        } else if (cleared) {
+          items.push(h('circle', { key: 'c', cx: sx, cy: y, r: 10, fill: color, stroke: 'var(--paper,#f3efe6)', strokeWidth: 3 }));
+        } else {
+          items.push(h('circle', { key: 'c', cx: sx, cy: y, r: 9, fill: 'var(--paper,#f3efe6)', stroke: '#b9b4a8', strokeWidth: 3 }));
+        }
+        const onConn = (j === 0 && vi > 0) || (j === n - 1 && vi < vis.length - 1);
+        const right = sx > W / 2;
+        const lx = onConn ? (right ? sx - 18 : sx + 18) : sx, anc = onConn ? (right ? 'end' : 'start') : 'middle';
+        const halo = { paintOrder: 'stroke', stroke: 'var(--paper,#f3efe6)', strokeWidth: 4, strokeLinejoin: 'round' };
+        if (!isCur) items.push(h('text', { key: 'no', x: lx, y: onConn ? y - 16 : y - 20, textAnchor: anc, style: { ...halo, fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, fill: 'var(--muted,#5a5e6b)' } }, String(i + 1).padStart(2, '0')));
+        items.push(h('text', { key: 'nm', x: lx, y: onConn ? y + 22 : y + 31, textAnchor: anc, style: { ...halo, fontSize: 13 * ts, fontWeight: isCur ? 700 : 500, fill: cleared || isNext ? 'var(--ink,#1d1f27)' : 'var(--muted,#5a5e6b)' } }, x.l.name));
+        const can = cleared || isNext;
+        g.push(h('g', { key, 'data-cur': isCur ? '1' : '0', 'data-y': y, onClick: can ? () => this.play(i) : () => this.setState({ selLine: k }), style: { cursor: 'pointer' } }, items));
+      });
+      prevEnd = [xs[n - 1], y];
+      out.push(h('g', { key: 'ln' + vi, style: teaser ? { opacity: 0.55, filter: 'blur(1.2px)' } : fresh ? { animation: 'yr-fade 400ms 1100ms both' } : {} }, g));
+    });
+    const Ht = TOP + (vis.length - 1) * ROW + 56;
+    return h('svg', { width: '100%', viewBox: `0 0 ${W} ${Ht}`, style: { display: 'block', overflow: 'visible', fontFamily: 'IBM Plex Sans KR, system-ui, sans-serif' } }, h('g', { key: 'rails' }, rails), out);
+  }
+
+  tile(type) {
+    const S = { stroke: INK, strokeWidth: 1.6, strokeLinejoin: 'round', strokeLinecap: 'round' };
+    if (type === 'pole') return h('svg', { width: 56, height: 56, viewBox: '0 0 64 64', style: { display: 'block', overflow: 'visible' } },
+      h('defs', null, h('radialGradient', { id: 'polG', cx: '38%', cy: '35%', r: '70%' }, h('stop', { offset: '0', stopColor: '#ffffff' }), h('stop', { offset: '.45', stopColor: '#c3ccd6' }), h('stop', { offset: '1', stopColor: '#6f7a88' }))),
+      h('rect', { x: 3, y: 3, width: 58, height: 58, rx: 10, fill: '#252a35' }),
+      h('path', { d: 'M32 61 L32 44', stroke: 'rgba(236,228,205,.6)', strokeWidth: 2, strokeDasharray: '2 4', strokeLinecap: 'round' }),
+      h('path', { d: 'M22 32 L6 32 M10 28 L5.5 32 L10 36 M42 32 L58 32 M54 28 L58.5 32 L54 36', stroke: '#ffcf5a', strokeWidth: 2.4, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round', style: { filter: 'drop-shadow(0 0 3px rgba(255,207,90,.8))' } }),
+      h('ellipse', { cx: 32, cy: 35, rx: 10, ry: 4, fill: 'rgba(0,0,0,.35)' }),
+      h('circle', { cx: 32, cy: 32, r: 9, fill: 'url(#polG)', ...S }),
+      h('path', { d: 'M28.5 26 q2 -2 4.5 -1.5', stroke: '#fff', strokeWidth: 1.6, fill: 'none', strokeLinecap: 'round' }),
+      h('path', { d: 'M46 10 l0 8 M42 14 l8 0', stroke: '#fff', strokeWidth: 1.6, strokeLinecap: 'round', style: { animation: 'yr-pulse 1.6s ease-in-out infinite', transformBox: 'fill-box', transformOrigin: 'center' } }));
+    return h('svg', { width: 56, height: 56, viewBox: '0 0 64 64', style: { display: 'block', overflow: 'visible' } },
+      h('rect', { x: 3, y: 3, width: 58, height: 58, rx: 10, fill: '#2a3140' }),
+      h('rect', { x: 29, y: 7, width: 6, height: 50, fill: '#ffcf5a', opacity: 0.85 }),
+      h('rect', { x: 7, y: 7, width: 23, height: 50, rx: 3, fill: '#56627a', ...S }),
+      h('rect', { x: 34, y: 7, width: 23, height: 50, rx: 3, fill: '#56627a', ...S }),
+      h('rect', { x: 11, y: 12, width: 15, height: 18, rx: 2, fill: '#2e5a6e', ...S, strokeWidth: 1.2 }),
+      h('rect', { x: 38, y: 12, width: 15, height: 18, rx: 2, fill: '#2e5a6e', ...S, strokeWidth: 1.2 }),
+      h('path', { d: 'M21 44 l-5 -4 l5 -4 M43 44 l5 -4 l-5 -4', stroke: '#e9e6dd', strokeWidth: 1.8, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      h('circle', { cx: 54, cy: 9, r: 9, fill: '#ffcf5a', ...S }),
+      h('text', { x: 54, y: 13.2, textAnchor: 'middle', style: { fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 12, fill: INK } }, '2'));
+  }
+  candidates() {
+    const lab = { fontSize: 11, color: '#a9adb8', textAlign: 'center', marginTop: 6, lineHeight: 1.3, wordBreak: 'keep-all' };
+    const items = [
+      ['코골이 아저씨', P({ a: 3, kind: 'N', st: 'asleep', side: 1, size: 56, uid: 'cn' })],
+      ['깬 이웃', P({ a: 0, st: 'startle', size: 56, uid: 'cs' })],
+      ['우는 아기', P({ a: 5, kind: 'Y', dir: 'd', size: 56, uid: 'cy' })],
+      ['아기 잠듦', P({ a: 5, kind: 'Y', st: 'asleep', side: -1, size: 56, uid: 'cy2' })],
+      ['잠꼬대', P({ a: 4, kind: 'T', st: 'asleep', side: 1, size: 56, uid: 'ct' })],
+      ['마스크', P({ a: 1, kind: 'K', dir: 'r', size: 56, uid: 'ck' })],
+      ['마스크 하품', P({ a: 1, kind: 'K', st: 'yawn', loop: true, size: 56, uid: 'ck2' })],
+      ['기둥 · 시선 갈라짐', this.tile('pole')],
+      ['출입문 · 2박 남음', this.tile('door')],
+    ];
+    return h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '22px 14px', paddingTop: 14 } },
+      items.map(([n, el], j) => h('div', { key: j, style: { width: 72, display: 'flex', flexDirection: 'column', alignItems: 'center' } }, el, h('div', { style: lab }, n))));
+  }
+
+  sheet() {
+    const cols = ['아래', '왼쪽', '오른쪽', '위', '하품', '잠듦'];
+    const lab = { fontSize: 11, color: '#a9adb8', textAlign: 'center', fontFamily: 'IBM Plex Sans KR, sans-serif' };
+    const grid = { display: 'grid', gridTemplateColumns: '84px repeat(6, 56px)', gap: '10px 12px', alignItems: 'center', minWidth: 'max-content' };
+    const cells = [h('div', { key: 'h' })].concat(cols.map(c => h('div', { key: 'c' + c, style: lab }, c)));
+    ARCH.forEach((A, ai) => {
+      cells.push(h('div', { key: 'n' + ai, style: { ...lab, textAlign: 'left', color: '#e9e6dd', fontSize: 12 } }, A.name));
+      ['d', 'l', 'r', 'u'].forEach(d => cells.push(h('div', { key: ai + d }, P({ a: ai, dir: d, size: 56, uid: 's' + ai + d }))));
+      cells.push(h('div', { key: ai + 'y' }, P({ a: ai, st: 'yawn', loop: true, size: 56, uid: 's' + ai + 'y' })));
+      cells.push(h('div', { key: ai + 'z' }, P({ a: ai, st: 'asleep', size: 56, side: 1, uid: 's' + ai + 'z' })));
+    });
+    return h('div', { style: grid }, cells);
+  }
+  kinds() {
+    const lab = { fontSize: 11, color: '#a9adb8', textAlign: 'center', marginTop: 6, lineHeight: 1.3, wordBreak: 'keep-all' };
+    const items = [
+      ['휴대폰', { a: 4, kind: 'P' }], ['커피', { a: 0, kind: 'C', dir: 'd' }], ['커피 · 거절', { a: 0, kind: 'C', st: 'refuse' }],
+      ['말똥말똥', { a: 1, kind: 'M', dir: 'd' }], ['중간 졸음', { a: 1, kind: 'M', st: 'drowsy', exp: 1, dir: 'd' }],
+      ['두리번', { a: 3, kind: 'S', dir: 'r' }], ['부릅뜸', { a: 5, st: 'glare' }],
+    ];
+    return h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(7, 56px)', gap: 12, minWidth: 'max-content' } },
+      items.map(([n, o], j) => h('div', { key: j, style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } }, P({ ...o, size: 56, uid: 'k' + j }), h('div', { style: lab }, n))));
+  }
+
+  renderVals() {
+    const s = this.state, dark = !!this.props.dark, ts = this.props.textScale === '130%' ? 1.3 : 1;
+    const cl = s.cleared, selNext = nextOf(s.selLine, cl), done = selNext < 0;
+    const selIdx = done ? LINE_IDX[s.selLine][LINE_IDX[s.selLine].length - 1] : selNext;
+    const info = (i) => { const L = LV[i], ln = LINES[L.line]; return { name: L.name, num: String(i + 1).padStart(2, '0'), lineName: `${ln.n}호선 · ${ln.name}`, hint: L.hint || '', color: ln.color }; };
+    const mapCur = info(selIdx), carCur = info(s.lv);
+    const curLn = LV[s.lv].line;
+    let wn = nextOf(curLn, cl); if (wn < 0 && s.justOpened != null) wn = nextOf(s.justOpened, cl);
+    const tL = s.justOpened != null ? LINES[s.justOpened] : null;
+    const themeVars = dark
+      ? { height: '100%', '--paper': '#14161c', '--surface': '#1f222b', '--ink': '#ece8de', '--muted': '#a2a6b2', '--hair': 'rgba(236,232,222,.12)', '--hair2': 'rgba(236,232,222,.28)', '--pri': '#ffc94a', '--rew': '#ece8de', '--rewInk': '#14161c', '--ts': ts }
+      : { height: '100%', '--paper': '#f3efe6', '--surface': '#ffffff', '--ink': '#1d1f27', '--muted': '#5a5e6b', '--hair': 'rgba(29,31,39,.1)', '--hair2': 'rgba(29,31,39,.25)', '--pri': '#ffc94a', '--rew': '#23262f', '--rewInk': '#ffffff', '--ts': ts };
+    const awake = s.cells.filter(c => c.t === 'p' && c.st === 'glare');
+    const nearMiss = s.card === 'lose' && awake.length === 1;
+    const isLast = wn < 0;
+    const sw = (on) => ({ track: { flex: 'none', width: 52, height: 32, borderRadius: 16, boxSizing: 'border-box', background: on ? 'var(--ink,#1d1f27)' : 'transparent', border: on ? '0' : '2px solid var(--muted,#5a5e6b)', position: 'relative', transition: 'background .2s' }, thumb: { position: 'absolute', top: on ? 4 : 6, left: on ? 24 : 6, width: on ? 24 : 16, height: on ? 24 : 16, borderRadius: 12, background: on ? '#ffc94a' : 'var(--muted,#5a5e6b)', transition: 'all .2s' } });
+    const sfx = sw(s.sfx), vib = sw(s.vib);
+    let loseFaces = null;
+    if (s.card === 'lose') {
+      loseFaces = awake.length === 1
+        ? P({ a: awake[0].a, kind: awake[0].kind, st: 'glare', size: 96, uid: 'lf' })
+        : awake.slice(0, 3).map((c, j) => h('div', { key: j }, P({ a: c.a, kind: c.kind, st: 'glare', size: awake.length > 2 ? 44 : 60, uid: 'lf' + j })));
+    }
+    return {
+      deviceDark: dark || s.screen === 'car',
+      themeVars,
+      isMap: s.screen === 'map', isCar: s.screen === 'car', isSettings: s.screen === 'settings',
+      mapCur, carCur, mapRef: this.mapRef,
+      mapEl: s.screen === 'map' ? this.mapSvg(ts) : null,
+      nextLabel: done ? '다음 역 공사 중' : '다음 역', nextDisabled: done,
+      playNext: () => { if (!done) this.play(selNext); },
+      hasToast: !!tL && s.screen === 'map', toast: tL ? { n: tL.n, name: `${tL.n}호선 ${tL.name}`, label: tL.label + ' — 노선 띠를 눌러 골라요' } : { n: '', name: '', label: '' },
+      toastChip: { flex: 'none', width: 36, height: 36, borderRadius: 10, background: tL ? tL.color : '#999', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 15 },
+      openSettings: () => this.setState({ screen: 'settings' }),
+      closeSettings: () => this.setState({ screen: 'map' }),
+      carChip: { flex: 'none', width: 32, height: 32, borderRadius: 16, background: carCur.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13, border: '2px solid #17151d', boxSizing: 'border-box' },
+      hasHint: !!carCur.hint && s.screen === 'car',
+      boardEl: s.screen === 'car' ? this.board() : null,
+      tapList: Array.from({ length: LV[s.lv].taps }, (_, j) => ({ style: { opacity: j < s.taps ? 1 : 0.25, transform: j < s.taps ? 'none' : 'scale(.85)', transition: 'all .2s', width: 36, height: 36 } })),
+      tapsLeft: s.taps, tapsMax: LV[s.lv].taps,
+      dimStyle: { position: 'absolute', inset: 0, background: 'rgba(4,6,12,.5)', opacity: s.phase === 'won' ? 1 : 0, transition: 'opacity .5s', pointerEvents: 'none', zIndex: 4 },
+      isWin: s.card === 'win', isLose: s.card === 'lose', isPause: s.pause,
+      announce: `${carCur.name} 도착 · 이 칸은 전원 취침 중입니다. 내리실 분은 살금살금.`,
+      winSub: isLast ? '이 노선 다음 역은 곧 개통해요' : `다음 · ${LV[wn].name}` + (LV[wn].line !== curLn ? ` · ${LINES[LV[wn].line].n}호선 환승` : ''),
+      winPrimaryLabel: isLast ? '노선도' : '다음 역',
+      winPrimary: () => isLast ? this.setState({ screen: 'map', card: null }) : this.play(wn),
+      notLast: !isLast,
+      goMap: () => { this.clearTimers(); this.setState({ screen: 'map', card: null, pause: false }); },
+      retry: () => this.play(s.lv),
+      pause: () => { if (!s.card) this.setState({ pause: true }); },
+      resume: () => this.setState({ pause: false }),
+      loseTitle: awake.length === 1 ? '딱 한 명이 안 자요' : `${awake.length}명이 아직 말똥말똥해요`,
+      loseSub: awake.length === 1 ? '툭 한 번이면 될 것 같은데…' : '누구부터 건드릴지 다시 골라 봐요',
+      loseFaces, nearMiss, notNearMiss: s.card === 'lose' && !nearMiss,
+      failLabel: `실패 ${s.fails}회`,
+      showHintAd: s.card === 'lose' && s.fails >= 3,
+      moreTap: () => this.runAd('tap', () => this.setState(st => ({ card: null, taps: 1, phase: 'idle', cells: st.cells.map(c => c.st === 'glare' ? { ...c, st: c.prev || 'awake' } : c) }))),
+      hintAd: () => this.runAd('hint', () => this.setState(st => ({ ...this.load(st.lv), hint: LV[st.lv].sol }))),
+      adOn: !!s.ad, adCount: s.ad ? s.ad.count : '', adLabel: s.ad ? (s.ad.kind === 'tap' ? '보상 · 툭 +1' : '보상 · 첫 툭 자리 힌트') : '',
+      sfxTrack: sfx.track, sfxThumb: sfx.thumb, vibTrack: vib.track, vibThumb: vib.thumb,
+      toggleSfx: () => this.setState({ sfx: !s.sfx }), toggleVib: () => this.setState({ vib: !s.vib }),
+      sheetEl: this.sheet(), kindsEl: this.kinds(), candEl: this.candidates(),
+    };
+  }
+}
+</script>
+</body>
+</html>
