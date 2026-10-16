@@ -1,7 +1,7 @@
 ---
 build-spec: adaptive
 stage: 02-construction/10-adaptive-difficulty
-status: QUESTIONS_OPEN
+status: READY
 depth: comprehensive
 updated: 2026-10-16
 ---
@@ -31,8 +31,7 @@ updated: 2026-10-16
 | frontend-components | ✅ DRAFT (설정 타일 하나) | [`frontend-components.md`](frontend-components.md) |
 
 ## §3. 미해결 질문
-- [ ] **Q1 BigQuery 연결 (오너 작업):** 출시 뒤 보정(BLM §6)에는 Firebase Analytics 원시 이벤트가 필요하다. Firebase 프로젝트에서 BigQuery 연결을 켜야 한다(무료 샌드박스 범위로 시작 가능 [추정 — 연결 시 확인]). 각 게임 출시 전에 켜면 된다. 대안은 Analytics 화면의 집계만 쓰는 것인데, 기믹별 보정이 어렵다.
-- [ ] **Q2 초기 수치 확인:** 목표 패배 확률 10% → 35%(120판에 걸쳐), 톱니 `[-5, 0, +5, +10, -10]%p`, 2연패 −8%p. 수치는 시뮬레이션 뒤 다시 보여 드리고 원격 설정으로 바꿀 수 있다. 출발점으로 괜찮은가?
+- 없음. Q1 BigQuery 연결(오너, 출시 전)·Q2 초기 수치는 DECISIONS 2026-10-16 「적응형 난이도 초기 수치와 BigQuery 연결」로 해소 → `READY`.
 
 ## §4. 구현 체크리스트
 - [ ] 패키지 생성 + `check_deps` 규칙
