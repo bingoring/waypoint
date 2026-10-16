@@ -22,6 +22,7 @@
 > 🚧 **Yawn! (2-9) 화면 구현 1차 끝 (2026-10-16), 오너 「마음에 든다」.** 다음 세션은 [`yawn-relay/handoff-2026-10-16.md`](02-construction/yawn-relay/handoff-2026-10-16.md)부터 — 에뮬레이터 검사 → 릴리스 빌드 → `IMPLEMENTED`. 오너: FC §7.2 D10~D18 확인, 후보 기믹 판정, AdMob·Firebase·업로드 키·BigQuery, 상표.
 > 🧪 **Yawn! 에뮬레이터 검사·릴리스 리허설 (2026-10-17).** 정적 검사 통과, AAB 최대 다운로드 11.57MB / 25MB, `validate --release`는 AdMob ID만 남음. 화면 전부 ko·en·다크·130%·애니메이션 끔 정상. 문제 3개 **고침** (FC §9.1, DECISIONS 2026-10-17): 배너 높이 처음부터 예약(모든 앱 공통 코어), 생성 판을 사람 범위로 자름, 도착 안내 때 헤더 흐림.
 > 📋 **Yawn! Build Spec 체크리스트 정리·박자 측정 (2026-10-17).** §4·§5 20개 중 14개 근거와 함께 체크. 박자: 가상 시계 누적 오차 0, 실제 간격 평균 650.3ms·±1프레임 56/58, 백그라운드 복귀 뒤 이어짐 → 통과(§5.1). `IMPLEMENTED`까지 남은 것: 화면 테스트 3개(AI) · Firebase·AdMob·업로드 키·G1·`sync_site`(오너 몫 이후).
+> ✅ **Yawn! Build Spec `IMPLEMENTED` → 2-9 승인 대기 (2026-10-17).** 화면 테스트 3개 추가(니어미스 → 한 번 더 툭, 커피 거절, 재시작 뒤 진행), 테스트 30개 통과. 오너: D10·D17·D18 확인, 후보 기믹 판정. 승인 뒤 R-1 독립 리뷰.
 > 🗺️ **개발 대기열:** 하품 릴레이(아트 → Build Spec) · 새떼 그림 · 번짐 · 샴페인 타워 · 눈꽃 가위 · **로그라이크 2종(사다리 원정, 딱지왕 — 고도화 설계 `roguelike/design-direction-2026-10-16.md`)**.
 > 📌 **3-1 공통:** 네 앱 모두 런처 아이콘이 아직 Flutter 기본 아이콘이다.
 
@@ -49,7 +50,7 @@
 | 2-6 물 마시기 알림 · standard | (보류, DECISIONS 2026-10-15) | DEFERRED |
 | 2-7 Game Kit + 조각보 블록 퍼즐 · comprehensive | [07-game-kit-puzzle.md](02-construction/07-game-kit-puzzle.md) · [Build Spec](02-construction/puzzle/build-spec-index.md) (보류, DECISIONS 2026-10-16) | DEFERRED |
 | 2-8 하이퍼캐주얼 신작 컨셉 · 조사·결정 | [08-hypercasual-concept.md](02-construction/08-hypercasual-concept.md) | HUMAN_APPROVED |
-| 2-9 Yawn! (하품) · comprehensive | [09-yawn-relay.md](02-construction/09-yawn-relay.md) · [Build Spec](02-construction/yawn-relay/build-spec-index.md) | AI_PROPOSED (Build Spec `READY`, 화면 구현 1차 완료 2026-10-16 — 인계: [handoff](02-construction/yawn-relay/handoff-2026-10-16.md)) |
+| 2-9 Yawn! (하품) · comprehensive | [09-yawn-relay.md](02-construction/09-yawn-relay.md) · [Build Spec](02-construction/yawn-relay/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` 2026-10-17 — 오너 승인 대기) |
 | 2-10 공통 적응형 난이도 · 조사·설계 | [10-adaptive-difficulty.md](02-construction/10-adaptive-difficulty.md) | AI_PROPOSED (Build Spec `READY`, `factory_adaptive` 구현 끝 — 남은 일: `fit_difficulty.dart`, `pool.json` 도구) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
