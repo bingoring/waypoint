@@ -77,6 +77,8 @@ updated: 2026-10-16
 
 ## 3. 영속 데이터 (`KeyValueStore`, 기기 안에만)
 
+> **구현 2026-10-16:** 아래 `yawn.progress.v1`·`yawn.attempts.v1`은 2-10 노선 선택에 맞춰 `yawn.map.v1` 하나로 바뀌었다 — [FC §7.2 D12](frontend-components.md).
+
 | 키 | 값 | 비고 |
 |---|---|---|
 | `yawn.progress.v1` | int | 깬 가장 높은 역 번호. 그 다음 역까지 열린다 (프로토타입 `yawn.progress`) |
