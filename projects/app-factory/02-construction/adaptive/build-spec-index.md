@@ -36,7 +36,7 @@ updated: 2026-10-16
 ## §4. 구현 체크리스트
 - [x] 패키지 생성 + `check_deps` 규칙 A-DEP (메인 `25f1da1`)
 - [x] core: 인터페이스·Director·커리큘럼·목표·예측·Glicko-2 + 단위 테스트 21개, 라인 96% (Glicko-2 Glickman 2012 골든 일치)
-- [ ] flutter: isolate 실행기, 저장(`adaptive.<game>.v1`), 원격 설정 키, 분석 이벤트 `adaptive_result`, 상황 신호, `AdaptiveTile`(ko·en)
+- [x] flutter: `AdaptiveSession`(isolate 미리 만들기, 저장 `adaptive.<game>.v1`, 원격 설정 `app_adaptive` JSON, 익명 이벤트 매개변수, 출퇴근·셀룰러 신호), `AdaptiveTile`(ko·en) — 메인 `4da2409`, 테스트 31개, 라인 97%
 - [ ] 하품 릴레이 어댑터: `generate`(구성형 생성기, 프로토타입 `gen2.js` 방식 이식) · `measure`(풀이기) · 소개 판 = 프로토타입 역
 - [ ] `pool.json` 도구: 기믹 묶음별 검증된 판 미리 생성
 - [ ] 시뮬레이터 + 결과 문서 `sim-yawn-<날짜>.md` → 기본 설정값 확정
@@ -63,4 +63,9 @@ updated: 2026-10-16
 ## §7. 편차 로그 — 구현 후
 | SoT | 실제 구현 | 사유 |
 |---|---|---|
-| | | |
+| DE §3 설정 키 목록 | + `warmup`·`warmup_cap`·`rd_ease`·`near_bonus`·`offset_rate`·`offset_cap` | 개선 I-1~5 (BR §9) |
+| BR A-PRED (모델만) | 모델 로짓 + 기믹별 개인 보정 | I-1 |
+| BR A-TGT | + 몸풀기·불확실성 완화·포기 다음 쉬어 가기 | I-2·3·5 |
+| BR A-GEN-2 (다양성만) | + 니어미스 가점 | I-4 |
+| DE §2.5 상황 신호(연결 종류 직접 읽기) | 패키지는 `network` 함수만 받고, 연결 상태 플러그인은 앱이 고른다 | 공통 패키지 의존을 가볍게 (A-DEP) |
+| 원격 설정 키 여러 개 | 앱 키 하나 `app_adaptive`(JSON 문자열) | 코어 원격 설정은 앱이 `app_` 키마다 기본값을 선언해야 한다 — 게임마다 한 줄로 줄임 |
