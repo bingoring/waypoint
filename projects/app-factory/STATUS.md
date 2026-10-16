@@ -46,6 +46,7 @@
 | 2-6 물 마시기 알림 · standard | (보류, DECISIONS 2026-10-15) | DEFERRED |
 | 2-7 Game Kit + 조각보 블록 퍼즐 · comprehensive | [07-game-kit-puzzle.md](02-construction/07-game-kit-puzzle.md) · [Build Spec](02-construction/puzzle/build-spec-index.md) (보류, DECISIONS 2026-10-16) | DEFERRED |
 | 2-8 하이퍼캐주얼 신작 컨셉 · 조사·결정 | [08-hypercasual-concept.md](02-construction/08-hypercasual-concept.md) | HUMAN_APPROVED |
+| 2-9 하품 릴레이 · comprehensive | [09-yawn-relay.md](02-construction/09-yawn-relay.md) · [Build Spec](02-construction/yawn-relay/build-spec-index.md) | AI_PROPOSED (Build Spec 작성 중) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
