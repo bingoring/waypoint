@@ -21,8 +21,8 @@ updated: 2026-10-17
 ## 체크리스트
 
 - [x] Build Spec 초안 — [`yawn-mechanics/build-spec-index.md`](yawn-mechanics/build-spec-index.md) (comprehensive, `QUESTIONS_OPEN`)
-- [x] 미해결 질문 해소 → `READY` (2026-10-17, 구현 착수 승인 대기)
-- [ ] 구현 (Build Spec §4)
+- [x] 미해결 질문 해소 → `READY` (2026-10-17, 오너 승인 「승인할게, 구현 시작해줘」)
+- [ ] 구현 (Build Spec §4) — U1~U5 끝(메인 `0510003`), U6~U8 진행 중
 - [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
 
 ## AI 제안 (AI Proposal)
@@ -38,7 +38,7 @@ updated: 2026-10-17
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
-- [ ] Build Spec이 `READY`로 승인되었는가?
+- [x] Build Spec이 `READY`로 승인되었는가? (2026-10-17)
 - [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
 
 ## 다음 단계

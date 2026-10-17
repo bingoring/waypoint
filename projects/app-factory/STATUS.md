@@ -28,7 +28,8 @@
 > 🎨 **디자인 핸드오프 v2 확인 (2026-10-17).** 요청서 v2 묶음 A~E 모두 충족, 게임 규칙과 어긋남 없음, SVG 정상(메타데이터·CSS 변형 때문에 렌더러를 Dart로 이식). 오너 결정 3개: 노선 20색 통일, 툭 표시 숫자만, 새 8종 판정 — `yawn-relay/handoff-v2-review-2026-10-17.md`.
 > ✅ **핸드오프 v2 결정 (2026-10-17).** 노선 20색·툭 숫자만 앱 반영, 새 8종 출시 포함(노선 20개), 출입문·기둥 디자이너 정정 요청서 준비(`yawn-relay/design-correction-v2-2026-10-17.md`). 다음: 8종 Flutter 구현을 위한 2-9 Build Spec 보강.
 > 📝 **2-11 기믹 확장 Build Spec 초안 (2026-10-17).** 노선 7~20 연결 전체(엔진 상태 격자·새 8종 규칙·박자 순서 11단계·판당 기믹 상한·렌더러 v2·효과·터널·노선 아이콘). 미해결 질문 Q1~Q4.
-> 📝 **2-11 Build Spec `READY` (2026-10-17).** 질문 4개 해소 — 핸드오프 순서, 20개 모두 켜고 출시, 디자이너 v2.1(문·기둥 정정) 그대로 구현, 노선 여는 간격 유지(리서치: Royal Match 초반 약 10판). 구현 착수 승인 대기.
+> 📝 **2-11 Build Spec `READY` (2026-10-17).** 질문 4개 해소 — 핸드오프 순서, 20개 모두 켜고 출시, 디자이너 v2.1(문·기둥 정정) 그대로 구현, 노선 여는 간격 유지(리서치: Royal Match 초반 약 10판). 오너가 구현 착수를 승인했다.
+> 🔧 **2-11 구현 U1~U5 (2026-10-17, 메인 `0510003`).** 새 8종 엔진·상태 격자·박자 11단계, 역 1~36 골든이 solver.js와 일치, 생성기 기믹 상한·새 기믹 넣기, 노선 20개. 테스트 59개 통과, 노선별 측정 p95 ≤ 84ms·힌트 최대 34ms. 다음: 렌더러 v2(U6)·화면 효과(U7)·노선도 아이콘(U8).
 > 🗺️ **개발 대기열:** 하품 릴레이(아트 → Build Spec) · 새떼 그림 · 번짐 · 샴페인 타워 · 눈꽃 가위 · **로그라이크 2종(사다리 원정, 딱지왕 — 고도화 설계 `roguelike/design-direction-2026-10-16.md`)**.
 > 📌 **3-1 공통:** 네 앱 모두 런처 아이콘이 아직 Flutter 기본 아이콘이다.
 
@@ -58,7 +59,7 @@
 | 2-8 하이퍼캐주얼 신작 컨셉 · 조사·결정 | [08-hypercasual-concept.md](02-construction/08-hypercasual-concept.md) | HUMAN_APPROVED |
 | 2-9 Yawn! (하품) · comprehensive | [09-yawn-relay.md](02-construction/09-yawn-relay.md) · [Build Spec](02-construction/yawn-relay/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` 2026-10-17 — 오너 승인 대기) |
 | 2-10 공통 적응형 난이도 · 조사·설계 | [10-adaptive-difficulty.md](02-construction/10-adaptive-difficulty.md) | AI_PROPOSED (Build Spec `READY`, `factory_adaptive` 구현 끝 — 남은 일: `fit_difficulty.dart`, `pool.json` 도구) |
-| 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | IN_PROGRESS (Build Spec `READY` — 구현 착수 승인 대기) |
+| 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | IN_PROGRESS (Build Spec `READY` 승인 — 구현 U1~U5 끝, U6~U8 진행) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
