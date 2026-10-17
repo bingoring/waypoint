@@ -35,6 +35,7 @@
 > 🧩 **2-12 생성기 재설계 착수 (2026-10-17).** 오너 에뮬레이터 피드백 4가지를 재현: 창문 든 생성 판 16개 중 13개는 창문이 장식, 70판째까지 3×3~5×5·4~11명, 고립 승객, 노선 첫 소개 판 11명 → 다음 역 4명. 원인은 「사람 먼저, 기믹은 빈칸·무작위 사람에」 생성과 전체 판 수 기반 크기 단계. Bus Out 분석 → 「풀이 먼저 엮기」 생성기·잠든 사람 시선 막힘을 순서 퍼즐로·노선 안 규모 곡선·판 최대 7×11 제안. Firebase `smallmatter-yawn` 연결(메인 `713c26f`).
 > 🧩 **2-12 프로토타입 2차 (2026-10-18).** 엮기 생성기가 20호선 기믹 전부를 다룬다 — 기믹을 연결·속임·함정 세 갈래로 넣고 갈래별 장식 검사. 240판 생성 실패 0·장식 기믹 0·고립 0, 20호선 30 → 40명(11×7). 순서 퍼즐 실험 「신문 펼친 승객」(꾸벅 승객은 순서가 안 생겨 버림). 사슬 쏠림·판당 기믹 상한. 오너 플레이 검토 대기.
 > 🧩 **2-12 3차 · 2-13 제안 (2026-10-18).** 오너가 신문 채택 → **5호선**(노선 21개), 디자인 요청서 v3(신문 승객·7×11 판 44dp). 생성기 최적화는 기준(`weave-ref.js`)을 동결하고 대조: 엔진 359만 박자·생성기 1,512판 **완전히 같음**, 변이 시험으로 대조 도구 자체도 검증, **2.07배**. 시간 한도 때문에 기기마다 판이 달라질 수 있던 것을 박자 수 한도로 고침. **2-13 노선 길이 적응**: 증거(실패 종류·도움·평소 대비 고민 시간) + 노선 안 계단 + 졸업, `factory_adaptive`에 게임 무관 구현·테스트 19개·시뮬레이션(어려워하는 사람 15판, 고수 6판), 다른 게임용 설명서.
+> 🎨 **핸드오프 v3.3 확인 · 2-13 승인 · 2-14 제안 (2026-10-18).** 오너가 신문 → **짐수레 승객**으로 교체(규칙 같음, 프로토타입 이름 변경·대조 통과). v3 렌더러로 앱 기준 그림 164장 비교: 뒷모습 7·선 몸 10장 바뀜, **출입문 타일이 렌더러 버그로 빈 그림**(정정 요청). 2-13 오너 승인(최소 판 수 = 간격 유지, 복습 섞기) → `ReviewPlanner` 구현. **2-14 지하철 빌런 밈**: 행동만 빌리고 실존 인물·약자는 빼는 원칙, 기믹 후보 4(스피커·쩍벌·치킨·스피커폰 통화), 넣는 방식 3안 — 오너 결정 대기.
 > 🗺️ **개발 대기열:** 하품 릴레이(아트 → Build Spec) · 새떼 그림 · 번짐 · 샴페인 타워 · 눈꽃 가위 · **로그라이크 2종(사다리 원정, 딱지왕 — 고도화 설계 `roguelike/design-direction-2026-10-16.md`)**.
 > 📌 **3-1 공통:** 네 앱 모두 런처 아이콘이 아직 Flutter 기본 아이콘이다.
 
@@ -66,7 +67,8 @@
 | 2-10 공통 적응형 난이도 · 조사·설계 | [10-adaptive-difficulty.md](02-construction/10-adaptive-difficulty.md) | AI_PROPOSED (Build Spec `READY`, `factory_adaptive` 구현 끝 — 남은 일: `fit_difficulty.dart`, `pool.json` 도구) |
 | 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` — 오너 확인 대기) |
 | 2-12 Yawn! 판 생성기 재설계 (엮인 판·커지는 규모·필수 기믹) · comprehensive | [12-yawn-generator.md](02-construction/12-yawn-generator.md) | IN_PROGRESS (엮기 생성기 3차 프로토타입: 21호선·신문 5호선·최적화 대조 통과, 디자인 요청서 v3 READY → Build Spec 대기) |
-| 2-13 노선 길이 적응 (익힘 판정 v2) · comprehensive | [13-line-mastery.md](02-construction/13-line-mastery.md) · [알고리즘 설명서](02-construction/adaptive/line-mastery.md) | AI_PROPOSED (알고리즘·테스트·시뮬레이션 끝, 오너 승인 대기 — Q1~Q3) |
+| 2-13 노선 길이 적응 (익힘 판정 v2) · comprehensive | [13-line-mastery.md](02-construction/13-line-mastery.md) · [알고리즘 설명서](02-construction/adaptive/line-mastery.md) | APPROVED (오너 2026-10-18 — 간격 유지·복습 섞기 구현, 앱 연결은 2-12 Build Spec) |
+| 2-14 지하철 빌런 밈 → 기믹 · standard | [14-yawn-villains.md](02-construction/14-yawn-villains.md) | AI_PROPOSED (오너 결정 대기 — Q1~Q3) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 

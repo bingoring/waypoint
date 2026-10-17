@@ -1,7 +1,7 @@
 ---
 artifact: algorithm-reference
 build-spec: adaptive
-status: DRAFT (Stage 2-13 제안, 오너 승인 대기)
+status: APPROVED (Stage 2-13, 오너 2026-10-18)
 updated: 2026-10-18
 code: packages/factory_adaptive/lib/src/core/mastery.dart · test/mastery_test.dart · tool/mastery_sim.dart
 ---
@@ -80,7 +80,9 @@ e = 1 / (1 + 0.5·planFails + 0.12·executionFails + 0.3·otherFails)   (이김)
 3. 최근 `window`(4)판 증거 평균 ≥ 0.6
 4. 이번 판을 이김
 
-**막히지 않게:** `maxBoards`(40)판에 닿으면 조건과 상관없이 졸업시키고 `forced`로 알린다 — 게임은 그 기믹이 든 복습 판을 뒤 장에 조금 더 섞을 수 있다. 졸업 뒤에도 그 장은 계속 플레이할 수 있다(꼭대기 크기).
+**막히지 않게:** `maxBoards`(40)판에 닿으면 조건과 상관없이 졸업시키고 `forced`로 알린다. 졸업 뒤에도 그 장은 계속 플레이할 수 있다(꼭대기 크기).
+
+**복습 (`ReviewPlanner`):** 강제 졸업한 기믹은 「복습 빚」을 진다. 뒤 장 판을 만들 때마다 `ReviewPlanner.pick(커리큘럼 순서의 (id, 진행), 지금 장, 판 번호, 설정)`을 부르면 `reviewEvery`(3)판마다 하나에 가장 앞 장의 빚 있는 기믹 id를 준다 — 게임은 그 기믹을 그 판의 「이전 기믹」 하나로 반드시 넣는다(못 넣으면 그 판은 복습 없이). 그 판이 끝나면 `reviewed(기록)`; 증거 ≥ 0.6인 복습 판이 `reviewBoards`(4)번 쌓이거나 `reviewMax`(12)판을 섞으면 빚이 끝난다.
 
 ## 6. 검증 (tool/mastery_sim.dart, 유형마다 1000명)
 
@@ -103,7 +105,7 @@ e = 1 / (1 + 0.5·planFails + 0.12·executionFails + 0.3·otherFails)   (이김)
 | 실패 종류 가리기 정확도 60%(거의 동전) | 순서 유지 — 고수 6 · 손 서툼 8 · 어려움 14 · 광고 13 |
 | 고민 시간을 못 잼 (`thinkMs` null) | 「오래 고민해 한 번에 푸는 사람」을 못 가려 6판 — **고민 시간이 이 유형을 가리는 유일한 신호** |
 
-단위 테스트 19개(test/mastery_test.dart): 증거 식, 원래 느린 사람 z≈0, 복잡도 보정, 튀는 값 자르기, 계단 움직임·한계, 졸업 4조건, 최대 판 수 강제 졸업 1회, 저장 왕복·깨진 저장.
+단위 테스트 24개(test/mastery_test.dart, 복습 5개 포함): 증거 식, 원래 느린 사람 z≈0, 복잡도 보정, 튀는 값 자르기, 계단 움직임·한계, 졸업 4조건, 최대 판 수 강제 졸업 1회, 저장 왕복·깨진 저장.
 
 ## 7. 다른 게임에 붙이는 법
 
