@@ -31,7 +31,7 @@ updated: 2026-10-16
 | `line` | int | 노선 번호 (장(章), FC §3.1) |
 | `name` | {ko, en} | 역 이름 (가상의 이름만, 실제 역명·노선 색 금지) |
 | `taps` | int (1~3) | 이 역에서 쓸 수 있는 툭 수 |
-| `map` | List\<String\> | 1.1 토큰 행. 모든 행의 토큰 수가 같다 (최대 6×6, NFR) |
+| `map` | List\<String\> | 1.1 토큰 행. 모든 행의 토큰 수가 같다 (최대 6×6 → 2026-10-17부터 가로 5 × 세로 8, NFR) |
 | `guide` | int? | 첫 역 안내용: 손가락 표시를 띄울 승객 id `[engine: LEVELS[0].guide]` |
 | `intro` | Mechanic? | 이 역에서 처음 나오는 요소 (한 줄 힌트를 띄운다, BR Y-UI-2) |
 | `solution` | List\<TapPlan\> | 도구가 찾은 이기는 툭 하나 (보상형 「힌트」용, BR Y-ADS-3) |
