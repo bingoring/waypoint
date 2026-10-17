@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Gaegu:wght@700&display=swap" rel="stylesheet">
+<script src="./yawn-render.js"></script>
+<style>
+body{margin:0;background:#e6e1d7;font-family:'IBM Plex Sans KR',system-ui,sans-serif;color:#1d1f27;-webkit-font-smoothing:antialiased}
+a{color:#1d1f27}a:hover{color:#5a5e6b}
+@keyframes yr-flip{0%,88%,100%{opacity:0}91%,97%{opacity:1}}
+@keyframes yr-blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
+@keyframes yr-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.97)}}
+@keyframes yr-z{0%{opacity:0;transform:translate(0,4px) scale(.6)}25%{opacity:1}100%{opacity:0;transform:translate(-4px,-12px) scale(1.15)}}
+@keyframes yr-snot{0%,100%{transform:scale(.35)}50%{transform:scale(1.15)}}
+@keyframes yr-drool{0%,100%{transform:scaleY(.6)}50%{transform:scaleY(1.25)}}
+@keyframes cf-up{0%,30%{transform:rotate(0deg);opacity:1}43%{transform:rotate(80deg);opacity:1}44%,87%{transform:rotate(80deg);opacity:0}88%{transform:scale(.9);opacity:1}93%{transform:scale(1.06)}100%{transform:none;opacity:1}}
+@keyframes cf-down{0%,43%{opacity:0;transform:none}44%{opacity:1;transform:scale(1.14,.82)}50%{transform:scale(.96,1.05)}56%,87%{opacity:1;transform:none}88%,100%{opacity:0}}
+@keyframes cf-awake{0%,38%{opacity:1}39%,87%{opacity:0}88%,100%{opacity:1}}
+@keyframes cf-asleep{0%,38%{opacity:0}39%,87%{opacity:1}88%,100%{opacity:0}}
+@keyframes cf-line{0%,52%{opacity:0}58%,84%{opacity:1}87%,100%{opacity:0}}
+@keyframes cf-bar{0%,43%{opacity:1}44%,87%{opacity:0}88%,100%{opacity:1}}
+@keyframes yr-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:.55}}
+</style>
+</helmet>
+<div style="display:flex;flex-direction:column;gap:72px;padding:56px;box-sizing:border-box;width:max-content;min-width:100%">
+
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:900px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5a5e6b;letter-spacing:.06em">YAWN! · 핸드오프 v3.3 · 2026-10-18</div>
+    <div style="font-size:40px;font-weight:700;letter-spacing:-0.03em;line-height:1.15">짐수레 승객 · 큰 판 7×11 · 노선 21개</div>
+    <div style="font-size:16px;line-height:1.6;color:#3d404b;text-wrap:pretty">v2 렌더러(yawn-render.js)에 짐수레 승객(kind H), 수레 타일(짐표 색 4), 크기 단계(lod)만 더했습니다(신문 승객은 이 짐수레로 바꿨습니다). 기존 그림은 한 장도 바뀌지 않았습니다 — 기존 입력 25,018가지를 문자 단위로 비교해 모두 같음을 확인했습니다.</div>
+  </div>
+
+  <section data-screen-label="A 짐수레 승객" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">A</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">짐수레 끄는 택배 아저씨 — 5호선</div>
+    </div>
+    <div style="width:1544px;display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 24px 26px;box-sizing:border-box">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="{{ cartChip }}">5</div>
+        <div style="font-size:20px;font-weight:700">짐수레 승객 · 수레 타일</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.55;max-width:1100px;text-wrap:pretty">
+        <div style="color:#c9ccd4"><span style="color:#a9adb8;font-weight:600">규칙 · </span>상자 두 개를 쌓은 손수레를 바로 앞 칸에 세워 둔다. 수레 칸은 지나는 시선을 방향과 상관없이 모두 막고, 주인도 수레에 가려 아무도 보지 못한다. 다른 사람은 주인을 볼 수 있다. 주인이 잠들면 수레가 넘어가고 상자가 바닥에 흩어져 수레 칸이 시선을 통과시킨다. 코골이·알람에 깨면 수레를 다시 세운다(다시 막힘).</div>
+        <div style="color:#ffcf5a"><span style="font-weight:600">첫 만남 단서 · </span>① 주인에게선 시선선이 나오지 않는다 ② 수레에 닿은 시선선은 수레 앞에서 가로막대로 끊긴다(기둥 막힘과 같은 끝) ③ 잠들어 수레가 넘어가면 끊겼던 선이 수레 칸 너머까지 이어지며 빛난다. 「키 크게 서 있음 = 막음, 바닥에 납작하게 흩어짐 = 통과」. 주인 어깨의 동그란 표와 수레 짐표가 같은 색(노랑·민트·분홍·하늘)이라 한 쌍으로 읽힌다 — 바로 앞 칸이라는 위치가 먼저, 색은 수레가 붙어 있을 때 확인용.</div>
+      </div>
+      <sc-for list="{{ cartRows }}" as="row" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px">
+          <div style="font-size:12px;font-weight:600;color:#a9adb8;letter-spacing:.02em">{{ row.label }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px 14px;align-items:flex-end">
+            <sc-for list="{{ row.frames }}" as="fr" hint-placeholder-count="5">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:76px;padding-top:20px">
+                <div>{{ fr.el }}</div>
+                <div style="font-size:11px;color:#a9adb8;text-align:center;line-height:1.3;word-break:keep-all;max-width:240px">{{ fr.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="B1 큰 판 화면" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">B1</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">큰 판 7×11 · 41명</div>
+    </div>
+    <div style="font-size:15px;line-height:1.6;color:#3d404b;max-width:900px;text-wrap:pretty">칸 = min(72, 폭 ÷ 7, 높이 ÷ 11), 최소 44. 412×915 → 칸 52, 360×780 → 칸 46. 판이 커서 머리줄은 52, 툭 표시는 판 아래 한 줄(손 30 + 「2 / 3」)로 줄여 판과 겹치지 않습니다. 칸 56 이하에서는 렌더러를 작은 칸 단계(lod 's')로 그립니다.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+      <sc-for list="{{ screens }}" as="s" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600">{{ s.label }}</div>
+          <div style="{{ s.frame }}">
+            <div style="height:28px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#e9e6dd"><span>08:12</span><span style="width:14px;height:9px;border-radius:2px;border:1.5px solid #e9e6dd;box-sizing:border-box"></span></div>
+            <div style="height:52px;flex:none;display:flex;align-items:center;gap:4px;padding:0 6px 0 12px">
+              <div style="flex:1;display:flex">
+                <div style="display:flex;align-items:center;gap:8px;background:#f3efe6;color:#1d1f27;border-radius:12px;padding:5px 12px 5px 5px;box-shadow:0 2px 0 rgba(0,0,0,.35)">
+                  <div style="{{ cartChipSign }}">5</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:17px">{{ s.station }}</div>
+                </div>
+              </div>
+              <div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#e9e6dd"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"></path><path d="M4 4v4.5h4.5"></path></svg></div>
+              <div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#e9e6dd"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.5"></rect><rect x="14" y="5" width="4" height="14" rx="1.5"></rect></svg></div>
+            </div>
+            <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center">{{ s.board }}</div>
+            <div style="height:52px;flex:none;display:flex;align-items:center;justify-content:center;gap:14px">
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ s.taps }}" as="t" hint-placeholder-count="3">
+                  <div style="{{ t.style }}">
+                    <svg width="30" height="30" viewBox="0 0 32 32"><path d="M13 6.5a2.5 2.5 0 0 1 5 0V15l5.2.9a3 3 0 0 1 2.5 3.4l-.9 5.6A5 5 0 0 1 19.9 29h-5.4a5 5 0 0 1-4-2L6.2 21.6a2.2 2.2 0 0 1 3.2-3L13 21.5V6.5z" fill="#f0c6a0" stroke="#17151d" stroke-width="2" stroke-linejoin="round"></path><path d="M9.5 3.5l1.6 1.6M21.5 3.5l-1.6 1.6M15.5 .8v2" stroke="#ffcf5a" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#a9adb8;letter-spacing:.04em">{{ s.tapLabel }}</div>
+            </div>
+            <div style="height:20px;flex:none;display:flex;align-items:center;justify-content:center"><div style="width:108px;height:4px;border-radius:2px;background:rgba(233,230,221,.5)"></div></div>
+          </div>
+          <div style="font-size:13px;color:#3d404b;max-width:412px;line-height:1.55;text-wrap:pretty">{{ s.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="B2 44dp 점검" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">B2</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">44dp 점검 — 기본 단계 vs 작은 칸 단계</div>
+    </div>
+    <div style="font-size:15px;line-height:1.6;color:#3d404b;max-width:900px;text-wrap:pretty">위 줄은 64 그리드 그림을 44dp로 그대로 줄인 것, 아래 줄은 작은 칸 단계(lod 's'). 작은 칸 단계는 모든 선 ×1.3, 눈 ×1.2, 배지 ×1.3, z 한 개(크게)로 바꾸고, 커피 김·이어폰 음표·브로치 여밈선·후드끈·기둥 반짝임·수레 바퀴 축·상자 라벨·넘어질 때 먼지 선을 뺍니다. 소품 실루엣(휴대폰, 컵, 헤드폰, 안경, 마스크, 수레·상자)은 그대로 둡니다.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;background:#1b1f28;border-radius:20px;padding:16px 24px 22px;width:max-content">
+      <div style="display:grid;grid-template-columns:110px repeat(21,52px);column-gap:8px;align-items:end;padding-bottom:6px">
+        <div></div>
+        <sc-for list="{{ audit.names }}" as="n" hint-placeholder-count="21"><div style="font-size:10px;color:#a9adb8;text-align:center;line-height:1.25;word-break:keep-all">{{ n }}</div></sc-for>
+      </div>
+      <sc-for list="{{ audit.rows }}" as="row" hint-placeholder-count="2">
+        <div style="display:grid;grid-template-columns:110px repeat(21,52px);column-gap:8px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:13px;font-weight:600;color:#e9e6dd">{{ row.label }}</div>
+          <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="21">
+            <div style="width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:#252a35;border-radius:8px">{{ c }}</div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="B3 시선선" style="display:flex;flex-direction:column;gap:16px;max-width:1000px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">B3</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">겹치는 시선선 · 누른 칸 강조</div>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <sc-for list="{{ lineDemo }}" as="d" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div>{{ d.el }}</div>
+          <div style="font-size:13px;color:#3d404b;max-width:300px;line-height:1.5;text-wrap:pretty">{{ d.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="C 노선 21개" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">C</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">노선 21개 — 색은 번호에, 아이콘은 기믹에</div>
+    </div>
+    <div style="font-size:15px;line-height:1.6;color:#3d404b;max-width:900px;text-wrap:pretty">1–20번 색은 v2 그대로. 21번은 채도를 낮춘 강철색(oklch 0.42 · 0.035 · 250 / 다크 0.74 · 0.04) — 다른 20색이 모두 채도 0.085 이상이라 색상환 어디에 두어도 이웃과 겹쳐, 대신 채도로 구별했습니다. 흰 번호 8.4:1, 다크 번호 7.8:1.</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;background:#f3efe6;border-radius:20px;padding:12px 20px;width:520px;box-sizing:border-box">
+        <div style="display:grid;grid-template-columns:44px 40px minmax(0,1fr) 120px 84px;gap:12px;align-items:center;padding:8px 0;font-size:12px;font-weight:600;color:#5a5e6b"><span>라이트</span><span></span><span>기믹</span><span>띠</span><span>hex</span></div>
+        <sc-for list="{{ lines }}" as="l" hint-placeholder-count="21">
+          <div style="display:grid;grid-template-columns:44px 40px minmax(0,1fr) 120px 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid rgba(29,31,39,.08)">
+            <div style="{{ l.chipL }}">{{ l.n }}</div>
+            <div style="width:36px;height:36px;border-radius:10px;background:#1b1f28;display:flex;align-items:center;justify-content:center;overflow:hidden">{{ l.icon }}</div>
+            <div style="font-size:14px;font-weight:600;color:#1d1f27">{{ l.name }}</div>
+            <div style="{{ l.railL }}"></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5a5e6b">{{ l.light }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;background:#14161c;border-radius:20px;padding:12px 20px;width:520px;box-sizing:border-box">
+        <div style="display:grid;grid-template-columns:44px 40px minmax(0,1fr) 120px 84px;gap:12px;align-items:center;padding:8px 0;font-size:12px;font-weight:600;color:#a2a6b2"><span>다크</span><span></span><span>기믹</span><span>띠</span><span>hex</span></div>
+        <sc-for list="{{ lines }}" as="l" hint-placeholder-count="21">
+          <div style="display:grid;grid-template-columns:44px 40px minmax(0,1fr) 120px 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid rgba(236,232,222,.1)">
+            <div style="{{ l.chipD }}">{{ l.n }}</div>
+            <div style="width:36px;height:36px;border-radius:10px;background:#1f222b;display:flex;align-items:center;justify-content:center;overflow:hidden">{{ l.icon }}</div>
+            <div style="font-size:14px;font-weight:600;color:#ece8de">{{ l.name }}</div>
+            <div style="{{ l.railD }}"></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#a2a6b2">{{ l.dark }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  n = 0;
+  componentDidMount() {
+    if (!window.YawnRender) this.t = setInterval(() => { if (window.YawnRender) { clearInterval(this.t); this.forceUpdate(); } }, 50);
+  }
+  componentWillUnmount() { clearInterval(this.t); }
+  get Y() { if (!this._Y && window.YawnRender) this._Y = window.YawnRender(React.createElement); return this._Y; }
+  u() { return 'v' + (this.n++); }
+
+  board(cfg) {
+    this._tagN = 0;
+    const Y = this.Y, h = React.createElement, INK = Y.INK, cs = cfg.cs, R = cfg.rows.length, C = cfg.rows[0].length, W = C * cs, H = R * cs;
+    const pad = cfg.pad || [22, 26], lod = cfg.lod || (cs <= 56 ? 's' : undefined), dense = cfg.dense;
+    const cells = [];
+    cfg.rows.forEach((row, r) => row.forEach((tk, c) => {
+      const ov = (cfg.ov || {})[r + ',' + c] || {};
+      let cell;
+      if (tk === '..') cell = { t: 'e' };
+      else if (tk === '#') cell = { t: 'ct' };
+      else if (tk === '/' || tk === '\\') cell = { t: 'w', m: tk };
+      else if (tk === 'I') cell = { t: 'i' };
+      else cell = { t: 'p', kind: tk[0], dir: tk[1] === 'x' ? 'd' : tk[1], a: tk[0] === 'H' ? 3 : (r * 5 + c * 3 + (cfg.seed || 0)) % 6, side: (r + c) % 2 ? 1 : -1 };
+      cells.push(Object.assign(cell, ov));
+    }));
+    const DIR = { u: [-1, 0], d: [1, 0], l: [0, -1], r: [0, 1] }, MIR = { '/': { r: 'u', u: 'r', l: 'd', d: 'l' }, '\\': { r: 'd', d: 'r', l: 'u', u: 'l' } };
+    cells.forEach((c, i) => {
+      if (c.kind !== 'H') return;
+      c.tag = c.tag != null ? c.tag : (this._tagN = (this._tagN || 0) + 1) - 1;
+      const rr = Math.floor(i / C) + DIR[c.dir][0], cc = i % C + DIR[c.dir][1];
+      if (rr >= 0 && cc >= 0 && rr < R && cc < C && cells[rr * C + cc].t === 'ct') cells[rr * C + cc].owner = i;
+    });
+    const paperOpen = (x) => x.t === 'ct' && x.owner != null && cells[x.owner].st !== 'asleep';
+    const split = (r0, c0, d0, lvl) => ((d0 === 'u' || d0 === 'd') ? ['l', 'r'] : ['u', 'd']).map(pd => {
+      let rr = r0, cc = c0, d = pd; const sp = [[rr, cc]];
+      for (let q = 0; q < 40; q++) {
+        rr += DIR[d][0]; cc += DIR[d][1];
+        if (rr < 0 || cc < 0 || rr >= R || cc >= C) return null;
+        const y = cells[rr * C + cc];
+        if (paperOpen(y)) return { pts: sp.concat([[rr, cc]]), blocked: true, paper: true };
+        if (y.t === 'w') { d = MIR[y.m][d]; sp.push([rr, cc]); continue; }
+        if (y.t === 'i') return lvl < 2 ? { pts: sp.concat([[rr, cc]]), splits: split(rr, cc, d, lvl + 1) } : { pts: sp.concat([[rr, cc]]), blocked: true };
+        if (y.t === 'p') return { pts: sp.concat([[rr, cc]]), t: rr * C + cc };
+      }
+      return null;
+    }).filter(Boolean);
+    const trace = (i) => {
+      const c = cells[i];
+      if (c.t !== 'p' || ['P', 'C', 'G', 'H'].includes(c.kind) || (c.st && c.st !== 'awake')) return null;
+      let r = Math.floor(i / C), col = i % C, d = c.dir, skipped = null, through = null;
+      const pts = [[r, col]];
+      for (let k = 0; k < 40; k++) {
+        r += DIR[d][0]; col += DIR[d][1];
+        if (r < 0 || col < 0 || r >= R || col >= C) return null;
+        const j = r * C + col, x = cells[j];
+        if (paperOpen(x)) return { t: -1, pts: pts.concat([[r, col]]), paper: true };
+        if (x.t === 'ct') through = j;
+        if (x.t === 'w') { d = MIR[x.m][d]; pts.push([r, col]); continue; }
+        if (x.t === 'i') return { t: -1, pts: pts.concat([[r, col]]), splits: split(r, col, d, 1) };
+        if (x.t === 'p') { if (c.kind === 'J' && skipped == null) { skipped = j; continue; } return { t: j, pts: pts.concat([[r, col]]), skipped, through }; }
+      }
+      return null;
+    };
+    const ctr = ([r, c]) => [c * cs + cs / 2, r * cs + cs / 2];
+    const mv = (a, b, d) => { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1; return [a[0] + dx / L * d, a[1] + dy / L * d]; };
+    const off = dense ? 2.4 : 3;
+    const poly = (pts, t0, t1) => {
+      let p = pts.map(ctr);
+      p[0] = mv(p[0], p[1], cs * t0); p[p.length - 1] = mv(p[p.length - 1], p[p.length - 2], cs * t1);
+      const dx = Math.sign(p[1][0] - p[0][0]), dy = Math.sign(p[1][1] - p[0][1]);
+      p = p.map(q => [q[0] - dy * off, q[1] + dx * off]);
+      return { p, d: 'M' + p.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L') };
+    };
+    const pressed = cfg.pressed, traces = cells.map((c, i) => trace(i));
+    const lit = cfg.lit || [];
+    const related = (i) => pressed != null && (i === pressed || (traces[i] && traces[i].t === pressed));
+    const idle = dense ? { fill: 'none', stroke: 'rgba(236,228,205,.3)', strokeWidth: 1.3, strokeDasharray: '1.5 4.5', strokeLinecap: 'round', strokeLinejoin: 'round' } : { fill: 'none', stroke: 'rgba(236,228,205,.34)', strokeWidth: 1.6, strokeDasharray: '1.5 5', strokeLinecap: 'round', strokeLinejoin: 'round' };
+    const dim = { ...idle, stroke: 'rgba(236,228,205,.12)' };
+    const press = { fill: 'none', stroke: '#ffffff', strokeWidth: 2.2, strokeLinecap: 'round', strokeLinejoin: 'round' };
+    const litS = { fill: 'none', stroke: '#ffcf5a', strokeWidth: dense ? 2.6 : 3, strokeLinecap: 'round', strokeLinejoin: 'round', style: { filter: 'drop-shadow(0 0 4px rgba(255,207,90,.8))' } };
+    const halo = { fill: 'none', stroke: '#20242e', strokeWidth: 4, strokeLinecap: 'round', strokeLinejoin: 'round', opacity: 0.9 };
+    const dotR = dense ? 1.7 : 2.2;
+    const lines = [];
+    const bar = (k, q) => { const e = q.p[q.p.length - 1], a = q.p[q.p.length - 2], vert = Math.abs(e[0] - a[0]) < 1, s = dense ? 5 : 6; return h('path', { key: k, d: vert ? `M${e[0] - s} ${e[1]} L${e[0] + s} ${e[1]}` : `M${e[0]} ${e[1] - s} L${e[0]} ${e[1] + s}`, stroke: '#e9e6dd', strokeWidth: 2.4, strokeLinecap: 'round' }); };
+    const push = (k, d, st) => { if (dense && st !== litS) lines.push(h('path', { key: k + 'h', d, ...halo })); lines.push(h('path', { key: k, d, ...st })); };
+    if (cfg.lines !== false) cells.forEach((c, i) => {
+      const tr = traces[i]; if (!tr) return;
+      const isLit = lit.includes(i), st = isLit ? litS : pressed != null ? (related(i) ? press : dim) : idle;
+      const dot = (k, e) => { if (!isLit) lines.push(h('circle', { key: k, cx: e[0], cy: e[1], r: dotR, fill: st === dim ? 'rgba(236,228,205,.18)' : st === press ? '#fff' : 'rgba(236,228,205,.5)' })); };
+      if (tr.paper) { const q = poly(tr.pts, 0.3, 0.62); push('n' + i, q.d, st); lines.push(bar('nb' + i, q)); return; }
+      if (tr.splits) {
+        const pp = poly(tr.pts, 0.3, 0.22); push('p' + i, pp.d, st);
+        const drawSp = (list, key) => list.forEach((sp, j) => {
+          const q = poly(sp.pts, 0.22, sp.paper ? 0.62 : sp.blocked ? 0.25 : sp.splits ? 0.22 : 0.3);
+          push(key + j, q.d, st);
+          if (sp.blocked) lines.push(bar(key + j + 'b', q)); else if (sp.splits) drawSp(sp.splits, key + j + '-'); else dot(key + j + 'd', q.p[q.p.length - 1]);
+        });
+        drawSp(tr.splits, 'ps' + i + '-');
+        return;
+      }
+      if (tr.skipped != null) {
+        const a = ctr(tr.pts[0]), b = ctr(tr.pts[tr.pts.length - 1]), s = mv(a, b, cs * 0.3), e = mv(b, a, cs * 0.3);
+        const mx = (s[0] + e[0]) / 2, my = (s[1] + e[1]) / 2, horiz = Math.abs(b[1] - a[1]) < 1;
+        push('j' + i, `M${s[0]} ${s[1]} Q${horiz ? mx : mx + cs * 0.8} ${horiz ? my - cs * 0.95 : my} ${e[0]} ${e[1]}`, st); dot('jd' + i, e); return;
+      }
+      const pp = poly(tr.pts, 0.3, 0.3); push('l' + i, pp.d, st); dot('ld' + i, pp.p[pp.p.length - 1]);
+    });
+    const kids = [];
+    cells.forEach((c, i) => {
+      const r = Math.floor(i / C), col = i % C, x = col * cs, y = r * cs, rad = cs < 56 ? 9 : 12, inset = cs < 56 ? 3 : 5;
+      if (c.t === 'p' && c.kind !== 'W') kids.push(h('div', { key: 'seat' + i, style: { position: 'absolute', left: x + inset, top: y + inset + 2, width: cs - inset * 2, height: cs - inset - 3, borderRadius: rad, background: '#323b4e' } }));
+      if (c.t === 'p' && c.kind !== 'W') kids.push(h('div', { key: 'lip' + i, style: { position: 'absolute', left: x + inset, top: y + cs - (cs < 56 ? 7 : 9), width: cs - inset * 2, height: cs < 56 ? 6 : 8, borderRadius: `3px 3px ${rad}px ${rad}px`, background: '#28303f', boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,.07)', zIndex: 3, pointerEvents: 'none' } }));
+      if (c.t === 'p' && c.kind === 'W') kids.push(h('div', { key: 'sh' + i, style: { position: 'absolute', left: x + cs * 0.22, top: y + cs * 0.84, width: cs * 0.56, height: cs * 0.14, borderRadius: '50%', background: 'rgba(0,0,0,.3)' } }));
+      if (c.t === 'w') kids.push(h('div', { key: 'w' + i, style: { position: 'absolute', left: x, top: y } }, Y.tile('window', { m: c.m, size: cs, uid: this.u(), lod })));
+      if (c.t === 'i') kids.push(h('div', { key: 'i' + i, style: { position: 'absolute', left: x, top: y } }, Y.tile('pole', { size: cs, uid: this.u(), lod })));
+      if (c.t === 'ct' && c.owner != null) { const ow = cells[c.owner]; kids.push(h('div', { key: 'ct' + i, style: { position: 'absolute', left: x, top: y } }, Y.tile('cart', { size: cs, uid: this.u(), tag: ow.tag, st: ow.st === 'asleep' ? 'down' : 'up', lod }))); }
+      if (pressed === i) kids.push(h('div', { key: 'pr' + i, style: { position: 'absolute', left: x + 1, top: y + 1, width: cs - 2, height: cs - 2, borderRadius: rad + 2, border: '2.5px solid #ffcf5a', background: 'rgba(255,207,90,.14)', boxSizing: 'border-box', zIndex: 4, pointerEvents: 'none' } }));
+      if (pressed != null && traces[pressed] && traces[pressed].t === i) kids.push(h('div', { key: 'pt' + i, style: { position: 'absolute', left: x + 2, top: y + 2, width: cs - 4, height: cs - 4, borderRadius: rad, border: '1.5px dashed rgba(255,255,255,.7)', boxSizing: 'border-box', zIndex: 4, pointerEvents: 'none' } }));
+    });
+    kids.push(h('svg', { key: 'lines', width: W, height: H, style: { position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 1 } }, lines));
+    cells.forEach((c, i) => {
+      if (c.t !== 'p') return;
+      const r = Math.floor(i / C), col = i % C;
+      const o = { a: c.a, kind: c.kind, dir: c.dir, st: c.st || 'awake', f: c.f || 0, side: c.side, size: cs, uid: this.u(), lod, blink: c.blink, exp: c.exp, tag: c.tag };
+      kids.push(h('div', { key: 'p' + i, style: { position: 'absolute', left: col * cs, top: r * cs, width: cs, height: cs, zIndex: 2 } }, Y.P(o)));
+      if (c.bubble) kids.push(h('div', { key: 'bb' + i, style: { position: 'absolute', left: col * cs + cs / 2, top: r * cs - 4, transform: 'translate(-50%,-100%)', zIndex: 6, background: '#fffaf0', color: INK, border: `2px solid ${INK}`, borderRadius: 12, padding: '0 8px 1px', fontFamily: 'Gaegu, cursive', fontWeight: 700, fontSize: cs < 56 ? 15 : 18, whiteSpace: 'nowrap', boxShadow: `2px 2px 0 ${INK}` } }, c.bubble));
+      if (c.tag) kids.push(h('div', { key: 'tg' + i, style: { position: 'absolute', left: col * cs + cs / 2, top: r * cs + cs + 4, transform: 'translateX(-50%)', zIndex: 6, background: '#ffcf5a', color: INK, borderRadius: 6, padding: '1px 6px', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' } }, c.tag));
+    });
+    const wall = (side) => h('div', { key: 'wall' + side, style: { position: 'absolute', top: 10, bottom: 10, [side]: Math.max(2, pad[1] / 2 - 4), width: 7, borderRadius: 4, background: 'repeating-linear-gradient(180deg,#34465a 0 30px,#171b23 30px 38px)', opacity: 0.9, zIndex: 6 } });
+    return h('div', { style: { position: 'relative', padding: `${pad[0]}px ${pad[1]}px`, borderRadius: 20, background: 'repeating-linear-gradient(90deg,#252a35 0 24px,#232833 24px 48px)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.05), 0 20px 50px rgba(0,0,0,.35)' } },
+      cfg.small ? null : wall('left'), cfg.small ? null : wall('right'),
+      h('div', { style: { position: 'relative', width: W, height: H } }, kids));
+  }
+
+  fallDemo(d) {
+    const Y = this.Y, h = React.createElement, cs = 72, horiz = d === 'r';
+    const W = horiz ? cs * 3 : cs, H = horiz ? cs : cs * 3;
+    const own = horiz ? [0, 0] : [0, 0], cart = horiz ? [cs, 0] : [0, cs], view = horiz ? [cs * 2, 0] : [0, cs * 2];
+    const abs = (p, kids, st) => h('div', { style: { position: 'absolute', left: p[0], top: p[1], width: cs, height: cs, ...(st || {}) } }, kids);
+    const seat = (p, k) => h('div', { key: k, style: { position: 'absolute', left: p[0] + 5, top: p[1] + 7, width: cs - 10, height: cs - 8, borderRadius: 12, background: '#323b4e' } });
+    const A = 'infinite 3.4s', vd = horiz ? 'l' : 'u';
+    const a = this.u(), b = this.u();
+    const lineD = horiz ? `M${view[0] + cs * 0.2} ${cs / 2 + 3} L${cs * 0.7} ${cs / 2 + 3}` : `M${cs / 2 - 3} ${view[1] + cs * 0.2} L${cs / 2 - 3} ${cs * 0.7}`;
+    const stopD = horiz ? `M${view[0] + cs * 0.2} ${cs / 2 + 3} L${cs * 2 - cs * 0.12} ${cs / 2 + 3}` : `M${cs / 2 - 3} ${view[1] + cs * 0.2} L${cs / 2 - 3} ${cs * 2 - cs * 0.12}`;
+    const barD = horiz ? `M${cs * 2 - cs * 0.12} ${cs / 2 - 3} L${cs * 2 - cs * 0.12} ${cs / 2 + 9}` : `M${cs / 2 - 9} ${cs * 2 - cs * 0.12} L${cs / 2 + 3} ${cs * 2 - cs * 0.12}`;
+    return h('div', { style: { position: 'relative', width: W + 24, height: H + 24, borderRadius: 16, background: 'repeating-linear-gradient(90deg,#252a35 0 24px,#232833 24px 48px)' } },
+      h('div', { style: { position: 'absolute', left: 12, top: 12, width: W, height: H } },
+        seat(own, 's1'), seat(view, 's2'),
+        h('svg', { key: 'ln', width: W, height: H, style: { position: 'absolute', left: 0, top: 0, overflow: 'visible', zIndex: 1 } },
+          h('path', { d: stopD, stroke: 'rgba(236,228,205,.4)', strokeWidth: 1.6, strokeDasharray: '1.5 5', fill: 'none', strokeLinecap: 'round', style: { animation: `cf-bar ${A}` } }),
+          h('path', { d: barD, stroke: '#e9e6dd', strokeWidth: 2.4, strokeLinecap: 'round', style: { animation: `cf-bar ${A}` } }),
+          h('path', { d: lineD, stroke: '#ffcf5a', strokeWidth: 3, fill: 'none', strokeLinecap: 'round', style: { animation: `cf-line ${A}`, filter: 'drop-shadow(0 0 4px rgba(255,207,90,.8))' } })),
+        abs(cart, Y.tile('cart', { size: cs, st: 'up', tag: 1, uid: this.u() }), { animation: `cf-up ${A} cubic-bezier(.5,0,.8,.4)`, transformOrigin: '74% 96%', zIndex: 1 }),
+        abs(cart, Y.tile('cart', { size: cs, st: 'down', tag: 1, uid: this.u() }), { animation: `cf-down ${A}`, transformOrigin: '50% 92%', opacity: 0, zIndex: 1 }),
+        abs(own, Y.P({ a: 3, kind: 'H', dir: d, f: 0, size: cs, tag: 1, uid: a }), { animation: `cf-awake ${A}`, zIndex: 2 }),
+        abs(own, Y.P({ a: 3, kind: 'H', dir: d, st: 'asleep', f: 0, side: 1, size: cs, tag: 1, uid: b }), { animation: `cf-asleep ${A}`, opacity: 0, zIndex: 2 }),
+        abs(view, Y.P({ a: 0, dir: vd, f: 0, size: cs, uid: this.u() }), { zIndex: 2 })));
+  }
+
+  build() {
+    const Y = this.Y, h = React.createElement, LC = Y.LINE_COLORS;
+    const P = (o) => Y.P({ uid: this.u(), ...o }), T = (type, o) => Y.tile(type, { uid: this.u(), ...o });
+    const Fr = (label, el) => ({ label, el });
+    const S = (cfg) => this.board({ cs: 64, pad: [14, 14], small: true, lod: null, ...cfg });
+    const DN = { d: '아래', l: '왼쪽', r: '오른쪽', u: '위 (뒤통수)' };
+    const pair = (d, st, extra) => {
+      const rows = { d: [['Hd'], ['#']], u: [['#'], ['Hu']], r: [['Hr', '#']], l: [['#', 'Hl']] }[d];
+      const at = { d: '0,0', u: '1,0', r: '0,0', l: '0,1' }[d];
+      return S({ rows, lines: false, ov: { [at]: { st: st || 'awake', ...(extra || {}) } } });
+    };
+    const cartRows = [
+      { label: '깨어 있음 · 방향 4 — 앞 칸에 수레를 세워 둠. 어깨의 동그란 표 = 수레 손잡이 짐표(같은 색)로 짝을 읽음', frames: ['d', 'l', 'r', 'u'].map(d => Fr(DN[d], pair(d))) },
+      { label: '하품 4프레임 520ms · 꾸벅 3 (수레는 아직 서 있음 — 막음) · 잠듦 2 (잠드는 순간 수레가 넘어가 상자가 바닥에 흩어짐, 짐표도 상자와 함께)', frames: [0, 1, 2, 3].map(f => Fr('하품 ' + (f + 1), pair('d', 'yawn', { f }))).concat([0, 1, 2].map(f => Fr('꾸벅 ' + (f + 1), pair('d', 'nod', { f, side: 1 })))).concat([Fr('잠듦 · 수레 넘어감', pair('d', 'asleep', { f: 0 })), Fr('숨 2', pair('d', 'asleep', { f: 1 }))]) },
+      { label: '깸 (코골이·알람) — 화들짝 + 수레를 다시 세움 · 부릅뜸 · 옆을 볼 때', frames: [Fr('깸', pair('d', 'startle')), Fr('부릅뜸', pair('d', 'glare')), Fr('오른쪽 · 하품', pair('r', 'yawn', { f: 1 })), Fr('오른쪽 · 잠듦', pair('r', 'asleep'))] },
+      { label: '수레 타일 2상태 × 짐표 색 4 — 방향과 상관없이 같은 그림', frames: [0, 1, 2, 3].map(t => Fr('서 있음 · 막음 · 색 ' + (t + 1), T('cart', { st: 'up', tag: t }))).concat([Fr('넘어짐 · 통과', T('cart', { st: 'down' }))]) },
+      { label: '넘어지는 움직임 (반복 재생) — 잠드는 박자 안: 오른쪽 바퀴를 축으로 쓰러짐 → 상자가 바닥에 닿으며 납작 → 막대가 사라지고 선이 이어지며 빛남 → (깸) 다시 세움', frames: [Fr('아래를 볼 때', this.fallDemo('d')), Fr('오른쪽을 볼 때', this.fallDemo('r'))] },
+      { label: '판 위 — 막힘 → 넘어짐 → 이어짐 · 수레 여럿', frames: [
+        Fr('① 깨어 있음: 양옆 시선이 수레 앞에서 끊김', S({ rows: [['..', 'Hd', '..'], ['Br', '#', 'Bl']] })),
+        Fr('② 잠듦: 수레가 넘어가자 선이 지나가며 빛남', S({ rows: [['..', 'Hd', '..'], ['Br', '#', 'Bl']], lit: [3], ov: { '0,1': { st: 'asleep' }, '1,2': { st: 'yawn', f: 1 } } })),
+        Fr('마주 보는 두 수레 — 짐표 색으로 갈림', S({ rows: [['Hr', '#', '#', 'Hl']] })),
+        Fr('나란히 두 수레', S({ rows: [['Hd', 'Hd'], ['#', '#'], ['Bu', 'Bu']] })),
+      ] },
+    ];
+    const ROWS = [
+      ['Br', '..', 'Bd', 'Hd', '..', 'Bd', '..'],
+      ['..', 'Pd', '..', '#', 'Br', '..', 'Bl'],
+      ['Bd', '..', 'Br', 'Bu', '..', '..', 'Ou'],
+      ['\\', 'Bl', '..', '..', 'Hr', '#', 'Bl'],
+      ['Bu', '..', 'Ed', 'Bl', '..', '..', 'Bu'],
+      ['..', 'Br', 'I', '..', 'Bu', 'Md', '..'],
+      ['Bd', '..', 'Bl', 'Bd', '..', 'Br', 'Bu'],
+      ['#', 'Kr', '..', 'Sr', '..', 'Pd', '..'],
+      ['Hu', '..', 'Bl', '..', 'Bd', '..', 'Bl'],
+      ['..', 'Bu', '/', 'Br', '#', 'Hl', '..'],
+      ['Br', '..', 'Bl', 'Bu', '..', 'Bu', 'Cl'],
+    ];
+    const frame = (W, Hh) => ({ width: W, height: Hh, borderRadius: 28, overflow: 'hidden', background: '#1b1f28', display: 'flex', flexDirection: 'column', boxShadow: '0 30px 60px rgba(0,0,0,.25), 0 0 0 8px #0d0f14', flex: 'none' });
+    const taps = (n, used) => Array.from({ length: n }, (_, j) => ({ style: { width: 30, height: 30, opacity: j < n - used ? 1 : 0.25 } }));
+    const screens = [
+      { label: '412 × 915 · 칸 52 · 평소', station: '09', frame: frame(412, 915), board: this.board({ rows: ROWS, cs: 52, pad: [14, 14], dense: true, seed: 5 }), taps: taps(3, 0), tapLabel: '3 / 3', note: '평소 시선선은 1.3dp · 30% 점선 + 어두운 테두리 4dp. 나중에 그린 선의 테두리가 앞선 선을 끊어, 교차점에서 어느 선이 이어지는지 보입니다. 수레 4대 중 3대가 시선을 막고 있습니다.' },
+      { label: '360 × 780 · 칸 46 · 누른 칸 강조', station: '09', frame: frame(360, 780), board: this.board({ rows: ROWS, cs: 46, pad: [12, 12], dense: true, seed: 5, pressed: 6 * 7 + 3 }), taps: taps(3, 1), tapLabel: '2 / 3', note: '손가락이 닿아 있는 동안(손을 떼기 전): 누른 칸에 노란 테두리, 그 사람이 보는 선과 그 사람을 보는 선만 흰 실선, 나머지는 12%로 흐려짐. 보는 대상 칸에 흰 점선 테두리. 손을 떼면 툭, 칸 밖으로 밀어 떼면 취소.' },
+      { label: '412 × 915 · 수레가 넘어가는 순간', station: '09', frame: frame(412, 915), board: this.board({ rows: ROWS, cs: 52, pad: [14, 14], dense: true, seed: 5, lit: [5], ov: { '3,4': { st: 'asleep' }, '5,5': { st: 'yawn', f: 1, bubble: '하아암' }, '0,5': { tag: '이어짐' } } }), taps: taps(3, 1), tapLabel: '2 / 3', note: '4행 짐수레 승객이 잠들어 수레가 넘어가자, 맨 위 승객의 막혀 있던 선이 수레 칸을 지나 말똥말똥 승객에게 닿고 노랗게 빛납니다(잠드는 박자 안에서 300 + 200ms).' },
+    ];
+    const ICON_ORDER = Y.GIMMICKS;
+    const audit = { names: ICON_ORDER.map(g => g.name), rows: [
+      { label: '기본 단계', cells: ICON_ORDER.map(g => g.icon(44)) },
+      { label: '작은 칸 (lod s)', cells: ICON_ORDER.map(g => g.icon(44, 's')) },
+    ] };
+    const crop = ROWS.slice(0, 5);
+    const lineDemo = [
+      { label: 'v2 시선선(1.6dp · 34%, 테두리 없음) — 칸 46에서 교차가 뭉칩니다.', el: this.board({ rows: crop, cs: 46, pad: [12, 12], small: true, seed: 5 }) },
+      { label: 'v3 큰 판 시선선 — 1.3dp · 30% + 어두운 테두리 4dp, 끝 점 1.7. 교차마다 위 선이 아래 선을 끊어 따라가기 쉽습니다. 빛날 때만 2.6dp 노랑.', el: this.board({ rows: crop, cs: 46, pad: [12, 12], small: true, dense: true, seed: 5 }) },
+      { label: '누른 칸 강조 — 그 사람과 엮인 선만 남기고 나머지를 흐립니다. 44dp에서 탭 실수를 줄이는 장치.', el: this.board({ rows: crop, cs: 46, pad: [12, 12], small: true, dense: true, seed: 5, pressed: 2 * 7 + 2 }) },
+    ];
+    const lines = LC.map((c, i) => ({
+      n: c.n, light: c.light, dark: c.dark, name: Y.GIMMICKS[i].name, icon: Y.GIMMICKS[i].icon(30),
+      chipL: { width: 32, height: 26, borderRadius: 7, background: c.light, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13 },
+      chipD: { width: 32, height: 26, borderRadius: 7, background: c.dark, color: '#14161c', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13 },
+      railL: { height: 7, borderRadius: 4, background: c.light }, railD: { height: 7, borderRadius: 4, background: c.dark },
+    }));
+    const cartChip = { flex: 'none', width: 36, height: 36, borderRadius: 10, background: LC[4].dark, color: '#14161c', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 15 };
+    const cartChipSign = { width: 30, height: 30, borderRadius: 15, background: LC[4].light, color: '#fff', border: '2px solid #17151d', boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13 };
+    return { cartRows, screens, audit, lineDemo, lines, cartChip, cartChipSign };
+  }
+
+  renderVals() {
+    if (!this.Y) return { cartRows: [], screens: [], audit: { names: [], rows: [] }, lineDemo: [], lines: [], cartChip: {}, cartChipSign: {} };
+    if (!this.cache) { this.n = 0; this.cache = this.build(); }
+    return this.cache;
+  }
+}
+</script>
+</body>
+</html>
