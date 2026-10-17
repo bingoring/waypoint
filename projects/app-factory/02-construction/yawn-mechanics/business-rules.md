@@ -1,7 +1,7 @@
 ---
 artifact: business-rules
 build-spec: yawn-mechanics
-status: DRAFT
+status: IMPLEMENTED
 updated: 2026-10-17
 ---
 

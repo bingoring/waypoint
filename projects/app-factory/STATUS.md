@@ -30,6 +30,7 @@
 > 📝 **2-11 기믹 확장 Build Spec 초안 (2026-10-17).** 노선 7~20 연결 전체(엔진 상태 격자·새 8종 규칙·박자 순서 11단계·판당 기믹 상한·렌더러 v2·효과·터널·노선 아이콘). 미해결 질문 Q1~Q4.
 > 📝 **2-11 Build Spec `READY` (2026-10-17).** 질문 4개 해소 — 핸드오프 순서, 20개 모두 켜고 출시, 디자이너 v2.1(문·기둥 정정) 그대로 구현, 노선 여는 간격 유지(리서치: Royal Match 초반 약 10판). 오너가 구현 착수를 승인했다.
 > 🔧 **2-11 구현 U1~U5 (2026-10-17, 메인 `0510003`).** 새 8종 엔진·상태 격자·박자 11단계, 역 1~36 골든이 solver.js와 일치, 생성기 기믹 상한·새 기믹 넣기, 노선 20개. 테스트 59개 통과, 노선별 측정 p95 ≤ 84ms·힌트 최대 34ms. 다음: 렌더러 v2(U6)·화면 효과(U7)·노선도 아이콘(U8).
+> ✅ **2-11 구현·검증 끝 (2026-10-17) → `AI_PROPOSED`.** 렌더러 v2.1 Dart 이식(기준 그림 164장 일치), 판 화면 v2(시선선 6종·기믹 효과·터널·문·알람), 노선 아이콘 20개, 화면 흐름 테스트. **고난이도 시험**(오너 요청): 가장 큰 단계 노선 20 × 120판·큰 판 탐색↔전수 14개 일치·표본 오차 최대 1.5%p·퍼징 80만 박자 위반 0·후반 300판~ 목표 대비 9.2%p. 힌트 최대 233→21ms, 걷는 판 측정 최대 241→85ms로 고침. 편차 11건(Build Spec §7). 다음: 오너 확인 → R-1 독립 리뷰(2-9·2-11) → 3-1.
 > 🗺️ **개발 대기열:** 하품 릴레이(아트 → Build Spec) · 새떼 그림 · 번짐 · 샴페인 타워 · 눈꽃 가위 · **로그라이크 2종(사다리 원정, 딱지왕 — 고도화 설계 `roguelike/design-direction-2026-10-16.md`)**.
 > 📌 **3-1 공통:** 네 앱 모두 런처 아이콘이 아직 Flutter 기본 아이콘이다.
 
@@ -59,7 +60,7 @@
 | 2-8 하이퍼캐주얼 신작 컨셉 · 조사·결정 | [08-hypercasual-concept.md](02-construction/08-hypercasual-concept.md) | HUMAN_APPROVED |
 | 2-9 Yawn! (하품) · comprehensive | [09-yawn-relay.md](02-construction/09-yawn-relay.md) · [Build Spec](02-construction/yawn-relay/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` 2026-10-17 — 오너 승인 대기) |
 | 2-10 공통 적응형 난이도 · 조사·설계 | [10-adaptive-difficulty.md](02-construction/10-adaptive-difficulty.md) | AI_PROPOSED (Build Spec `READY`, `factory_adaptive` 구현 끝 — 남은 일: `fit_difficulty.dart`, `pool.json` 도구) |
-| 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | IN_PROGRESS (Build Spec `READY` 승인 — 구현 U1~U5 끝, U6~U8 진행) |
+| 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` — 오너 확인 대기) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 

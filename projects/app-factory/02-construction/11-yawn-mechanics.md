@@ -1,7 +1,7 @@
 ---
 phase: 02-construction
 stage: 11-yawn-mechanics
-status: IN_PROGRESS
+status: AI_PROPOSED
 updated: 2026-10-17
 ---
 
@@ -22,8 +22,8 @@ updated: 2026-10-17
 
 - [x] Build Spec 초안 — [`yawn-mechanics/build-spec-index.md`](yawn-mechanics/build-spec-index.md) (comprehensive, `QUESTIONS_OPEN`)
 - [x] 미해결 질문 해소 → `READY` (2026-10-17, 오너 승인 「승인할게, 구현 시작해줘」)
-- [ ] 구현 (Build Spec §4) — U1~U5 끝(메인 `0510003`), U6~U8 진행 중
-- [ ] 검증 (Build Spec §5) → `IMPLEMENTED`
+- [x] 구현 (Build Spec §4) — U1~U5 `0510003`, U6 렌더러 v2.1, U7·U8 `03f17c2`, 화면 흐름 `7ed9199`, 고난이도 성능 `1d9a0fe`
+- [x] 검증 (Build Spec §5) → `IMPLEMENTED` (2026-10-17, 고난이도 스트레스 시험 포함 — Build Spec §5·§6·§7)
 
 ## AI 제안 (AI Proposal)
 
@@ -39,7 +39,7 @@ updated: 2026-10-17
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
 - [x] Build Spec이 `READY`로 승인되었는가? (2026-10-17)
-- [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가?
+- [ ] 구현 후: Build Spec §5 검증을 통과해 `IMPLEMENTED`가 되었는가? (AI: 통과 — 오너 확인 대기. 편차 11건은 Build Spec §7)
 
 ## 다음 단계
 
