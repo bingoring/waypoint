@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Gaegu:wght@700&display=swap" rel="stylesheet">
+<script src="./yawn-render.js"></script>
+<style>
+body{margin:0;background:#e6e1d7;font-family:'IBM Plex Sans KR',system-ui,sans-serif;color:#1d1f27;-webkit-font-smoothing:antialiased}
+a{color:#1d1f27}a:hover{color:#5a5e6b}
+</style>
+</helmet>
+<div style="display:flex;flex-direction:column;gap:72px;padding:56px;box-sizing:border-box;width:max-content;min-width:100%">
+
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:880px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5a5e6b;letter-spacing:.06em">YAWN! · 핸드오프 v2.1 · 2026-10-17</div>
+    <div style="font-size:40px;font-weight:700;letter-spacing:-0.03em;line-height:1.15">새 승객·타일 14종 · 세로로 긴 판 · 노선 20개</div>
+    <div style="font-size:16px;line-height:1.6;color:#3d404b;text-wrap:pretty">모든 그림은 같은 부품 조합 렌더러(yawn-render.js)에서 나옵니다. 앱은 이 렌더러를 Dart로 옮기고, 아래 프레임은 정지 프레임(f 번호) 그대로입니다. 규칙은 프로토타입에서 검증된 그대로이며, 그림은 규칙을 바꾸지 않습니다.</div>
+  </div>
+
+  <section data-screen-label="A 출시 확정 6종" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">A</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">출시 확정 6종 — 전체 프레임</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;width:1544px;max-width:1544px">
+      <sc-for list="{{ cardsA }}" as="g" hint-placeholder-count="6">
+        <div style="width:760px;display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 24px 26px;box-sizing:border-box">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="{{ g.chip }}">{{ g.n }}</div>
+            <div style="font-size:20px;font-weight:700">{{ g.name }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.55;text-wrap:pretty">
+            <div style="color:#c9ccd4"><span style="color:#a9adb8;font-weight:600">규칙 · </span>{{ g.rule }}</div>
+            <div style="color:#ffcf5a"><span style="font-weight:600">첫 만남 단서 · </span>{{ g.cue }}</div>
+          </div>
+          <sc-for list="{{ g.rows }}" as="row" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px">
+              <div style="font-size:12px;font-weight:600;color:#a9adb8;letter-spacing:.02em">{{ row.label }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:10px 8px;align-items:flex-end">
+                <sc-for list="{{ row.frames }}" as="fr" hint-placeholder-count="5">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:76px;padding-top:20px">
+                    <div>{{ fr.el }}</div>
+                    <div style="font-size:11px;color:#a9adb8;text-align:center;line-height:1.3;word-break:keep-all;max-width:220px">{{ fr.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="B 새 기믹 8종" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">B</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">새 기믹 8종 — 승객 6 · 판 전체 1 · 타일 1</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;width:1544px;max-width:1544px">
+      <sc-for list="{{ cardsB }}" as="g" hint-placeholder-count="8">
+        <div style="width:760px;display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 24px 26px;box-sizing:border-box">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="{{ g.chip }}">{{ g.n }}</div>
+            <div style="font-size:20px;font-weight:700">{{ g.name }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.55;text-wrap:pretty">
+            <div style="color:#c9ccd4"><span style="color:#a9adb8;font-weight:600">규칙 · </span>{{ g.rule }}</div>
+            <div style="color:#ffcf5a"><span style="font-weight:600">첫 만남 단서 · </span>{{ g.cue }}</div>
+          </div>
+          <sc-for list="{{ g.rows }}" as="row" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px">
+              <div style="font-size:12px;font-weight:600;color:#a9adb8;letter-spacing:.02em">{{ row.label }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:10px 8px;align-items:flex-end">
+                <sc-for list="{{ row.frames }}" as="fr" hint-placeholder-count="5">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:76px;padding-top:20px">
+                    <div>{{ fr.el }}</div>
+                    <div style="font-size:11px;color:#a9adb8;text-align:center;line-height:1.3;word-break:keep-all;max-width:220px">{{ fr.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="C 세로로 긴 판" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">C</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">세로로 긴 판 — 가로 5 × 세로 8</div>
+    </div>
+    <div style="font-size:15px;line-height:1.6;color:#3d404b;max-width:880px;text-wrap:pretty">칸 크기 = min(72, (화면 폭 − 바닥 좌우 여백 − 화면 여백) ÷ 열, (남은 높이 − 바닥 위아래 여백) ÷ 행), 최소 64. 412폭은 칸 68 · 바닥 여백 18/20, 360폭은 칸 64 · 바닥 여백 14/12로 줄여 맞춥니다. 시선선은 v1보다 가늘고 흐리게(1.6dp · 34%) 바꿔 20명 판에서도 엉키지 않습니다.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+      <sc-for list="{{ screens }}" as="s" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#1d1f27">{{ s.label }}</div>
+          <div style="{{ s.frame }}">
+            <div style="height:28px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#e9e6dd">
+              <span>23:48</span>
+              <span style="display:flex;gap:6px;align-items:center"><span style="width:14px;height:9px;border-radius:2px;border:1.5px solid #e9e6dd;box-sizing:border-box"></span></span>
+            </div>
+            <div style="height:56px;flex:none;display:flex;align-items:center;gap:4px;padding:0 6px 0 12px">
+              <div style="flex:1;display:flex;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px;background:#f3efe6;color:#1d1f27;border-radius:12px;padding:5px 12px 5px 5px;box-shadow:0 2px 0 rgba(0,0,0,.35)">
+                  <div style="{{ s.chip }}">{{ s.line }}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:17px">{{ s.station }}</div>
+                </div>
+              </div>
+              <sc-if value="{{ s.hasTunnel }}">
+                <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:3px 10px 3px 4px;margin-right:4px">
+                  <div>{{ s.tunnelIcon }}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;color:#ffcf5a">{{ s.tunnelIn }}</div>
+                </div>
+              </sc-if>
+              <div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#e9e6dd">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"></path><path d="M4 4v4.5h4.5"></path></svg>
+              </div>
+              <div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#e9e6dd">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.5"></rect><rect x="14" y="5" width="4" height="14" rx="1.5"></rect></svg>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center">{{ s.board }}</div>
+            <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0 10px">
+              <div style="display:flex;gap:12px">
+                <sc-for list="{{ s.taps }}" as="t" hint-placeholder-count="3">
+                  <div style="{{ t.style }}">
+                    <svg width="36" height="36" viewBox="0 0 32 32"><path d="M13 6.5a2.5 2.5 0 0 1 5 0V15l5.2.9a3 3 0 0 1 2.5 3.4l-.9 5.6A5 5 0 0 1 19.9 29h-5.4a5 5 0 0 1-4-2L6.2 21.6a2.2 2.2 0 0 1 3.2-3L13 21.5V6.5z" fill="#f0c6a0" stroke="#17151d" stroke-width="2" stroke-linejoin="round"></path><path d="M18 16v4.5M21.6 16.6v4" stroke="#17151d" stroke-width="1.6" stroke-linecap="round"></path><path d="M9.5 3.5l1.6 1.6M21.5 3.5l-1.6 1.6M15.5 .8v2" stroke="#ffcf5a" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#a9adb8;letter-spacing:.04em">{{ s.tapLabel }}</div>
+            </div>
+            <div style="height:20px;flex:none;display:flex;align-items:center;justify-content:center"><div style="width:108px;height:4px;border-radius:2px;background:rgba(233,230,221,.5)"></div></div>
+          </div>
+          <div style="font-size:13px;color:#3d404b;max-width:412px;line-height:1.5;text-wrap:pretty">{{ s.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="D 노선 20개" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">D</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">노선 20개 — 색 · 노선 머리 아이콘</div>
+    </div>
+    <div style="font-size:15px;line-height:1.6;color:#3d404b;max-width:880px;text-wrap:pretty">oklch 색상환을 두 단(1–10: 명도 0.50 · 채도 0.10, 11–20: 명도 0.40 · 채도 0.085)으로 나눴습니다. 라이트는 흰 번호, 다크는 밝힌 색(명도 0.76 / 0.68)에 #14161C 번호 — 모두 4.5:1 이상. 이웃 노선끼리는 색상이 45° 이상 떨어집니다. 아이콘은 노선 번호와 분리된 부품이라 순서가 바뀌면 바꿔 끼우면 됩니다.</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;background:#f3efe6;border-radius:20px;padding:12px 20px;width:520px;box-sizing:border-box">
+        <div style="display:grid;grid-template-columns:44px 40px minmax(0,1fr) 120px 84px;gap:12px;align-items:center;padding:8px 0;font-size:12px;font-weight:600;color:#5a5e6b"><span>라이트</span><span></span><span>기믹</span><span>띠</span><span>hex</span></div>
+        <sc-for list="{{ lines }}" as="l" hint-placeholder-count="20">
+          <div style="display:grid;grid-template-columns:44px 40px minmax(0,1fr) 120px 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid rgba(29,31,39,.08)">
+            <div style="{{ l.chipL }}">{{ l.n }}</div>
+            <div style="width:36px;height:36px;border-radius:10px;background:#1b1f28;display:flex;align-items:center;justify-content:center;overflow:hidden">{{ l.icon }}</div>
+            <div style="font-size:14px;font-weight:600;color:#1d1f27">{{ l.name }}</div>
+            <div style="{{ l.railL }}"></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5a5e6b">{{ l.light }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;background:#14161c;border-radius:20px;padding:12px 20px;width:520px;box-sizing:border-box">
+        <div style="display:grid;grid-template-columns:44px 40px minmax(0,1fr) 120px 84px;gap:12px;align-items:center;padding:8px 0;font-size:12px;font-weight:600;color:#a2a6b2"><span>다크</span><span></span><span>기믹</span><span>띠</span><span>hex</span></div>
+        <sc-for list="{{ lines }}" as="l" hint-placeholder-count="20">
+          <div style="display:grid;grid-template-columns:44px 40px minmax(0,1fr) 120px 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid rgba(236,232,222,.1)">
+            <div style="{{ l.chipD }}">{{ l.n }}</div>
+            <div style="width:36px;height:36px;border-radius:10px;background:#1f222b;display:flex;align-items:center;justify-content:center;overflow:hidden">{{ l.icon }}</div>
+            <div style="font-size:14px;font-weight:600;color:#ece8de">{{ l.name }}</div>
+            <div style="{{ l.railD }}"></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#a2a6b2">{{ l.dark }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="E 움직임" style="display:flex;flex-direction:column;gap:12px;max-width:880px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#1d1f27;color:#ffc94a;border-radius:8px;padding:4px 10px">E</div>
+      <div style="font-size:28px;font-weight:700;letter-spacing:-0.02em">움직임</div>
+    </div>
+    <div style="font-size:15px;line-height:1.6;color:#3d404b;text-wrap:pretty">모든 길이는 박자 0.65초에 고정 — 표는 06_MOTION.md. 애니메이션 줄이기 설정에서는 이동·물결·흔들림을 생략하고 위 정지 프레임의 마지막 장면으로 바로 바꿉니다(터널은 밝기만, 걷기는 칸 이동만, 고양이·코골이는 물결 대신 범위 칸 테두리 1박자).</div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showSight&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;판&quot;}}">
+class Component extends DCLogic {
+  n = 0;
+  componentDidMount() {
+    if (!window.YawnRender) this.t = setInterval(() => { if (window.YawnRender) { clearInterval(this.t); this.forceUpdate(); } }, 50);
+  }
+  componentWillUnmount() { clearInterval(this.t); }
+  get Y() { if (!this._Y && window.YawnRender) this._Y = window.YawnRender(React.createElement); return this._Y; }
+  u() { return 'u' + (this.n++); }
+
+  board(cfg) {
+    const Y = this.Y, h = React.createElement, INK = Y.INK, cs = cfg.cs, R = cfg.rows.length, C = cfg.rows[0].length, W = C * cs, H = R * cs;
+    const pad = cfg.pad || [22, 26], showLines = cfg.lines !== false && !cfg.tunnel && this.props.showSight !== false;
+    const cells = [];
+    cfg.rows.forEach((row, r) => row.forEach((tk, c) => {
+      const ov = (cfg.ov || {})[r + ',' + c] || {};
+      let cell;
+      if (tk === '..') cell = { t: 'e' };
+      else if (tk === '/' || tk === '\\') cell = { t: 'w', m: tk };
+      else if (tk === 'I') cell = { t: 'i' };
+      else if (tk[0] === 'A') cell = { t: 'alarm', n: +tk.slice(1) };
+      else cell = { t: 'p', kind: tk[0], dir: tk[1] === 'x' ? 'd' : tk[1], a: (r * 5 + c * 3 + (cfg.seed || 0)) % 6, side: (r + c) % 2 ? 1 : -1 };
+      cells.push(Object.assign(cell, ov));
+    }));
+    cells.forEach((c, i) => { if (c.kind === 'Q' && !c.hand && i % C + 1 < C && cells[i + 1].kind === 'Q') { c.hand = 'r'; cells[i + 1].hand = 'l'; c.pair = i + 1; } });
+    const DIR = { u: [-1, 0], d: [1, 0], l: [0, -1], r: [0, 1] }, MIR = { '/': { r: 'u', u: 'r', l: 'd', d: 'l' }, '\\': { r: 'd', d: 'r', l: 'u', u: 'l' } };
+    // 기둥: 1·2번째 기둥에서 진행 방향의 양옆으로 갈라지고, 세 번째 기둥에서 막힌다. 창문은 그대로 꺾는다.
+    const split = (r0, c0, d0, lvl) => ((d0 === 'u' || d0 === 'd') ? ['l', 'r'] : ['u', 'd']).map(pd => {
+      let rr = r0, cc = c0, d = pd; const sp = [[rr, cc]];
+      for (let q = 0; q < 40; q++) {
+        rr += DIR[d][0]; cc += DIR[d][1];
+        if (rr < 0 || cc < 0 || rr >= R || cc >= C) return null;
+        const y = cells[rr * C + cc];
+        if (y.t === 'w') { d = MIR[y.m][d]; sp.push([rr, cc]); continue; }
+        if (y.t === 'i') return lvl < 2 ? { pts: sp.concat([[rr, cc]]), splits: split(rr, cc, d, lvl + 1) } : { pts: sp.concat([[rr, cc]]), blocked: true };
+        if (y.t === 'p') return { pts: sp.concat([[rr, cc]]) };
+      }
+      return null;
+    }).filter(Boolean);
+    const trace = (i) => {
+      const c = cells[i];
+      if (c.t !== 'p' || ['P', 'C', 'G'].includes(c.kind) || (c.st && c.st !== 'awake')) return null;
+      let r = Math.floor(i / C), col = i % C, d = c.dir, skipped = null;
+      const pts = [[r, col]];
+      for (let k = 0; k < 40; k++) {
+        r += DIR[d][0]; col += DIR[d][1];
+        if (r < 0 || col < 0 || r >= R || col >= C) return c.kind === 'O' ? { t: -1, pts: pts.concat([[r, col]]), myo: true } : null;
+        const j = r * C + col, x = cells[j];
+        if (c.kind === 'O') return { t: x.t === 'p' ? j : -1, pts: pts.concat([[r, col]]), myo: true };
+        if (x.t === 'w') { d = MIR[x.m][d]; pts.push([r, col]); continue; }
+        if (x.t === 'i') return { t: -1, pts: pts.concat([[r, col]]), splits: split(r, col, d, 1) };
+        if (x.t === 'p') { if (c.kind === 'J' && skipped == null) { skipped = j; continue; } return { t: j, pts: pts.concat([[r, col]]), skipped }; }
+      }
+      return null;
+    };
+    const ctr = ([r, c]) => [c * cs + cs / 2, r * cs + cs / 2];
+    const mv = (a, b, d) => { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1; return [a[0] + dx / L * d, a[1] + dy / L * d]; };
+    const poly = (pts, t0, t1) => {
+      let p = pts.map(ctr);
+      p[0] = mv(p[0], p[1], cs * t0); p[p.length - 1] = mv(p[p.length - 1], p[p.length - 2], cs * t1);
+      const dx = Math.sign(p[1][0] - p[0][0]), dy = Math.sign(p[1][1] - p[0][1]);
+      p = p.map(q => [q[0] - dy * 3, q[1] + dx * 3]);
+      return { p, d: 'M' + p.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L') };
+    };
+    const idle = { fill: 'none', stroke: 'rgba(236,228,205,.34)', strokeWidth: 1.6, strokeDasharray: '1.5 5', strokeLinecap: 'round', strokeLinejoin: 'round' };
+    const litS = { fill: 'none', stroke: '#ffcf5a', strokeWidth: 3, strokeLinecap: 'round', strokeLinejoin: 'round', style: { filter: 'drop-shadow(0 0 4px rgba(255,207,90,.8))' } };
+    const dot = (k, q, o) => h('circle', { key: k, cx: q[0], cy: q[1], r: 2.2, fill: 'rgba(236,228,205,.5)', ...(o || {}) });
+    const lines = [], lit = cfg.lit || [];
+    if (showLines) cells.forEach((c, i) => {
+      const tr = trace(i); if (!tr) return;
+      const isLit = lit.includes(i), st = isLit ? litS : idle;
+      if (tr.myo) {
+        const a = ctr(tr.pts[0]), b = ctr(tr.pts[1]), s = mv(a, b, cs * 0.3), e = mv(a, b, cs * (tr.t >= 0 ? 0.7 : 0.85));
+        lines.push(h('path', { key: 'm' + i, d: `M${s[0]} ${s[1]} L${e[0]} ${e[1]}`, fill: 'none', stroke: isLit ? '#ffcf5a' : 'rgba(236,228,205,.3)', strokeWidth: 3, strokeLinecap: 'round', style: { filter: 'blur(.8px)' } }));
+        return;
+      }
+      if (tr.skipped != null) {
+        const a = ctr(tr.pts[0]), b = ctr(tr.pts[tr.pts.length - 1]), s = mv(a, b, cs * 0.3), e = mv(b, a, cs * 0.3);
+        const mx = (s[0] + e[0]) / 2, my = (s[1] + e[1]) / 2, horiz = Math.abs(b[1] - a[1]) < 1;
+        const cx = horiz ? mx : mx + cs * 0.8, cy = horiz ? my - cs * 0.95 : my;
+        lines.push(h('path', { key: 'j' + i, d: `M${s[0]} ${s[1]} Q${cx} ${cy} ${e[0]} ${e[1]}`, ...st }), isLit ? null : dot('jd' + i, e));
+        return;
+      }
+      if (tr.splits) {
+        const pp = poly(tr.pts, 0.3, 0.22);
+        lines.push(h('path', { key: 'p' + i, d: pp.d, ...st }));
+        const drawSp = (list, key) => list.forEach((sp, j) => {
+          const q = poly(sp.pts, 0.22, sp.blocked ? 0.25 : sp.splits ? 0.22 : 0.3);
+          lines.push(h('path', { key: key + j, d: q.d, ...st }));
+          const e = q.p[q.p.length - 1];
+          if (sp.blocked) { const a = q.p[q.p.length - 2], vert = Math.abs(e[0] - a[0]) < 1; lines.push(h('path', { key: key + j + 'b', d: vert ? `M${e[0] - 6} ${e[1]} L${e[0] + 6} ${e[1]}` : `M${e[0]} ${e[1] - 6} L${e[0]} ${e[1] + 6}`, stroke: '#e9e6dd', strokeWidth: 2.4, strokeLinecap: 'round' })); }
+          else if (sp.splits) drawSp(sp.splits, key + j + '-');
+          else if (!isLit) lines.push(dot(key + j + 'd', e));
+        });
+        drawSp(tr.splits, 'ps' + i + '-');
+        return;
+      }
+      const pp = poly(tr.pts, 0.3, 0.3), e = pp.p[pp.p.length - 1];
+      if (cells[tr.t].kind === 'K') {
+        const pre = pp.p[pp.p.length - 2], f = mv(e, pre, cs * 0.35);
+        lines.push(h('path', { key: 'k' + i, d: 'M' + pp.p.slice(0, -1).concat([f]).map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L'), ...idle }));
+        lines.push(h('path', { key: 'kf' + i, d: `M${f[0]} ${f[1]} L${e[0]} ${e[1]}`, fill: 'none', stroke: 'rgba(236,228,205,.22)', strokeWidth: 6, strokeLinecap: 'round', style: { filter: 'blur(2.5px)' } }));
+        lines.push(h('circle', { key: 'kc' + i, cx: e[0], cy: e[1], r: 8, fill: 'rgba(238,241,244,.16)', style: { filter: 'blur(3px)' } }));
+        return;
+      }
+      lines.push(h('path', { key: 'l' + i, d: pp.d, ...st }), isLit ? null : dot('ld' + i, e));
+    });
+    const kids = [];
+    cells.forEach((c, i) => {
+      const r = Math.floor(i / C), col = i % C, x = col * cs, y = r * cs;
+      if (c.t === 'alarm' && c.st !== 'off') {
+        const x0 = Math.max(0, col - 1) * cs, y0 = Math.max(0, r - 1) * cs, x1 = Math.min(C, col + 2) * cs, y1 = Math.min(R, r + 2) * cs;
+        kids.push(h('div', { key: 'ar' + i, style: { position: 'absolute', left: x0 + 2, top: y0 + 2, width: x1 - x0 - 4, height: y1 - y0 - 4, borderRadius: 14, background: c.st === 'ring' ? 'rgba(255,207,90,.14)' : 'rgba(255,207,90,.05)', border: `1.5px dashed rgba(255,207,90,${c.st === 'ring' ? 0.7 : 0.32})`, boxSizing: 'border-box' } }));
+      }
+      if (c.t === 'p' && c.kind !== 'W') kids.push(h('div', { key: 'seat' + i, style: { position: 'absolute', left: x + 5, top: y + 8, width: cs - 10, height: cs - 12, borderRadius: 12, background: '#323b4e', boxShadow: 'inset 0 -6px 0 #28303f' } }));
+      if (c.t === 'p' && c.kind === 'W') kids.push(h('div', { key: 'sh' + i, style: { position: 'absolute', left: x + cs * 0.22, top: y + cs * 0.84, width: cs * 0.56, height: cs * 0.14, borderRadius: '50%', background: 'rgba(0,0,0,.3)' } }));
+      if (c.t === 'w') kids.push(h('div', { key: 'w' + i, style: { position: 'absolute', left: x, top: y } }, Y.tile('window', { m: c.m, size: cs, uid: this.u() })));
+      if (c.t === 'i') kids.push(h('div', { key: 'i' + i, style: { position: 'absolute', left: x, top: y } }, Y.tile('pole', { size: cs, uid: this.u(), st: c.st || 'idle' })));
+      if (c.t === 'alarm') kids.push(h('div', { key: 'a' + i, style: { position: 'absolute', left: x, top: y, zIndex: 2 } }, Y.tile('alarm', { size: cs, uid: this.u(), n: c.n, st: c.st, f: c.f })));
+    });
+    cells.forEach((c, i) => {
+      if (c.pair == null) return;
+      const r = Math.floor(i / C), col = i % C, bx = (col + 1) * cs, by = r * cs + cs * 0.86;
+      const both = (!c.st || c.st === 'awake' || c.st === 'yawn') && (!cells[c.pair].st || cells[c.pair].st === 'awake' || cells[c.pair].st === 'yawn');
+      kids.push(h('svg', { key: 'cp' + i, width: 60, height: 30, viewBox: '0 0 60 30', style: { position: 'absolute', left: bx - 30, top: by - 14, overflow: 'visible', zIndex: 2, pointerEvents: 'none' } },
+        h('path', { d: 'M8 12 Q30 30 52 12', fill: 'none', stroke: both ? '#ffcf5a' : '#a9adb8', strokeWidth: both ? 2.4 : 1.8, strokeDasharray: both ? null : '2 4', strokeLinecap: 'round', style: both ? { filter: 'drop-shadow(0 0 3px rgba(255,207,90,.7))' } : {} })));
+    });
+    kids.push(h('svg', { key: 'lines', width: W, height: H, style: { position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 1 } }, lines));
+    cells.forEach((c, i) => {
+      if (c.t !== 'p') return;
+      const r = Math.floor(i / C), col = i % C;
+      const o = { a: c.a, kind: c.kind, dir: c.dir, st: c.st || 'awake', f: c.f || 0, side: c.side, hand: c.hand, waves: c.waves, wave: c.wave, fly: c.fly, flyDir: c.flyDir, bounce: c.bounce, step: c.kind === 'W' && (!c.st || c.st === 'awake') && c.step !== false, walk: c.walk, cry: c.cry, blink: c.blink, size: cs, uid: this.u() };
+      kids.push(h('div', { key: 'p' + i, style: { position: 'absolute', left: col * cs, top: r * cs, width: cs, height: cs, zIndex: c.wave || c.waves ? 3 : 2, ...(c.alight ? { opacity: 0.5, transform: `translateY(${cs * 0.16}px) scale(.9)` } : {}) } }, Y.P(o)));
+      if (c.alight) kids.push(h('svg', { key: 'al' + i, width: cs, height: cs, viewBox: '0 0 64 64', style: { position: 'absolute', left: col * cs, top: r * cs, zIndex: 5, overflow: 'visible', pointerEvents: 'none' } }, h('path', { d: 'M32 52 L32 70 M26 64 L32 70 L38 64', stroke: '#e9e6dd', strokeWidth: 2.4, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' })));
+      if (c.bubble) kids.push(h('div', { key: 'bb' + i, style: { position: 'absolute', left: col * cs + cs / 2, top: r * cs - 6, transform: 'translate(-50%,-100%)', zIndex: 6, background: '#fffaf0', color: INK, border: `2px solid ${INK}`, borderRadius: 14, padding: '0 9px 2px', fontFamily: 'Gaegu, cursive', fontWeight: 700, fontSize: 18, whiteSpace: 'nowrap', boxShadow: `2px 2px 0 ${INK}` } }, c.bubble));
+    });
+    cells.forEach((c, i) => {
+      if (c.door == null) return;
+      const r = Math.floor(i / C), col = i % C;
+      kids.push(h('div', { key: 'dr' + i, style: { position: 'absolute', left: col * cs, top: r * cs, zIndex: 4, pointerEvents: 'none' } }, Y.tile('door', { size: cs, uid: this.u(), n: c.door, st: c.doorSt })));
+    });
+    if (cfg.tunnel) kids.push(h('div', { key: 'tn', style: { position: 'absolute', inset: -pad[0], borderRadius: 22, background: 'rgba(3,4,8,.65)', zIndex: 5, pointerEvents: 'none' } }));
+    const wall = (side) => h('div', { key: 'wall' + side, style: { position: 'absolute', top: 10, bottom: 10, [side]: 4, width: 8, borderRadius: 4, background: cfg.tunnel ? 'radial-gradient(circle at 50% 50%, #ffcf5a 0 1.2px, transparent 1.6px) 0 0/8px 46px, #07080c' : 'repeating-linear-gradient(180deg,#34465a 0 30px,#171b23 30px 38px)', opacity: 0.9, zIndex: 6 } });
+    return h('div', { style: { position: 'relative', padding: `${pad[0]}px ${pad[1]}px`, borderRadius: 22, background: 'repeating-linear-gradient(90deg,#252a35 0 24px,#232833 24px 48px)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.05), 0 20px 50px rgba(0,0,0,.35)' } },
+      cfg.small ? null : wall('left'), cfg.small ? null : wall('right'),
+      h('div', { style: { position: 'relative', width: W, height: H } }, kids));
+  }
+
+  build() {
+    const Y = this.Y, h = React.createElement, LC = Y.LINE_COLORS;
+    const P = (o) => Y.P({ uid: this.u(), ...o }), CAT = (o) => Y.CAT({ ...o }), T = (type, o) => Y.tile(type, { uid: this.u(), ...o });
+    const Fr = (label, el) => ({ label, el });
+    const S = (cfg) => this.board({ cs: 56, pad: [14, 14], small: true, ...cfg });
+    const DN = { d: '아래', l: '왼쪽', r: '오른쪽', u: '위 (뒤통수)' };
+    const dirs = (b, extra) => ['d', 'l', 'r', 'u'].map(d => Fr(DN[d], P({ ...b, dir: d, f: 0, ...(extra || {}) })));
+    const yawn4 = (b) => ['벌림', '최대', '눈물', '닫힘'].map((l, f) => Fr(l, P({ ...b, st: 'yawn', f })));
+    const common = (b) => [
+      { label: '부릅뜸 · 패배 카드', frames: [Fr('부릅뜸', P({ ...b, st: 'glare', f: 0 }))] },
+      { label: '깨어 있음 · 방향 4 + 깜빡임', frames: dirs(b).concat([Fr('깜빡임', P({ ...b, dir: 'd', f: 0, blink: true }))]) },
+      { label: '하품 · 4프레임 520ms', frames: yawn4(b) },
+      { label: '꾸벅 3프레임 200ms → 잠듦 숨 2프레임 → 깸 300ms', frames: [0, 1, 2].map(f => Fr('꾸벅 ' + (f + 1), P({ ...b, st: 'nod', f, side: 1 }))).concat([Fr('숨 1', P({ ...b, st: 'asleep', f: 0 })), Fr('숨 2', P({ ...b, st: 'asleep', f: 1 })), Fr('깸', P({ ...b, st: 'startle', f: 0 }))]) },
+    ];
+    const chip = (n) => ({ flex: 'none', width: 36, height: 36, borderRadius: 10, background: LC[n - 1].dark, color: '#14161c', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 15 });
+    const card = (n, name, rule, cue, rows) => ({ n, name, rule, cue, rows, chip: chip(n) });
+    const ring4 = (st) => ({ '0,1': { st }, '1,0': { st }, '1,2': { st }, '2,1': { st } });
+
+    const cardsA = [
+      card(7, '코골이 아저씨', '잠든 뒤 2박자마다 크게 코를 곤다. 소리는 상하좌우 바로 옆 칸까지만 닿아 잠든 사람을 깨운다(이어폰 제외).', '파동 호 3겹이 옆 칸 가운데에서 끝난다. 대각선 칸은 그대로 잔다.', [
+        ...common({ a: 3, kind: 'N' }),
+        { label: '코골이 맥동 — 1박 작게 / 2박 크게', frames: [Fr('1박 · 작게', P({ a: 3, kind: 'N', st: 'asleep', f: 0 })), Fr('2박 · 크게', P({ a: 3, kind: 'N', st: 'asleep', f: 1 })),
+          Fr('파동 범위 — 옆 4칸 깸, 대각선은 그대로', S({ rows: [['Bd', 'Bd', 'Bd'], ['Bl', 'Nx', 'Br'], ['Bu', 'Bu', 'Bu']], lines: false, ov: { ...ring4('startle'), '1,1': { a: 3, st: 'asleep', f: 1, waves: true }, '0,0': { st: 'asleep' }, '0,2': { st: 'asleep', f: 1 }, '2,0': { st: 'asleep', f: 1 }, '2,2': { st: 'asleep' } } }))] },
+      ]),
+      card(8, '우는 아기', '4박자마다 운다. 울음은 코골이처럼 상하좌우 바로 옆 칸까지만 닿아 잠든 이웃을 깨운다(이어폰 제외). 아기가 잠들면 조용해진다.', '울기 한 박자 전 찡그림(떨림선) = 예고. 울음 파동은 아기 쪽에서 바깥으로.', [
+        ...common({ a: 5, kind: 'Y', cry: 'pre' }),
+        { label: '아기 2단계 + 잠듦', frames: [Fr('평소 · 울기 1박 전 찡그림', P({ a: 5, kind: 'Y', dir: 'd', f: 0, cry: 'pre' })), Fr('울음 · 4박마다', P({ a: 5, kind: 'Y', dir: 'd', f: 0, cry: 'cry' })), Fr('아기 잠듦', P({ a: 5, kind: 'Y', st: 'asleep', f: 0, side: -1 })),
+          Fr('울음 범위 — 옆 4칸 깸, 대각선은 그대로', S({ rows: [['Bd', 'Bd', 'Bd'], ['Bl', 'Yx', 'Br'], ['Bu', 'Bu', 'Bu']], lines: false, ov: { ...ring4('startle'), '1,1': { a: 5, cry: 'cry', waves: true }, '0,0': { st: 'asleep' }, '0,2': { st: 'asleep', f: 1 }, '2,0': { st: 'asleep', f: 1 }, '2,2': { st: 'asleep' } } }))] },
+      ]),
+      card(9, '잠꼬대 승객', '잠드는 순간 낙서 말풍선이 바라보던 바로 앞 칸으로 날아간다. 받은 사람은 보고 있지 않아도 다음 박자에 보통 하품을 한다.', '말풍선이 앞 칸 머리 위로 포물선을 그리며 날아가는 궤적(점선).', [
+        ...common({ a: 4, kind: 'T' }),
+        { label: '잠드는 순간 — 말풍선 비행 3프레임', frames: [0, 0.5, 1].map(t => Fr(t === 0 ? '출발' : t === 1 ? '도착' : '비행', S({ rows: [['Tr', 'Bl']], lines: false, ov: { '0,0': { a: 4, st: 'asleep', fly: t, flyDir: 'r' } } }))).concat([Fr('다음 박자 — 받은 사람 하품', S({ rows: [['Tr', 'Bu']], lines: false, ov: { '0,0': { a: 4, st: 'asleep' }, '0,1': { st: 'yawn', f: 1, bubble: '하아암' } } }))]) },
+      ]),
+      card(10, '마스크 승객', '하품해도 남에게 옮지 않는다(마스크가 막음). 남의 하품은 보고 따라 한다.', '하품 내내 마스크가 풍선처럼 부풀고, 이 사람을 보는 시선선은 마스크 앞에서 흐려져 사라진다.', [
+        ...common({ a: 1, kind: 'K' }),
+        { label: '시선선 비교', frames: [Fr('마스크 — 흐려짐, 빛 없음', S({ rows: [['Br', '..', 'Kl']], ov: { '0,2': { a: 1, st: 'yawn', f: 2 } } })), Fr('보통 승객 — 빛이 흐름', S({ rows: [['Br', '..', 'Bl']], lit: [0], ov: { '0,2': { a: 1, st: 'yawn', f: 2 } } }))] },
+      ]),
+      card(11, '스테인리스 기둥', '시선이 기둥에 닿으면 진행 방향의 양옆 두 갈래로 갈라진다(1단계). 갈라진 시선이 또 기둥에 닿으면 다시 양옆으로 갈라진다(2단계). 2단계로 갈라진 시선이 또 기둥에 닿으면 거기서 막힌다(세 번째 기둥).', '들어온 점선 → 양옆 노란 화살표 두 개. 세 번째 기둥에서는 선 끝에 짧은 가로막대.', [
+        { label: '타일', frames: [Fr('평소', T('pole')), Fr('갈라짐 · 1·2번째 기둥', T('pole', { st: 'split' })), Fr('막힘 · 세 번째 기둥', T('pole', { st: 'blocked' }))] },
+        { label: '판 위', frames: [
+          Fr('기둥 → 갈림 → 기둥 → 다시 갈림', S({ rows: [['..', '..', 'Bd', '..', 'Bd'], ['Br', '..', 'I', '..', 'I'], ['..', '..', '..', '..', 'Bu']], ov: {} })),
+          Fr('세 번째 기둥에서 막힘', S({ rows: [['..', 'Bd', '..', 'Bd', '..'], ['Br', 'I', '..', 'I', '..'], ['..', '..', '..', '..', '..'], ['..', '..', '..', 'I', '..']], ov: {} }))] },
+      ]),
+      card(12, '출입문', '문 칸에도 승객이 앉아 있다. 이 승객은 다른 승객과 똑같이 남을 보고, 남에게 보이고, 하품하고, 잠든다. 남은 박자가 0이 되는 박자에 문이 열리고 그 칸 승객이 깨어 있는 새 승객(같은 종류, 처음 방향)으로 바뀐다 — 잠들어 있었어도 바뀌고, 그 칸에 예약된 하품도 사라진다.', '칸 테두리 문틀 + 오른쪽 위 노란 숫자 배지가 박자마다 줄어든다. 0에서 승객이 내리고 문짝이 양옆으로 열린다.', [
+        { label: '문 표시 레이어 (승객 칸 위에 얹음)', frames: [Fr('3', T('door', { n: 3 })), Fr('2', T('door', { n: 2 })), Fr('1', T('door', { n: 1 })), Fr('열림', T('door', { st: 'open' }))] },
+        { label: '판 위 — 문 칸 승객 한 사람의 흐름', frames: [Fr('3 · 깨어 있음', S({ rows: [['Bd']], lines: false, ov: { '0,0': { a: 1, door: 3 } } })), Fr('2 · 하품', S({ rows: [['Bd']], lines: false, ov: { '0,0': { a: 1, door: 2, st: 'yawn', f: 1 } } })), Fr('1 · 잠듦', S({ rows: [['Bd']], lines: false, ov: { '0,0': { a: 1, door: 1, st: 'asleep' } } })), Fr('0 · 내림 (선택)', S({ rows: [['Bd']], lines: false, ov: { '0,0': { a: 1, door: 0, st: 'asleep', doorSt: 'open', alight: true } } })), Fr('0 · 새 승객 앉음', S({ rows: [['Bd']], lines: false, ov: { '0,0': { a: 1, door: 0, doorSt: 'open', blink: true } } })), Fr('다음 박자 · 3부터 다시', S({ rows: [['Bd']], lines: false, ov: { '0,0': { a: 1, door: 3 } } }))] },
+        { label: '시선 — 문 칸 승객에게 닿고, 문 칸 승객도 본다', frames: [Fr('문 칸 승객을 봄', S({ rows: [['Br', '..', 'Bl']], ov: { '0,2': { door: 2 } } })), Fr('문 칸 승객이 봄 · 하품 전파', S({ rows: [['Br', 'Bl', '..']], lit: [0], ov: { '0,0': { door: 1 }, '0,1': { st: 'yawn', f: 1 } } }))] },
+      ]),
+    ];
+
+    const cardsB = [
+      card(13, '고양이 (가방 속)', '아무도 안 본다(방향 없음). 고양이가 하품하면 방향과 상관없이 상하좌우 이웃 모두가 다음 박자에 하품한다. 탭으로만 하품시킬 수 있다.', '하품 순간 분홍 원형 물결이 네 방향 이웃 칸 가운데까지 퍼진다 — 사람의 직선 시선선과 다른 모양.', [
+        { label: '깨어 있음 — 꼬리 살랑 2프레임', frames: [Fr('꼬리 1', CAT({ f: 0 })), Fr('꼬리 2', CAT({ f: 1 }))] },
+        { label: '하품 520ms — 입이 쩍, 귀 젖힘', frames: ['벌림', '최대', '눈물', '닫힘'].map((l, f) => Fr(l, CAT({ st: 'yawn', f }))) },
+        { label: '잠듦 — 둥글게 말림 · 하품 물결', frames: [Fr('잠듦 1', CAT({ st: 'asleep', f: 0 })), Fr('잠듦 2', CAT({ st: 'asleep', f: 1 })),
+          Fr('물결 — 등 돌린 이웃도 하품', S({ rows: [['Bl', 'Bu', 'Br'], ['Bl', 'Gx', 'Br'], ['Bl', 'Bd', 'Br']], lines: false, ov: { '1,1': { st: 'yawn', f: 2, wave: true } } }))] },
+      ]),
+      card(14, '서서 가는 승객', '깨어 있는 동안 박자마다 바라보는 방향으로 한 칸 걷는다. 막히면 돌아서 반대로. 시선 = 걷는 방향. 잠들면 그 자리에 선 채 존다.', '발밑 화살표와 다음 칸 발자국 두 개. 앉은 승객보다 키가 크고 손잡이를 잡고 있다.', [
+        { label: '깨어 있음 — 방향 4 (발걸음 표시는 다음 칸에)', frames: [
+          Fr('아래', S({ rows: [['Wd'], ['..']], lines: false })), Fr('왼쪽', S({ rows: [['..', 'Wl']], lines: false })),
+          Fr('오른쪽', S({ rows: [['Wr', '..']], lines: false })), Fr('위 (뒤통수)', S({ rows: [['..'], ['Wu']], lines: false }))] },
+        { label: '걷기 260ms · 돌아서기 150ms', frames: [Fr('걸음 1', P({ a: 0, kind: 'W', dir: 'r', walk: 0, f: 0 })), Fr('걸음 2', P({ a: 0, kind: 'W', dir: 'r', walk: 1, f: 0 })), Fr('돌아서기', P({ a: 0, kind: 'W', st: 'turn', f: 0 }))] },
+        { label: '하품 · 선 채 꾸벅 · 손잡이에 매달려 잠듦', frames: [Fr('하품', P({ a: 0, kind: 'W', st: 'yawn', f: 1 })), Fr('꾸벅', P({ a: 0, kind: 'W', st: 'nod', f: 2, side: 1 })), Fr('잠듦 1', P({ a: 0, kind: 'W', st: 'asleep', f: 0, side: 1 })), Fr('잠듦 2', P({ a: 0, kind: 'W', st: 'asleep', f: 1, side: 1 })),
+          Fr('판 위 — 다음 박자에 한 칸', S({ rows: [['Wr', '..', '..', 'Bl']] }))] },
+      ]),
+      card(15, '커플', '붙어 앉은 두 사람. 한 명이 잠들면 다른 한 명도 하품 없이 어깨에 기대 잠든다. 하품을 안 했으므로 그 사람을 보던 승객에게는 옮지 않는다.', '두 사람 손이 칸 경계에서 맞잡히고, 그 아래 노란 손 연결선. 기대어 잠들 때는 「하아암」 말풍선이 없다.', [
+        { label: '깨어 있음 — 방향 4 (손은 늘 짝 쪽)', frames: dirs({ a: 4, hand: 'r' }) },
+        { label: '연결선 2종 · 기대어 잠듦 300ms', frames: [Fr('깨어 있음 — 실선', S({ rows: [['Qd', 'Qd']], lines: false, ov: { '0,0': { a: 4 }, '0,1': { a: 1 } } })),
+          Fr('한 명 하품 (말풍선 있음)', S({ rows: [['Qd', 'Qd']], lines: false, ov: { '0,0': { a: 4, st: 'yawn', f: 1, bubble: '하아암' }, '0,1': { a: 1 } } })),
+          Fr('짝이 기대어 잠듦 (말풍선 없음) — 점선', S({ rows: [['Qd', 'Qd']], lines: false, ov: { '0,0': { a: 4, st: 'asleep', f: 0, side: 1 }, '0,1': { a: 1, st: 'lean', side: -1 } } }))] },
+      ]),
+      card(16, '근시 승객', '안경을 벗어 바로 앞 칸만 본다. 한 칸이라도 떨어진 사람, 창문·기둥 너머는 못 본다.', '시선선이 한 칸 길이에서 끝나는 흐릿한 짧은 실선. 안경은 이마 위에.', [
+        { label: '깨어 있음 — 실눈 · 방향 4', frames: dirs({ a: 4, kind: 'O' }) },
+        { label: '하품 · 꾸벅 (안경 떨어짐) · 잠듦', frames: [Fr('하품', P({ a: 4, kind: 'O', st: 'yawn', f: 1 }))].concat([0, 1, 2].map(f => Fr('꾸벅 ' + (f + 1), P({ a: 4, kind: 'O', st: 'nod', f, side: 1 })))).concat([Fr('잠듦', P({ a: 4, kind: 'O', st: 'asleep', f: 0, side: 1 }))]) },
+        { label: '판 위', frames: [Fr('바로 앞 칸 — 봄', S({ rows: [['Or', 'Bu', '..']] })), Fr('한 칸 떨어짐 — 못 봄', S({ rows: [['Or', '..', 'Bu']] }))] },
+      ]),
+      card(17, '까치발 아이', '앞사람 머리 너머로 두 번째로 마주치는 사람을 본다. 첫 번째 사람은 건너뛴다.', '시선선이 첫 사람 머리 위로 아치를 그리며 넘어간다. 목을 길게 뺀 자세.', [
+        { label: '깨어 있음 — 목을 길게 뺌 · 방향 4', frames: dirs({ kind: 'J' }) },
+        { label: '하품 · 잠듦 · 깸', frames: [Fr('하품', P({ kind: 'J', st: 'yawn', f: 1 })), Fr('잠듦', P({ kind: 'J', st: 'asleep', f: 0, side: 1 })), Fr('깸', P({ kind: 'J', st: 'startle', f: 0 }))] },
+        { label: '판 위', frames: [Fr('첫 사람 건너뛰고 두 번째', S({ rows: [['Jr', 'Bd', 'Bu']] }))] },
+      ]),
+      card(18, '이어폰 승객', '코골이·아기 울음·알람에 깨지 않는다. 나머지는 기본 승객과 같다.', '소리 파동이 헤드폰에 부딪혀 노란 사선으로 튕겨 나간다. 깨어 있을 땐 머리 옆 음표.', [
+        { label: '깨어 있음 — 방향 4', frames: dirs({ a: 1, kind: 'E' }) },
+        { label: '튕김 250ms · 하품 · 잠듦', frames: [Fr('튕김', P({ a: 1, kind: 'E', st: 'asleep', f: 0, bounce: true, side: 1 })), Fr('하품', P({ a: 1, kind: 'E', st: 'yawn', f: 1 })), Fr('잠듦', P({ a: 1, kind: 'E', st: 'asleep', f: 1, side: 1 })),
+          Fr('코골이 옆 — 왼쪽만 깸', S({ rows: [['Bd', 'Nx', 'Er']], lines: false, ov: { '0,0': { st: 'startle' }, '0,1': { a: 3, st: 'asleep', f: 1, waves: true }, '0,2': { a: 1, st: 'asleep', bounce: true, side: 1 } } }))] },
+      ]),
+      card(19, '터널', 'N박자마다 한 박자 동안 객차가 깜깜해져 아무도 못 본다. 그 박자에 한 하품은 옮지 않는다(고양이·잠꼬대는 시선이 아니라 그대로 된다).', '머리줄 오른쪽 터널 입구 아이콘 + 남은 박자 숫자. 한 박자 전 깜빡임, 터널 중엔 판 밝기 35%와 창 띠 밖 터널 벽 불빛.', [
+        { label: '남은 박자 표시', frames: [Fr('3', T('tunnel', { n: 3 })), Fr('2', T('tunnel', { n: 2 })), Fr('1 · 깜빡임 예고', T('tunnel', { n: 1 })), Fr('터널 중', T('tunnel', { st: 'dark', n: 0 }))] },
+        { label: '판 — 터널 중에는 시선선이 꺼짐 (전체 화면은 C)', frames: [Fr('터널 밖', S({ rows: [['Br', 'Bd', 'Bl'], ['Bu', '..', 'Bu']] })), Fr('터널 중 · 밝기 35%', S({ rows: [['Br', 'Bd', 'Bl'], ['Bu', '..', 'Bu']], tunnel: true }))] },
+      ]),
+      card(20, '알람 시계', '정해진 박자에 한 번 울려 주변 8칸(대각 포함)의 잠든 사람을 깨운다(이어폰 제외). 칸을 차지하지만 시선은 통과한다.', '바닥에 3×3 범위 점선이 은은하게 깔리고, 숫자가 줄어든다. 울릴 때 벨이 흔들리며 범위가 밝아진다.', [
+        { label: '타일 — 남은 박자 · 울림 2프레임 · 꺼짐', frames: [Fr('3', T('alarm', { n: 3 })), Fr('2', T('alarm', { n: 2 })), Fr('1', T('alarm', { n: 1 })), Fr('울림 1', T('alarm', { st: 'ring', f: 0 })), Fr('울림 2', T('alarm', { st: 'ring', f: 1 })), Fr('꺼짐', T('alarm', { st: 'off' }))] },
+        { label: '판 위', frames: [Fr('시선은 통과', S({ rows: [['Br', 'A2', 'Bl']] })),
+          Fr('울림 — 주변 8칸 깸, 이어폰은 그대로', S({ rows: [['Bd', 'Bd', 'Er'], ['Br', 'A0', 'Bl'], ['Bu', 'Bu', 'Bu']], lines: false, ov: { '0,0': { st: 'startle' }, '0,1': { st: 'startle' }, '0,2': { a: 1, st: 'asleep', bounce: true, side: 1 }, '1,0': { st: 'startle' }, '1,1': { st: 'ring', f: 1 }, '1,2': { st: 'startle' }, '2,0': { st: 'startle' }, '2,1': { st: 'startle' }, '2,2': { st: 'startle' } } }))] },
+      ]),
+    ];
+
+    const glare = { 13: [Fr('부릅뜸', CAT({ st: 'glare' }))], 14: [Fr('부릅뜸', P({ a: 0, kind: 'W', st: 'glare' }))], 15: [Fr('부릅뜸 · 대학생', P({ a: 4, hand: 'r', st: 'glare' })), Fr('부릅뜸 · 학생', P({ a: 1, hand: 'l', st: 'glare' }))], 16: [Fr('부릅뜸', P({ a: 4, kind: 'O', st: 'glare' }))], 17: [Fr('부릅뜸', P({ kind: 'J', st: 'glare' }))], 18: [Fr('부릅뜸', P({ a: 1, kind: 'E', st: 'glare' }))] };
+    cardsB.forEach(c => { if (glare[c.n]) c.rows.push({ label: '부릅뜸 · 패배 카드', frames: glare[c.n] }); });
+    const R58 = [
+      ['Br', '..', '..', 'Ol', 'Bl'],
+      ['Ed', '..', '/', '..', 'Bu'],
+      ['Bu', 'Jr', 'Bl', '..', 'Bl'],
+      ['..', '..', 'A3', 'Kl', '..'],
+      ['Qr', 'Ql', '..', 'Bu', '..'],
+      ['Bu', '..', 'Gx', '..', 'Wl'],
+      ['Nd', '..', '..', '\\', 'Bu'],
+      ['..', 'Br', 'Bu', '..', '..'],
+    ];
+    const R33 = [['Br', 'Bd', 'Bl'], ['Bu', '..', 'Bu'], ['Br', 'Bu', 'Bl']];
+    const scr = (label, W, H, cs, pad, rows, line, station, taps, note, extra) => {
+      const ex = extra || {};
+      return {
+        label, note, line, station,
+        frame: { width: W, height: H, borderRadius: 28, overflow: 'hidden', background: '#1b1f28', display: 'flex', flexDirection: 'column', boxShadow: '0 30px 60px rgba(0,0,0,.25), 0 0 0 8px #0d0f14', flex: 'none' },
+        chip: { width: 30, height: 30, borderRadius: 15, background: LC[line - 1].light, color: '#fff', border: '2px solid #17151d', boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13 },
+        hasTunnel: ex.tunnelIn != null, tunnelIn: ex.tunnelIn != null ? String(ex.tunnelIn) : '', tunnelIcon: ex.tunnelIn != null ? T('tunnel', { size: 26, st: ex.tunnel ? 'dark' : 'idle' }) : null,
+        board: this.board({ rows, cs, pad, tunnel: ex.tunnel, lit: ex.lit, seed: line }),
+        taps: Array.from({ length: taps }, (_, j) => ({ style: { width: 36, height: 36, opacity: j < (ex.used ? taps - ex.used : taps) ? 1 : 0.25 } })),
+        tapLabel: `${ex.used ? taps - ex.used : taps} / ${taps}`,
+      };
+    };
+    const screens = [
+      scr('412 × 915 · 5×8 · 칸 68', 412, 915, 68, [18, 20], R58, 17, '04', 3, '바닥 380dp(칸 68×5 + 좌우 20). 판 아래위로 각 70dp 여유 — 더 긴 기기에서는 이 여유만 늘어납니다. 한 줄이 빛나는 중(하품 전파).', { lit: [0] }),
+      scr('360 × 780 · 5×8 · 칸 64 (최소)', 360, 780, 64, [14, 12], R58, 17, '04', 3, '바닥 여백을 14/12로 줄여 칸 64를 지킵니다. 머리줄·툭 표시 높이는 그대로.'),
+      scr('412 × 915 · 터널 중', 412, 915, 68, [18, 20], R58, 19, '02', 3, '판 밝기 35% · 시선선 꺼짐 · 창 띠 밖 터널 벽 불빛. 머리줄의 터널 아이콘이 채워지고 숫자 0. 툭은 그대로 할 수 있습니다.', { tunnel: true, tunnelIn: 0, used: 1 }),
+      scr('360 × 780 · 3×3 작은 판', 360, 780, 72, [22, 26], R33, 1, '01', 1, '작은 판은 칸 72 · v1 여백 그대로, 세로 가운데. 바닥 그림자로 무게를 줘 휑하지 않게.'),
+    ];
+    const lines = LC.map((c, i) => ({
+      n: c.n, light: c.light, dark: c.dark, name: Y.GIMMICKS[i].name, icon: Y.GIMMICKS[i].icon(30),
+      chipL: { width: 32, height: 26, borderRadius: 7, background: c.light, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13 },
+      chipD: { width: 32, height: 26, borderRadius: 7, background: c.dark, color: '#14161c', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13 },
+      railL: { height: 7, borderRadius: 4, background: c.light }, railD: { height: 7, borderRadius: 4, background: c.dark },
+    }));
+    return { cardsA, cardsB, screens, lines };
+  }
+
+  renderVals() {
+    if (!this.Y) return { cardsA: [], cardsB: [], screens: [], lines: [] };
+    const key = String(this.props.showSight !== false);
+    if (!this.cache || this.cacheKey !== key) { this.n = 0; this.cache = this.build(); this.cacheKey = key; }
+    return this.cache;
+  }
+}
+</script>
+</body>
+</html>

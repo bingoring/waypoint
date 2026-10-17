@@ -7,7 +7,7 @@ updated: 2026-10-17
 
 # Frontend Components — Yawn! 기믹 확장
 
-> **SoT:** 핸드오프 v2 `02_COMPONENTS.md`·`03_CHARACTERS.md`·`04_SCREENS.md`·`06_MOTION.md`·`reference/yawn-render.js`(구현 착수 때 `inputs/design-handoff-yawn-relay_v2/`에 원문 보관). 확인 기록 [`../yawn-relay/handoff-v2-review-2026-10-17.md`](../yawn-relay/handoff-v2-review-2026-10-17.md). 기존 화면은 2-9 FC 그대로.
+> **SoT:** 핸드오프 **v2.1** `02_COMPONENTS.md`·`03_CHARACTERS.md`·`04_SCREENS.md`·`06_MOTION.md`·`reference/yawn-render.js`(구현 착수 때 `inputs/design-handoff-yawn-relay_v2/`에 원문 보관). 확인 기록 [`../yawn-relay/handoff-v2-review-2026-10-17.md`](../yawn-relay/handoff-v2-review-2026-10-17.md). 기존 화면은 2-9 FC 그대로.
 
 ## 1. 렌더러 v2 이식 (`ui/character/`)
 
@@ -15,7 +15,7 @@ updated: 2026-10-17
 - **종류 대응표**(한곳에 둔다): 핸드오프 `kind` B·P·C·M·S·N·Y·T·K·W·O·J·E·G + 커플 `hand` ↔ 엔진 `Kind` normal·phone·coffee·stubborn·rot·snorer·baby·talker·mask·walker·myopic·tiptoe·earphone·cat·couple. 핸드오프 기믹 이름 `wide`·`looker`·`pole`·`standing` = 엔진 `stubborn`·`rot`·`pillar`·`walker`.
 - **상태 추가:** `startle`(깸, 모든 종류), `lean`(커플), `turn`·`walk`(서서 가는), 아기 `cry: pre|cry`, 코골이 `waves`, 이어폰 `bounce`, 잠꼬대 `fly`.
 - **기준 그림:** 핸드오프 SVG를 메타데이터 빼고 브라우저로 래스터화해 골든 기준 그림으로 쓴다(앱은 SVG를 직접 읽지 않음 — CSS 변형·C2PA 메타데이터).
-- **부릅뜸:** 새 종류의 `glare`는 렌더러가 만드는지 확인. 정정본 v2.1에서 받기로 함.
+- **부릅뜸:** v2.1 렌더러가 모든 종류에서 `st: 'glare'`를 그린다(고양이는 전용 하악 표정). 기준 그림 `*_glare.svg` 17개.
 
 ## 2. 판 (`ui/board_view.dart`)
 
@@ -33,7 +33,7 @@ updated: 2026-10-17
 | 근시 | 3 · 흐린 짧은 실선, 앞 칸 0.7(사람 없으면 0.85)에서 끝 |
 | 까치발 | 첫 사람 머리 위로 0.95칸 아치 |
 | 마스크를 보는 선 | 끝 0.35칸이 굵고 흐린 안개, 끝 점 없음 |
-| 기둥 | 기둥 가운데서 양옆으로, 3단계째 막히면 12dp 가로막대(정정본 v2.1 기준) |
+| 기둥 | 기둥 가운데서 진행 방향 양옆으로. 1·2번째 기둥에서 갈라지고 세 번째 기둥에서 12dp 가로막대. 갈라진 선도 창문에서 꺾임(v2.1) |
 같은 칸 쌍을 오가는 두 선은 진행 방향 오른쪽으로 3dp 비켜 그린다.
 
 ### 2.3 효과
@@ -61,13 +61,14 @@ updated: 2026-10-17
 ### 2.6 커플 손 연결선 (02)
 경계 중심 ±22dp 아래로 처진 호. 둘 다 깨어 있음 = 실선 2.4 `#FFCF5A` + glow, 한 명이라도 잠듦 = 점선 1.8 `#A9ADB8`.
 
-### 2.7 출입문 (정정 반영 — Q3)
-문은 **승객 칸 위 표시**: 문틀 테두리 + 오른쪽 위 남은 박자 배지(공통 숫자 배지), 열림 연출(문짝 밀림 + 새 승객 75%) 300ms. 시선을 막지 않는다. 정정본 v2.1이 오면 그림만 교체.
+### 2.7 출입문 (v2.1 — 승객 칸 위 문 표시)
+- 좌석·승객은 평소대로 그리고 그 위(승객 위, 말풍선 아래)에 문 표시 레이어: 문틀 테두리 3.6 `#56627A`(+ 바깥 1.2 `#17151D`), 상인방 32×6 + 가운데 등(평소 `#2A3140`, 열림 `#FFCF5A`), 오른쪽 위 남은 박자 배지.
+- 흐름: 3 → 2 → 1 → **0 박자에 승객이 내림**(50% 불투명 + 아래로 0.16칸 + 0.9배, 200ms) → 문 열림(문짝 8dp 밀림, 노란 빛 16%) → 깨어 있는 새 승객(깜빡임 프레임부터) → 다음 박자 문 닫힘 + 배지 다시 시작. 예약된 하품과 빛나던 시선선은 끈다.
+- **시선을 막지 않는다.** 기준 그림 `tile_door_1..3`·`tile_door_open`은 레이어만 그린 그림.
 
 ## 3. 노선도 (`ui/line_map_page.dart`)
 - 노선 20개, 노선 머리 = 번호 칩 + **기믹 아이콘 34**(검정 상자, 핸드오프 `line_icon_*` 그림을 렌더러로 그림). 지금의 「새 승객 얼굴」을 아이콘으로 바꾼다.
 - 21번 이후 색은 처음부터 다시(앱 반영 끝).
-- (Q2) 꺼진 노선은 예고에도 나오지 않는다.
 
 ## 4. 화면 상태 추가
 | 상태 | 화면 |

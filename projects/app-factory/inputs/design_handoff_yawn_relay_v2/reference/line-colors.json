@@ -1,0 +1,162 @@
+[
+  {
+    "line": 1,
+    "gimmick": "basic",
+    "name": "기본",
+    "light": "#007570",
+    "dark": "#49c7c0",
+    "oklchHue": 190
+  },
+  {
+    "line": 2,
+    "gimmick": "phone",
+    "name": "휴대폰",
+    "light": "#815c0a",
+    "dark": "#d6a95b",
+    "oklchHue": 80
+  },
+  {
+    "line": 3,
+    "gimmick": "coffee",
+    "name": "커피",
+    "light": "#934c3a",
+    "dark": "#ee9781",
+    "oklchHue": 35
+  },
+  {
+    "line": 4,
+    "gimmick": "window",
+    "name": "창문 반사",
+    "light": "#4d5f9c",
+    "dark": "#96aef7",
+    "oklchHue": 270
+  },
+  {
+    "line": 5,
+    "gimmick": "wide",
+    "name": "말똥말똥",
+    "light": "#5c6b21",
+    "dark": "#a8bc69",
+    "oklchHue": 120
+  },
+  {
+    "line": 6,
+    "gimmick": "looker",
+    "name": "두리번",
+    "light": "#834d7e",
+    "dark": "#d997d2",
+    "oklchHue": 330
+  },
+  {
+    "line": 7,
+    "gimmick": "snorer",
+    "name": "코골이",
+    "light": "#1f6a96",
+    "dark": "#6bbaf0",
+    "oklchHue": 240
+  },
+  {
+    "line": 8,
+    "gimmick": "baby",
+    "name": "우는 아기",
+    "light": "#8e5224",
+    "dark": "#e79e6b",
+    "oklchHue": 55
+  },
+  {
+    "line": 9,
+    "gimmick": "talker",
+    "name": "잠꼬대",
+    "light": "#337344",
+    "dark": "#7cc58c",
+    "oklchHue": 150
+  },
+  {
+    "line": 10,
+    "gimmick": "mask",
+    "name": "마스크",
+    "light": "#904961",
+    "dark": "#ea93ae",
+    "oklchHue": 0
+  },
+  {
+    "line": 11,
+    "gimmick": "pole",
+    "name": "기둥",
+    "light": "#005264",
+    "dark": "#3fa8bf",
+    "oklchHue": 215
+  },
+  {
+    "line": 12,
+    "gimmick": "door",
+    "name": "출입문",
+    "light": "#534800",
+    "dark": "#a79a4c",
+    "oklchHue": 100
+  },
+  {
+    "line": 13,
+    "gimmick": "cat",
+    "name": "고양이",
+    "light": "#6e3239",
+    "dark": "#ce7e84",
+    "oklchHue": 15
+  },
+  {
+    "line": 14,
+    "gimmick": "standing",
+    "name": "서서 가는 승객",
+    "light": "#4b3d70",
+    "dark": "#9d8cd0",
+    "oklchHue": 295
+  },
+  {
+    "line": 15,
+    "gimmick": "couple",
+    "name": "커플",
+    "light": "#33521f",
+    "dark": "#7da667",
+    "oklchHue": 135
+  },
+  {
+    "line": 16,
+    "gimmick": "myopic",
+    "name": "근시",
+    "light": "#69334e",
+    "dark": "#c77ea1",
+    "oklchHue": 350
+  },
+  {
+    "line": 17,
+    "gimmick": "tiptoe",
+    "name": "까치발 아이",
+    "light": "#254974",
+    "dark": "#6d9bd5",
+    "oklchHue": 255
+  },
+  {
+    "line": 18,
+    "gimmick": "earphone",
+    "name": "이어폰",
+    "light": "#663c08",
+    "dark": "#c38b53",
+    "oklchHue": 65
+  },
+  {
+    "line": 19,
+    "gimmick": "tunnel",
+    "name": "터널",
+    "light": "#005641",
+    "dark": "#4fac8f",
+    "oklchHue": 170
+  },
+  {
+    "line": 20,
+    "gimmick": "alarm",
+    "name": "알람 시계",
+    "light": "#56396a",
+    "dark": "#ab87c7",
+    "oklchHue": 310
+  }
+]

@@ -65,7 +65,7 @@ step(yawnSet):
 
 - `lineMechanics`가 20개가 되면 `factory_adaptive` 커리큘럼이 노선을 차례로 연다(간격 `spacing`, Q4).
 - `MapProgress.load(store, lines.length)`: 저장된 노선이 6개면 7~20을 「깬 역 0」으로 붙인다(기존 6개 진행 유지). 테스트로 증명한다.
-- (Q2) 노선 켜기 원격 키 `app_yawn.lines_enabled`(정수, 기본 20): 커리큘럼에 넘기는 기믹 목록을 그 수로 자른다.
+- 노선 20개를 모두 켜고 출시한다(원격 노선 스위치 없음, DECISIONS 2026-10-17).
 
 ## 5. 화면 연출 (요약 — 자세히는 FC)
 
