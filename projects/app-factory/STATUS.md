@@ -63,7 +63,7 @@
 | 2-9 Yawn! (하품) · comprehensive | [09-yawn-relay.md](02-construction/09-yawn-relay.md) · [Build Spec](02-construction/yawn-relay/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` 2026-10-17 — 오너 승인 대기) |
 | 2-10 공통 적응형 난이도 · 조사·설계 | [10-adaptive-difficulty.md](02-construction/10-adaptive-difficulty.md) | AI_PROPOSED (Build Spec `READY`, `factory_adaptive` 구현 끝 — 남은 일: `fit_difficulty.dart`, `pool.json` 도구) |
 | 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` — 오너 확인 대기) |
-| 2-12 Yawn! 판 생성기 재설계 (엮인 판·커지는 규모·필수 기믹) · comprehensive | [12-yawn-generator.md](02-construction/12-yawn-generator.md) | IN_PROGRESS (진단·Bus Out 분석·방향 제안 — 오너 결정 대기) |
+| 2-12 Yawn! 판 생성기 재설계 (엮인 판·커지는 규모·필수 기믹) · comprehensive | [12-yawn-generator.md](02-construction/12-yawn-generator.md) | IN_PROGRESS (오너 결정: 7×11·기둥 4호선·프로토타입 먼저 → 엮기 생성기 1차 프로토타입, 오너 플레이 검토 대기) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
