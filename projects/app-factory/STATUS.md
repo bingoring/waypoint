@@ -33,6 +33,7 @@
 > ✅ **2-11 구현·검증 끝 (2026-10-17) → `AI_PROPOSED`.** 렌더러 v2.1 Dart 이식(기준 그림 164장 일치), 판 화면 v2(시선선 6종·기믹 효과·터널·문·알람), 노선 아이콘 20개, 화면 흐름 테스트. **고난이도 시험**(오너 요청): 가장 큰 단계 노선 20 × 120판·큰 판 탐색↔전수 14개 일치·표본 오차 최대 1.5%p·퍼징 80만 박자 위반 0·후반 300판~ 목표 대비 9.2%p. 힌트 최대 233→21ms, 걷는 판 측정 최대 241→85ms로 고침. 편차 11건(Build Spec §7). 다음: 오너 확인 → R-1 독립 리뷰(2-9·2-11) → 3-1.
 > 🔍 **R-1 독립 리뷰 (2026-10-17) → `AI_PROPOSED`.** 컨텍스트가 분리된 리뷰어 3명(정확성·화면/수명·보안/정책, 하나는 다른 모델). 엔진·풀이기는 프로토타입 차분 시험 1.5만 판 불일치 0. 채택 수정: 노선 기믹 빠진 판(이어폰 노선 30%), 동의 철회 미반영, 화면 잠김·재진입, 노선도 매 프레임 문단 재생성, 배너 재펼침, 진행 저장 전체 초기화, 출시 검사 §7.3·워크플로 게이트·bundletool 해시. **저장소 CI가 10-16부터 실패 중이던 것을 발견해 고침**(quality·security 통과). 반박·보류 10건 근거 기록. 3-1로: Firebase 키 제한, 심볼 업로드, 방침 확정, 액션 SHA 고정.
 > 🧩 **2-12 생성기 재설계 착수 (2026-10-17).** 오너 에뮬레이터 피드백 4가지를 재현: 창문 든 생성 판 16개 중 13개는 창문이 장식, 70판째까지 3×3~5×5·4~11명, 고립 승객, 노선 첫 소개 판 11명 → 다음 역 4명. 원인은 「사람 먼저, 기믹은 빈칸·무작위 사람에」 생성과 전체 판 수 기반 크기 단계. Bus Out 분석 → 「풀이 먼저 엮기」 생성기·잠든 사람 시선 막힘을 순서 퍼즐로·노선 안 규모 곡선·판 최대 7×11 제안. Firebase `smallmatter-yawn` 연결(메인 `713c26f`).
+> 🧩 **2-12 프로토타입 2차 (2026-10-18).** 엮기 생성기가 20호선 기믹 전부를 다룬다 — 기믹을 연결·속임·함정 세 갈래로 넣고 갈래별 장식 검사. 240판 생성 실패 0·장식 기믹 0·고립 0, 20호선 30 → 40명(11×7). 순서 퍼즐 실험 「신문 펼친 승객」(꾸벅 승객은 순서가 안 생겨 버림). 사슬 쏠림·판당 기믹 상한. 오너 플레이 검토 대기.
 > 🗺️ **개발 대기열:** 하품 릴레이(아트 → Build Spec) · 새떼 그림 · 번짐 · 샴페인 타워 · 눈꽃 가위 · **로그라이크 2종(사다리 원정, 딱지왕 — 고도화 설계 `roguelike/design-direction-2026-10-16.md`)**.
 > 📌 **3-1 공통:** 네 앱 모두 런처 아이콘이 아직 Flutter 기본 아이콘이다.
 
@@ -63,7 +64,7 @@
 | 2-9 Yawn! (하품) · comprehensive | [09-yawn-relay.md](02-construction/09-yawn-relay.md) · [Build Spec](02-construction/yawn-relay/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` 2026-10-17 — 오너 승인 대기) |
 | 2-10 공통 적응형 난이도 · 조사·설계 | [10-adaptive-difficulty.md](02-construction/10-adaptive-difficulty.md) | AI_PROPOSED (Build Spec `READY`, `factory_adaptive` 구현 끝 — 남은 일: `fit_difficulty.dart`, `pool.json` 도구) |
 | 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` — 오너 확인 대기) |
-| 2-12 Yawn! 판 생성기 재설계 (엮인 판·커지는 규모·필수 기믹) · comprehensive | [12-yawn-generator.md](02-construction/12-yawn-generator.md) | IN_PROGRESS (오너 결정: 7×11·기둥 4호선·프로토타입 먼저 → 엮기 생성기 1차 프로토타입, 오너 플레이 검토 대기) |
+| 2-12 Yawn! 판 생성기 재설계 (엮인 판·커지는 규모·필수 기믹) · comprehensive | [12-yawn-generator.md](02-construction/12-yawn-generator.md) | IN_PROGRESS (오너 결정: 7×11·기둥 4호선·프로토타입 먼저 → 엮기 생성기 2차 프로토타입: 20호선 전부·신문 실험, 오너 플레이 검토 대기) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
