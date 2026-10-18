@@ -39,6 +39,7 @@
 > 🦹 **2-14 빌런 노선 22~28호선 (2026-10-18).** 오너: 빼는 원칙 동의·후보 넷 다·빌런 노선(A) + 순찰(단소 살인마 행동)·호통(자르반 84세 행동)·대머리(반짝임) 추가 → 7종 엔진 규칙·빠른 계산·생성기 구현. 엔진 대조 3,201판 같음(변이 시험 11), 28노선 336판 실패·장식 0, 1~21호선은 기준과 1,512판 같음. 대머리는 「깨어 있는 동안 갈라짐」으로 뒤집어 연결 갈래로. 실존 인물 **외형**은 원칙과 겹쳐 보류(Q4). 핸드오프 **v3.4** 문 버그 정정 확인. 디자인 요청서 v4 초안.
 > 🎨 **핸드오프 v4.5 확인 · 호통 규칙 강화 (2026-10-18).** 빌런 7종 그림이 요청서대로(단소·장난감 왕관·코스튬 갑옷, 지킬 선 지킴). v4.5에서 모든 승객 몸 아래 끝이 둥글어져 앱 기준 그림 164장 중 140장 갱신 필요 — 몸 경로만 되돌리면 v3.4와 0장 다름(디자이너 주장 확인). 오너 지적(28호선이 「먼저 툭 하면 끝」)으로 **호통(왕관) 승객 강화**: 툭 안 통함·박자마다 고개 돌림·안 볼 때 옆 사람 하품으로만 잠듦 → 28호선 이기는 툭 박자 비율 13.7%(알람 노선 수준). 디자인 요청서 v4.1(고개 표시·툭 튕김·졸음 옮음).
 > 🎨 **핸드오프 v4.7 확인 (2026-10-18).** 호통(왕관) 승객 새 규칙 그림(다음 방향 배지·툭 튕김·졸음 옮음·보는 칸)이 요청서 v4.1대로, 배지 방향이 엔진 회전과 같음. 다른 그림은 v4.5와 같고(앱 기준 그림 0장 다름), 잠듦 z는 고개 꺾인 쪽으로. 앱 렌더러 이식 기준 v4.7.
+> 📐 **2-12 Build Spec 초안 (2026-10-18)** — `02-construction/yawn-generator/`(comprehensive, 4 아티팩트). 엮기 생성기·짐수레·빌런 노선·노선 길이 적응·렌더러 v4.7을 앱으로. 핵심: JS 고정 자료로 **같은 시드 → 같은 판**(언어 넘는 대조). 발견: 지금 `measure`의 표본 어림은 엮기 판(이기는 비율 0.0x%)을 「못 푸는 판」으로 버림 → 계획 풀이 기반으로. `QUESTIONS_OPEN` Q1~Q4.
 > 🗺️ **개발 대기열:** 하품 릴레이(아트 → Build Spec) · 새떼 그림 · 번짐 · 샴페인 타워 · 눈꽃 가위 · **로그라이크 2종(사다리 원정, 딱지왕 — 고도화 설계 `roguelike/design-direction-2026-10-16.md`)**.
 > 📌 **3-1 공통:** 네 앱 모두 런처 아이콘이 아직 Flutter 기본 아이콘이다.
 
@@ -69,7 +70,7 @@
 | 2-9 Yawn! (하품) · comprehensive | [09-yawn-relay.md](02-construction/09-yawn-relay.md) · [Build Spec](02-construction/yawn-relay/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` 2026-10-17 — 오너 승인 대기) |
 | 2-10 공통 적응형 난이도 · 조사·설계 | [10-adaptive-difficulty.md](02-construction/10-adaptive-difficulty.md) | AI_PROPOSED (Build Spec `READY`, `factory_adaptive` 구현 끝 — 남은 일: `fit_difficulty.dart`, `pool.json` 도구) |
 | 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` — 오너 확인 대기) |
-| 2-12 Yawn! 판 생성기 재설계 (엮인 판·커지는 규모·필수 기믹) · comprehensive | [12-yawn-generator.md](02-construction/12-yawn-generator.md) | IN_PROGRESS (엮기 생성기 3차 프로토타입: 21호선·신문 5호선·최적화 대조 통과, 디자인 요청서 v3 READY → Build Spec 대기) |
+| 2-12 Yawn! 판 생성기 재설계 (엮인 판·커지는 규모·필수 기믹) · comprehensive | [12-yawn-generator.md](02-construction/12-yawn-generator.md) · [Build Spec](02-construction/yawn-generator/build-spec-index.md) | IN_PROGRESS (엮기 생성기 3차 프로토타입: 21호선·신문 5호선·최적화 대조 통과, 디자인 요청서 v3 READY → Build Spec 대기) |
 | 2-13 노선 길이 적응 (익힘 판정 v2) · comprehensive | [13-line-mastery.md](02-construction/13-line-mastery.md) · [알고리즘 설명서](02-construction/adaptive/line-mastery.md) | APPROVED (오너 2026-10-18 — 간격 유지·복습 섞기 구현, 앱 연결은 2-12 Build Spec) |
 | 2-14 지하철 빌런 밈 → 기믹 · standard | [14-yawn-villains.md](02-construction/14-yawn-villains.md) | IN_PROGRESS (빌런 노선 22~28 프로토타입 끝, Q4 일반 인물 → 디자인 요청서 v4 READY — 오너 플레이 검토 대기) |
 
