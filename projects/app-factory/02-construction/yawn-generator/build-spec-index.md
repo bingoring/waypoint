@@ -3,7 +3,7 @@ build-spec: yawn-generator
 stage: 02-construction/12-yawn-generator (+ 13-line-mastery, 14-yawn-villains)
 status: IN_PROGRESS
 depth: comprehensive
-updated: 2026-10-18
+updated: 2026-10-19
 ---
 
 # Build Spec — Yawn! 엮기 생성기 이식 · 짐수레 · 빌런 노선 · 노선 길이 적응 · 렌더러 v4.7
@@ -62,7 +62,7 @@ updated: 2026-10-18
 - [x] ~~U3 빠른 박자~~ — **하지 않음(편차)**: Dart 엔진만으로 생성기 대조 118판이 18초(JS + 빠른 박자 25초). 필요해지면 다시
 - [x] U4 생성기 (`lib/domain/weave.dart`): `weavePlan`·`weaveBuild`·`weaveRun`·`weaveNeutral`·`weaveEssential`·`weaveSweep`·`weaveCheck`·`weaveGenerate` 이식, mulberry32, 안정 정렬, 박자 한도
 - [x] U5 생성기 대조: JS 고정 자료 28노선 × 역 4 + 복습 판 6 = 118판 → Dart 결과(판·사람·기믹·검증·시도 수·돌린 박자 수) 글자 단위 일치(`test/weave_port_test.dart`). 변이 4가지 중 3가지 잡힘 — 정렬 동점 순서는 점수에 난수 항이 있어 이 118판에서 동점이 안 나 드러나지 않음
-- [ ] U6 게임 연결: `generate`·`measure`(Q2)·노선 28·소개/대체 판(Q3)·`Station.plan`
+- [x] U6 게임 연결 (`yawn_game.dart`·`yawn_config.dart`): `generate` = `Weaver.generate(노선, 계단, 시드, 복습)`, `measure` = 고르기 C 지표 6개(생성 판은 계획 풀이로 풀림 확인, 사람이 만든 역은 풀이기·타이밍 여유 1), 노선 28(`lineMechanics = weaveOrder`), 소개 판은 1호선 첫 역만(Q3), 대체 판 그대로, `Station.plan`·`g`(기믹 수) 저장, `Kit`에 `mastery: masteryDefaults`. 테스트 `yawn_game_test` 10개(노선 28 × 계단 0·8 생성·풀림, 결정성, 복습, JSON, Director 계단 흐름)
 - [ ] U7 실패 종류·고민 시간 + isolate
 - [ ] U8 노선 길이 연결(계단 n·졸업·복습·`Director` 역할 Q2)
 - [ ] U9 저장 v2(새로 시작) + 깨진 저장 견딤
@@ -70,7 +70,7 @@ updated: 2026-10-18
 - [ ] U12 판 화면(칸 44dp·lod·dense·좌석·수레 움직임·효과층·누른 칸 강조·힌트 계획 풀이·미리 만들기)
 - [ ] U13 노선도 28
 - [ ] U14 분석 필드
-- [ ] U15 후보 고르기 C: 그래프 이식 + JS 고정 자료로 원천 덩어리 수·논리로 좁힘 일치, 무게 표
+- [x] U15 후보 고르기 C (`difficulty.dart`): 원천 덩어리(타잔 강연결요소)·타이밍 여유·실패 종류 이식, 무게 = `lab/fit-model.js` 값(`yawn_config.defaultModel`). 대조 `test/difficulty_port_test.dart` — JS 고정 자료(`fixtures-difficulty.js`) 생성 판 118 + 엔진 판 841의 덩어리 전부 일치, 생성 판 118의 이긴 조합 수 일치, 실패 종류 = 생성기 sweep 판정 116판 일치(풀이 실수 111·손 실수 5)
 - [ ] U16 원격 조정값 키 + 기본값 + 범위 검사(`AdaptiveConfig.fromMap`처럼 틀린 값은 기본값)
 - [ ] 화면 흐름 테스트: 호통 툭 거절, 수레 넘어짐 뒤 이어짐, 쩍벌 꼬리 툭, 졸업 → 새 노선, 복습 판, 저장 이전
 - [ ] 판 사진 도구(`tool/shots/boards_test.dart`): 7×11·46dp 판, 빌런 7종 판, 412·360 폭
@@ -80,7 +80,7 @@ updated: 2026-10-18
 - [ ] `flutter analyze --fatal-infos --fatal-warnings`(저장소 루트) · `dart format` = 0
 - [ ] 단위: 엔진 대조(U2) · 빠른 박자(U3) · 생성기 대조(U5) · 규칙 16 · mastery 24 · 저장 이전 · 실패 분류(손으로 만든 판: 박자만 틀린 묶음 = 손 실수, 틀린 사람 = 풀이 실수)
 - [ ] 기존 테스트 유지: 역 36 골든(`engine_golden_test`), 풀이기 대조, 화면 흐름
-- [ ] 성능(§6) 측정 도구: `tool/bench_gen.dart`를 엮기 생성기로
+- [x] 성능(§6) 측정 도구: `tool/bench_gen.dart`를 엮기 생성기로 — 맥(JIT) 노선 28 × 계단 0·4·8·11: 판 하나 생성 중앙 25ms·p95 323ms·최대 1.1초, 측정 중앙 3ms, 「다음 판」(후보 3) 중앙 111ms·p95 938ms·최대 1.26초(무거운 노선: 걷는 승객·순찰·호통·확성기). 생성은 이미 isolate + 미리 만들기. 기기 측정은 에뮬레이터 단계에서
 - [ ] 시각: 기준 그림 골든 + 판 사진 + 에뮬레이터
 
 ## §6. NFR · 성능
@@ -96,3 +96,6 @@ updated: 2026-10-18
 | SoT | 실제 구현 | 사유 |
 |---|---|---|
 | U3 빠른 박자 계산(`engine-fast.js` 이식) | 이식하지 않음, 엔진(`Engine.step`)을 그대로 씀 | Dart 엔진이 JS 빠른 박자보다 빠르다(생성기 대조 118판 Dart 18초 vs JS 25초). 결과는 같음(대조 통과) |
+| 개발 도구 `tool/simulate.dart`·`tool/stress_hard.dart`(구 생성기용) | 삭제 | 시선 나무 생성기·`win_ratio` 지표에 묶여 있었다. 같은 역할은 프로토타입 난이도 실험실(`difficulty-lab.js`·`lab/selection-test.js`)과 대조 테스트(엔진·생성기·지표)가 맡는다 |
+| 풀이기 대조(`solver_equivalence_test`)의 생성 판 240개 | 엮기 생성 판 중 전수 시험이 되는 작은 판(계단 0~2, 24판) + 엔진 대조 판 중 작은 판 | 엮기 판은 툭 3~4·사람 20명 이상이 흔해 묶음 5만 개를 넘는다. 노선 기믹 28개가 모두 대조에 들어가는 것은 그대로 확인 |
+| `Station`의 판 크기 단계(`sizes`) | 형식상 1단계만 남김 | 계단 방식은 판 규모를 계단 높이가 정한다(Director가 첫 항목을 넘김) |
