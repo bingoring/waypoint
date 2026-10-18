@@ -58,7 +58,7 @@ updated: 2026-10-19
 
 - [x] U1 엔진: kind `q v o f l j a e`, `C.`·`-.` 해석·검사, `carts`·`tails`, `effDir`, 박자 15단계(BR Y2-ENG-9), 사건 `startle`·`shout`·`call`, `TapResult.armored`
 - [x] U2 엔진 대조 (판 841·플레이 6,800, `test/engine_port_test.dart` + 상태 보는 시선 targetsOn = sights 800판, 변이 9가지 모두 잡힘): JS 고정 자료(무작위 판 ≥ 2,000 · 플레이 ≥ 20 · 박자 40, 빌런·수레·쩍벌 포함, 순서 중요 사람 먼저 재우는 플레이 포함) → Dart 박자마다 상태 전체 일치
-- [ ] U2 규칙 확인: `villain-rules.js` 16개를 Dart 테스트로
+- [x] U2 규칙 확인: `villain-rules.js` 16개를 Dart 테스트로(`test/villain_rules_test.dart` 7묶음) — JS 16 통과 · Dart 16 통과
 - [x] ~~U3 빠른 박자~~ — **하지 않음(편차)**: Dart 엔진만으로 생성기 대조 118판이 18초(JS + 빠른 박자 25초). 필요해지면 다시
 - [x] U4 생성기 (`lib/domain/weave.dart`): `weavePlan`·`weaveBuild`·`weaveRun`·`weaveNeutral`·`weaveEssential`·`weaveSweep`·`weaveCheck`·`weaveGenerate` 이식, mulberry32, 안정 정렬, 박자 한도
 - [x] U5 생성기 대조: JS 고정 자료 28노선 × 역 4 + 복습 판 6 = 118판 → Dart 결과(판·사람·기믹·검증·시도 수·돌린 박자 수) 글자 단위 일치(`test/weave_port_test.dart`). 변이 4가지 중 3가지 잡힘 — 정렬 동점 순서는 점수에 난수 항이 있어 이 118판에서 동점이 안 나 드러나지 않음
