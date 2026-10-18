@@ -1,7 +1,7 @@
 ---
 build-spec: yawn-generator
 stage: 02-construction/12-yawn-generator (+ 13-line-mastery, 14-yawn-villains)
-status: READY
+status: IN_PROGRESS
 depth: comprehensive
 updated: 2026-10-18
 ---
@@ -56,8 +56,8 @@ updated: 2026-10-18
 
 ## §4. 구현 체크리스트
 
-- [ ] U1 엔진: kind `q v o f l j a e`, `C.`·`-.` 해석·검사, `carts`·`tails`, `effDir`, 박자 15단계(BR Y2-ENG-9), 사건 `startle`·`shout`·`call`, `TapResult.armored`
-- [ ] U2 엔진 대조: JS 고정 자료(무작위 판 ≥ 2,000 · 플레이 ≥ 20 · 박자 40, 빌런·수레·쩍벌 포함, 순서 중요 사람 먼저 재우는 플레이 포함) → Dart 박자마다 상태 전체 일치
+- [x] U1 엔진: kind `q v o f l j a e`, `C.`·`-.` 해석·검사, `carts`·`tails`, `effDir`, 박자 15단계(BR Y2-ENG-9), 사건 `startle`·`shout`·`call`, `TapResult.armored`
+- [x] U2 엔진 대조 (판 841·플레이 6,800, `test/engine_port_test.dart` + 상태 보는 시선 targetsOn = sights 800판, 변이 9가지 모두 잡힘): JS 고정 자료(무작위 판 ≥ 2,000 · 플레이 ≥ 20 · 박자 40, 빌런·수레·쩍벌 포함, 순서 중요 사람 먼저 재우는 플레이 포함) → Dart 박자마다 상태 전체 일치
 - [ ] U2 규칙 확인: `villain-rules.js` 16개를 Dart 테스트로
 - [ ] U3 빠른 박자: U2 자료로 엔진과 일치 + 변이 시험 목록(BLM §2.2 — JS 대조 도구에서 잡힌 14+11+3가지를 Dart 테스트에 「일부러 틀린 구현」으로 넣어 잡히는지)
 - [ ] U4 생성기: `weavePlan`·`weaveBuild`·`weaveRun`·`weaveNeutral`·`weaveEssential`·`weaveSweep`·`weaveCheck`·`weaveGenerate` 이식, mulberry32, 안정 정렬, 박자 한도
