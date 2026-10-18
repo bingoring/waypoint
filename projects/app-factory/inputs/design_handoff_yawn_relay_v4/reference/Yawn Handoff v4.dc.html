@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Gaegu:wght@700&display=swap" rel="stylesheet">
+<script src="./yawn-render.js"></script>
+<style>
+body{margin:0;background:#e6e1d7;font-family:'IBM Plex Sans KR',system-ui,sans-serif;color:#1d1f27;-webkit-font-smoothing:antialiased}
+a{color:#1d1f27}a:hover{color:#5a5e6b}
+</style>
+</helmet>
+<section data-screen-label="v4 빌런 칸" style="display:flex;flex-direction:column;gap:28px;padding:56px;box-sizing:border-box;width:max-content;min-width:100%">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:980px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5a5e6b;letter-spacing:.06em">YAWN! · 핸드오프 v4 · 빌런 칸 22–28호선 · 2026-10-18</div>
+    <div style="font-size:36px;font-weight:700;letter-spacing:-0.03em;line-height:1.15">소란한 칸을 하품으로 재운다</div>
+    <div style="font-size:16px;line-height:1.6;color:#3d404b;text-wrap:pretty">빌런 7종은 깨어 있는 동안만 민폐 표시(음표·냄새 김·말풍선 파동·반짝임·삑삑 파동·버럭)를 낸다. 잠들면 소품이 꺼지고 다른 승객과 같은 순한 잠든 얼굴로 돌아간다. 민폐 효과는 승객 그림과 따로 그리는 효과 레이어 <span style="font-family:'IBM Plex Mono',monospace;font-size:14px">FX(type, o)</span>라서, 앱이 박자에 맞춰 켜고 끈다. v4.5에서 모든 승객의 몸 아래 끝을 둥글게 바꿔 기존 승객 그림도 바뀌었다(몸 모양만, 나머지는 같음). 앱은 기준 그림을 <span style="font-family:'IBM Plex Mono',monospace;font-size:14px">reference/svg/base/</span>로 새로 맞춘다(README).</div>
+  </div>
+
+  <div id="A" style="display:flex;flex-direction:column;gap:18px">
+    <div style="font-size:22px;font-weight:700">A · 빌런 승객 7종</div>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <sc-for list="{{ villains }}" as="v" hint-placeholder-count="7">
+        <div style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;max-width:1500px;box-sizing:border-box">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;border-radius:8px;padding:3px 9px;background:{{ v.light }};color:#ffffff">{{ v.n }}</div>
+            <div style="font-size:21px;font-weight:700">{{ v.name }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#a9adb8">{{ v.code }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px 24px;font-size:13.5px;line-height:1.55;color:#c9ccd4;text-wrap:pretty">
+            <div><span style="font-weight:700;color:#e9e6dd">규칙 · </span>{{ v.rule }}</div>
+            <div><span style="font-weight:700;color:#e9e6dd">그림 · </span>{{ v.look }}</div>
+          </div>
+          <sc-for list="{{ v.rows }}" as="row" hint-placeholder-count="2">
+            <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px">
+              <div style="font-size:12px;font-weight:600;color:#a9adb8">{{ row.label }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:14px 16px;align-items:flex-end">
+                <sc-for list="{{ row.frames }}" as="fr" hint-placeholder-count="6">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:22px">
+                    <div>{{ fr.el }}</div>
+                    <div style="font-size:11px;color:#a9adb8;text-align:center;line-height:1.35;word-break:keep-all;max-width:260px">{{ fr.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="B" style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;max-width:1500px;box-sizing:border-box">
+    <div style="font-size:22px;font-weight:700">B · 노선 22–28</div>
+    <div style="font-size:13.5px;line-height:1.55;color:#c9ccd4;max-width:900px;text-wrap:pretty">새 단계 D(oklch L 0.45 · C 0.14 / 다크 L 0.82 · C 0.12). 기존 21색보다 진하고 선명해서 빌런 시즌이 한눈에 갈린다. 기존 21색과 가장 가까운 색 사이 거리 0.054(기존 21색끼리는 0.023). 라이트는 흰 번호, 다크는 #14161C 번호, 대비 모두 4.5:1 이상. 노선 머리에는 번호 옆에 소란 별 모양의 「빌런 칸」 표시가 붙는다(글자 없음).</div>
+    <div style="display:flex;flex-wrap:wrap;gap:14px">
+      <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="7">
+        <div style="display:flex;flex-direction:column;gap:8px;width:190px">
+          <div style="display:flex;align-items:center;gap:8px;background:{{ ln.light }};border-radius:14px;padding:8px 10px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:18px;color:#ffffff;min-width:24px">{{ ln.n }}</div>
+            <div>{{ ln.mark }}</div>
+            <div style="margin-left:auto;background:rgba(255,255,255,.14);border-radius:10px">{{ ln.icon }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:#14161c;border:2px solid {{ ln.dark }};border-radius:14px;padding:6px 10px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;background:{{ ln.dark }};color:#14161c;border-radius:7px;padding:1px 7px">{{ ln.n }}</div>
+            <div style="font-size:12px;color:#c9ccd4">{{ ln.name }}</div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#a9adb8">{{ ln.hex }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="C" style="display:flex;flex-direction:column;gap:12px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;max-width:1500px;box-sizing:border-box">
+    <div style="font-size:22px;font-weight:700">C · 움직임 (박자 0.65초)</div>
+    <div style="display:flex;flex-direction:column">
+      <sc-for list="{{ motion }}" as="m" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 120px;gap:16px;padding:9px 0;border-top:1px solid rgba(255,255,255,.08);font-size:13.5px;line-height:1.5">
+          <div style="font-weight:700">{{ m.k }}</div>
+          <div style="color:#c9ccd4;text-wrap:pretty">{{ m.v }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffcf5a">{{ m.t }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  n = 0;
+  componentDidMount() { if (!window.YawnRender) this.t = setInterval(() => { if (window.YawnRender) { clearInterval(this.t); this.forceUpdate(); } }, 50); }
+  componentWillUnmount() { clearInterval(this.t); }
+  get Y() { if (!this._Y && window.YawnRender) this._Y = window.YawnRender(React.createElement); return this._Y; }
+  u() { return 'v' + (this.n++); }
+
+  // 미니 판. cells: [{r,c,kind,a,dir,st,f,span,seat,left,walk,step,fx:[[type,o]]}], lines: [{a:[r,c], b:[r,c], lit, bar, end}]
+  board(R, C, cells, lines, cs) {
+    const Y = this.Y, h = React.createElement; cs = cs || 64;
+    const lod = cs <= 56 ? 's' : undefined, ins = cs < 56 ? 3 : 5, rad = cs < 56 ? 9 : 12;
+    const kids = [], ctr = ([r, c]) => [c * cs + cs / 2, r * cs + cs / 2];
+    cells.forEach((c, i) => {
+      const x = c.c * cs, y = c.r * cs, w = (c.span || 1) * cs;
+      if (c.seat !== false) {
+        kids.push(h('div', { key: 's' + i, style: { position: 'absolute', left: x + ins, top: y + ins + 2, width: w - ins * 2, height: cs - ins - 3, borderRadius: rad, background: '#323b4e', boxShadow: c.span ? 'inset 0 0 0 2px #4a5570' : 'none' } }));
+      }
+    });
+    const L = [];
+    (lines || []).forEach((l, i) => {
+      const a = ctr(l.a), b = ctr(l.b), dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]);
+      const s = [a[0] + dx * cs * 0.3, a[1] + dy * cs * 0.3], e = [b[0] - dx * cs * (l.short || 0.3), b[1] - dy * cs * (l.short || 0.3)];
+      const o = 3, S = [s[0] - dy * o, s[1] + dx * o], E = [e[0] - dy * o, e[1] + dx * o];
+      L.push(h('path', { key: 'l' + i, d: `M${S[0]} ${S[1]} L${E[0]} ${E[1]}`, fill: 'none', stroke: l.lit ? '#ffcf5a' : 'rgba(236,228,205,.4)', strokeWidth: l.lit ? 3 : 1.6, strokeDasharray: l.lit ? null : '1.5 5', strokeLinecap: 'round', style: l.lit ? { filter: 'drop-shadow(0 0 4px rgba(255,207,90,.8))' } : {} }));
+      if (l.bar) L.push(h('path', { key: 'b' + i, d: dy === 0 ? `M${E[0]} ${E[1] - 6} L${E[0]} ${E[1] + 6}` : `M${E[0] - 6} ${E[1]} L${E[0] + 6} ${E[1]}`, stroke: '#e9e6dd', strokeWidth: 2.4, strokeLinecap: 'round' }));
+      else if (!l.lit && !l.noDot) L.push(h('circle', { key: 'd' + i, cx: E[0], cy: E[1], r: 2.2, fill: 'rgba(236,228,205,.55)' }));
+    });
+    kids.push(h('svg', { key: 'ln', width: C * cs, height: R * cs, style: { position: 'absolute', left: 0, top: 0, overflow: 'visible', zIndex: 1, pointerEvents: 'none' } }, L));
+    cells.forEach((c, i) => {
+      if (!c.kind) return;
+      const o = { a: c.a, kind: c.kind, dir: c.dir || 'd', st: c.st || 'awake', f: c.f || 0, side: c.side || 1, size: cs, uid: this.u(), lod, left: c.left, walk: c.walk, step: c.step };
+      kids.push(h('div', { key: 'p' + i, style: { position: 'absolute', left: c.c * cs, top: c.r * cs, zIndex: 2 } }, Y.P(o)));
+      (c.fx || []).forEach(([t, fo], j) => kids.push(h('div', { key: 'fx' + i + j, style: { position: 'absolute', left: c.c * cs, top: c.r * cs, zIndex: 4, pointerEvents: 'none' } }, Y.FX(t, { size: cs, lod, ...(fo || {}) }))));
+    });
+    return h('div', { style: { position: 'relative', padding: 14, borderRadius: 18, background: 'repeating-linear-gradient(90deg,#252a35 0 24px,#232833 24px 48px)' } }, h('div', { style: { position: 'relative', width: C * cs, height: R * cs } }, kids));
+  }
+
+  frames(kind, a, extra) {
+    const Y = this.Y, h = React.createElement, Fr = (label, el) => ({ label, el }), q = kind === 'Q';
+    const one = (o, cs) => this.board(1, q ? 2 : 1, [{ r: 0, c: 0, kind, a, span: q ? 2 : undefined, seat: kind !== 'R', ...o }], null, cs);
+    return [
+      { label: '깨어 있음 · 방향 4 (쩍벌은 위·아래 2) — 민폐 소품이 켜진 상태', frames: (q ? ['d', 'u'] : ['d', 'l', 'r', 'u']).map(d => Fr({ d: '아래', l: '왼쪽', r: '오른쪽', u: '위 · 뒷모습' }[d], one({ dir: d, left: 2, walk: 2 }))).concat(extra || []) },
+      { label: '상태 — 하품(소품 내려놓음) · 꾸벅(아직 민폐) · 잠듦(소품 꺼짐, 순한 얼굴) · 깸 · 부릅뜸 · 작은 칸 44dp', frames: [
+        Fr('하품 1/4', one({ st: 'yawn', f: 1, walk: 2 })), Fr('꾸벅 3/3', one({ st: 'nod', f: 2, walk: 2, left: 1 })), Fr('잠듦', one({ st: 'asleep', walk: 2 })), Fr('깸', one({ st: 'startle', walk: 2 })), Fr('부릅뜸 (패배 카드)', one({ st: 'glare', walk: 2 })), Fr('작은 칸 · 깨어 있음', one({ left: 2, walk: 2 }, 44)), Fr('작은 칸 · 잠듦', one({ st: 'asleep', walk: 2 }, 44))] },
+    ];
+  }
+
+  build() {
+    const Y = this.Y, h = React.createElement, Fr = (label, el) => ({ label, el }), B = this.board.bind(this), LC = Y.LINE_COLORS;
+    const nb = (r, c, dir, x) => ({ r, c, kind: 'B', a: (r * 3 + c * 5 + 1) % 6, dir, ...(x || {}) });
+    const V = [];
+    const add = (n, name, code, rule, look, kind, a, scenes, extra) => V.push({ n, name, code, rule, look, light: LC[n - 1].light, rows: this.frames(kind, a, extra).concat([{ label: '판 위 — 첫 만남 단서 (효과 레이어 FX)', frames: scenes }]) });
+
+    add(22, '스피커 승객', "kind 'V' · FX 'music' · 'noteMark'", '깨어 있는 동안 상하좌우 이웃 4칸은 하품을 보고도 따라 하지 않는다.', '무릎 위 작은 휴대 스피커(초록 불), 눈을 감고 흥얼거리는 얼굴. 고개 까딱은 앱이 박자마다 ±6° 회전. 잠들면 불이 꺼진다. 외형은 기존 6종 중 아무나(기본 대학생).', 'V', 4, [
+      Fr('깨어 있음: 음표 물결이 옆 4칸에만, 그 칸 머리 위 작은 음표 = 따라 하지 않음', B(3, 3, [nb(0, 1, 'd'), nb(1, 0, 'r'), { r: 1, c: 1, kind: 'V', a: 4, fx: [['music']] }, nb(1, 2, 'l', { st: 'yawn', f: 1 }), nb(2, 1, 'u')])),
+      Fr('잠듦: 스피커 꺼짐 → 옆 사람 하품이 다시 번진다', B(3, 3, [nb(0, 1, 'd', { st: 'yawn', f: 1 }), nb(1, 0, 'r'), { r: 1, c: 1, kind: 'V', a: 4, st: 'asleep' }, nb(1, 2, 'l', { st: 'asleep' }), nb(2, 1, 'u')], [{ a: [0, 1], b: [1, 1], noDot: true }]))]);
+
+    add(23, '쩍벌 승객', "kind 'Q' · 두 칸", '좌석 두 칸을 차지하는 한 사람(오른쪽 칸까지). 위·아래만 본다. 어느 칸을 보든 이 사람을 본다.', '정면에서 본 쩍벌: 윗몸은 두 칸 가운데에, 둥근 엉덩이선 아래로 V자로 벌린 다리(짧은 허벅지 + 아래로 내린 정강이), 두 팔은 어깨 옆 등받이에 가볍게 걸침. 그림 하나가 128×64(두 칸)이고, 좌석도 두 칸을 감싸는 하나의 테두리. 잠들어도 다리는 그대로(자리는 여전히 두 칸). 하품할 때만 두 팔을 등받이에서 내린다.', 'Q', 0, [
+      Fr('두 칸 어느 쪽을 봐도 같은 사람에게 닿는다', B(2, 4, [nb(0, 1, 'd'), nb(0, 2, 'd', { a: 4 }), { r: 1, c: 1, kind: 'Q', a: 0, span: 2, dir: 'u' }], [{ a: [0, 1], b: [1, 1] }, { a: [0, 2], b: [1, 2] }])),
+      Fr('잠듦: 그대로 두 칸, 고개만 꾸벅', B(2, 4, [nb(0, 1, 'd', { st: 'yawn', f: 1 }), nb(0, 2, 'd', { a: 4 }), { r: 1, c: 1, kind: 'Q', a: 0, span: 2, dir: 'u', st: 'asleep' }]))]);
+
+    add(24, '치킨 승객', "kind 'F' · FX 'smell' · 'sniff'", '깨어 있는 동안 상하좌우의 깨어 있는 이웃이 이 사람 쪽으로 고개를 돌린다(냄새). 잠들면 원래 방향으로.', '무릎 위 빨강·흰 줄무늬 치킨 상자(로고·글자 없음, 뚜껑 열림), 오른손에 닭다리, 오물오물 입 + 볼. 잠들면 상자가 닫힌다. 외형 기본은 학생.', 'F', 1, [
+      Fr('깨어 있음: 냄새 김이 옆 4칸으로, 그 칸 승객이 고개를 돌려 킁킁', B(3, 3, [nb(0, 1, 'd', { fx: [['sniff', { dir: 'd' }]] }), nb(1, 0, 'r', { fx: [['sniff', { dir: 'r' }]] }), { r: 1, c: 1, kind: 'F', a: 1, fx: [['smell']] }, nb(1, 2, 'l', { fx: [['sniff', { dir: 'l' }]] }), nb(2, 1, 'u', { fx: [['sniff', { dir: 'u' }]] })])),
+      Fr('잠듦: 상자 닫힘 → 이웃이 원래 방향으로', B(3, 3, [nb(0, 1, 'l'), nb(1, 0, 'u'), { r: 1, c: 1, kind: 'F', a: 1, st: 'asleep' }, nb(1, 2, 'd'), nb(2, 1, 'r')]))]);
+
+    add(25, '스피커폰 통화 승객', "kind 'L' · FX 'call' · o.left 1|2", '깨어 있는 동안 두 박자마다, 보는 쪽 곧은 줄의 첫 사람이 잠들어 있으면 깨운다(이어폰 승객은 안 깸, 창문·기둥·알람·수레에서 멈춤).', '휴대폰을 입 앞에 들고 눈썹을 올린 채 크게 말하는 얼굴. 머리 위 노란 배지 = 다음 통화까지 남은 박자(2 → 1 → 통화). 잠들면 휴대폰이 무릎에 떨어지고 화면이 꺼진다. 외형 기본은 아이 엄마.', 'L', 5, [
+      Fr('남은 박자 2: 아직 조용', B(1, 4, [{ r: 0, c: 0, kind: 'L', a: 5, dir: 'r', left: 2 }, { r: 0, c: 1, seat: true }, nb(0, 2, 'l', { st: 'asleep' })], [{ a: [0, 0], b: [0, 2] }])),
+      Fr('통화: 노란 직선 파동이 보는 줄로 → 첫 사람이 화들짝 (코골이의 둘레 파동과 다른 모양)', B(1, 4, [{ r: 0, c: 0, kind: 'L', a: 5, dir: 'r', left: 2, fx: [['call', { dir: 'r', reach: 2 }]] }, { r: 0, c: 1, seat: true }, nb(0, 2, 'l', { st: 'startle' })])),
+      Fr('잠듦: 휴대폰이 무릎에, 배지 없음', B(1, 2, [{ r: 0, c: 0, kind: 'L', a: 5, dir: 'r', st: 'asleep' }]))]);
+
+    add(26, '대머리 승객', "kind 'Z' · FX 'shine'", '깨어 있는 동안 머리가 번쩍여, 닿은 시선이 기둥처럼 양옆으로 갈라진다(얼굴·하품은 안 보임). 잠들어 고개를 떨구면 반짝임이 사라져 보통 사람처럼 막는다.', '새 인물. 귀 옆에만 남은 짧은 머리, 정수리 하이라이트 + 노란 반짝 별, 흐뭇한 입. 놀리는 표정이 아니라 「광이 나는」 정도. 뒷모습에서도 반짝임이 보인다. 잠들면 하이라이트와 별이 꺼진다.', 'Z', 0, [
+      Fr('깨어 있음: 시선이 머리에서 튕겨 위·아래 두 줄로 갈라짐', B(3, 3, [nb(0, 1, 'd'), nb(1, 0, 'r'), { r: 1, c: 1, kind: 'Z', dir: 'l', fx: [['shine', { from: 'l' }]] }, nb(2, 1, 'u', { a: 4 })], [{ a: [1, 0], b: [1, 1], short: 0.42, noDot: true }, { a: [1, 1], b: [0, 1] }, { a: [1, 1], b: [2, 1] }])),
+      Fr('잠듦: 반짝임 사라짐 → 보통 사람처럼 시선이 여기서 끝', B(3, 3, [nb(0, 1, 'd'), nb(1, 0, 'r'), { r: 1, c: 1, kind: 'Z', st: 'asleep' }, nb(2, 1, 'u', { a: 4 })], [{ a: [1, 0], b: [1, 1] }]))]);
+
+    add(27, '순찰 승객', "kind 'R' · 선 몸 · o.walk 0|1|2 · o.step · FX 'whistle'", '깨어 있는 동안 통로를 박자마다 한 칸씩 오가며(막히면 돌아섬), 걸은 뒤 상하좌우의 잠든 사람을 깨운다.', '일반 인물 + 단소. 서서 가는 승객의 선 몸(손잡이는 안 잡음), 두 손으로 단소를 입에 대고 분다. 단소는 악기로만 — 휘두르거나 겨누지 않는다. 잠들면 단소를 늘어뜨린 손에 쥔다. 외형 기본은 등산복 아저씨.', 'R', 3, [
+      Fr('걷기: 진행 방향 화살표 + 걸은 뒤 둘레 4칸 삑삑 파동(주황, 날카로운 지그재그 — 스피커의 둥근 음표와 구별)', B(3, 4, [nb(0, 1, 'd', { st: 'asleep' }), nb(0, 2, 'd', { st: 'startle', a: 4 }), { r: 1, c: 2, kind: 'R', a: 3, dir: 'r', walk: 0, step: true, seat: false, fx: [['whistle']] }, nb(2, 1, 'u', { st: 'asleep', a: 0 }), nb(2, 2, 'u', { st: 'startle', a: 5 }), { r: 1, c: 0, seat: false }])),
+      Fr('걸음 2프레임', B(1, 2, [{ r: 0, c: 0, kind: 'R', a: 3, dir: 'r', walk: 0, seat: false }, { r: 0, c: 1, kind: 'R', a: 3, dir: 'r', walk: 1, seat: false }])),
+      Fr('잠듦: 단소를 내리고 선 채로 꾸벅', B(1, 1, [{ r: 0, c: 0, kind: 'R', a: 3, st: 'asleep', walk: 2, seat: false }]))]);
+
+    add(28, '호통 승객', "kind 'U' · a 0|1 · st 'shout' · FX 'shout' · 'watch'", '하품을 따라 하지 않는다. 자기가 보는 사람이 하품하면 버럭 해서 깨운다(이어폰 제외). 그래서 먼저 재워야 한다.', '일반 인물 + 장난감 같은 금빛 왕관과 코스튬 갑옷(금빛 어깨 덮개·은빛 가슴판), 팔짱, 찌푸린 눈썹. 외형 2가지(a 0 짧은 머리 · a 1 단발). 특정 게임 캐릭터의 투구·창·문양·색 배치는 쓰지 않았다. 잠들면 왕관이 비스듬히 미끄러진다.', 'U', 0, [
+      Fr('지켜봄: 시선선 끝에 「!」', B(1, 3, [{ r: 0, c: 0, kind: 'U', a: 0, dir: 'r' }, nb(0, 1, 'l', { a: 1 }), { r: 0, c: 1, seat: false, fx: [['watch', { size: 28 }]] }], [{ a: [0, 0], b: [0, 1], noDot: true }])),
+      Fr('상대가 하품 → 버럭 말풍선 + 상대 「깸」', B(1, 3, [{ r: 0, c: 0, kind: 'U', a: 0, st: 'shout', fx: [['shout', { dir: 'r' }]] }, nb(0, 1, 'l', { a: 1, st: 'startle' })])),
+      Fr('잠듦: 왕관이 미끄러짐', B(1, 2, [{ r: 0, c: 0, kind: 'U', a: 1, st: 'asleep' }, { r: 0, c: 1, kind: 'U', a: 0, st: 'asleep', side: -1 }]))],
+      [Fr('외형 a 1 · 깨어 있음', this.board(1, 1, [{ r: 0, c: 0, kind: 'U', a: 1 }])), Fr('버럭 (st shout)', this.board(1, 1, [{ r: 0, c: 0, kind: 'U', a: 1, st: 'shout' }]))]);
+
+    const lines = Y.GIMMICKS.slice(21).map(g => { const c = LC[g.n - 1]; return { n: g.n, name: g.name, light: c.light, dark: c.dark, hex: c.light + ' / ' + c.dark, icon: g.icon(36), mark: Y.villainMark(20) }; });
+    const motion = [
+      { k: '스피커 음악', v: '깨어 있는 동안 박자마다 음표 물결이 둘레 4칸으로 한 번(굵기 0 → 2 → 사라짐), 이웃 머리 위 음표가 톡 튀어 오름. 스피커 승객 고개 까딱 ±6°.', t: '박자마다 300ms' },
+      { k: '치킨 냄새', v: '김이 둘레 4칸으로 피어오르고, 깨어 있는 이웃 고개가 이 사람 쪽으로 돌아감 + 킁킁 선 2번 깜빡.', t: '돌림 150ms' },
+      { k: '통화', v: '남은 박자 배지 2 → 1 → 통화. 홀수 박자에 노란 직선 파동이 보는 줄을 따라 칸마다 60ms씩 퍼짐 → 첫 사람이 자고 있으면 공통 「깸」.', t: '300ms' },
+      { k: '대머리 반짝', v: '시선이 닿을 때 정수리 별이 1.3배로 반짝 + 갈라지는 두 선이 머리에서 뻗어 나감(기둥과 같은 언어).', t: '200ms' },
+      { k: '순찰 걷기', v: '서서 가는 승객과 같은 걸음(o.walk 0 → 1 → 2, 한 칸 이동) → 멈춰서 삑삑 지그재그 파동이 둘레 4칸으로. 막히면 몸을 돌려 반대 방향 화살표.', t: '260 + 200ms' },
+      { k: '호통', v: '보는 사람이 하품하면 st shout + 뾰족 말풍선 「버럭!」이 튀어나옴(scale 0.6 → 1.1 → 1) → 상대 「깸」.', t: '300ms' },
+      { k: '빌런 잠듦', v: '민폐 효과가 먼저 꺼지고(스피커 불 꺼짐·상자 닫힘·휴대폰 떨어짐·반짝임 사라짐·단소 내림·왕관 미끄러짐) 이어서 공통 잠듦(고개 기울기 + z).', t: '300ms' },
+      { k: '움직임 줄이기', v: 'prefers-reduced-motion: 효과 레이어는 정지 그림 한 장으로만 켜 둔다(음표 하나·김 한 줄·파동 정지). 규칙이 정지 상태로도 읽힌다. 고개 까딱·걷기 사이 프레임 생략.', t: '정지' },
+    ];
+    return { villains: V, lines, motion };
+  }
+  renderVals() {
+    if (!this.Y) return { villains: [], lines: [], motion: [] };
+    if (!this.cache) { this.n = 0; this.cache = this.build(); }
+    return this.cache;
+  }
+}
+</script>
+</body>
+</html>

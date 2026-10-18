@@ -1,0 +1,51 @@
+[
+  {
+    "n": 22,
+    "hue": 260,
+    "light": "#2151a1",
+    "dark": "#96c5ff",
+    "key": "speaker"
+  },
+  {
+    "n": 23,
+    "hue": 20,
+    "light": "#932a33",
+    "dark": "#ffa4a4",
+    "key": "spread"
+  },
+  {
+    "n": 24,
+    "hue": 55,
+    "light": "#8d3800",
+    "dark": "#ffaf76",
+    "key": "chicken"
+  },
+  {
+    "n": 25,
+    "hue": 135,
+    "light": "#2e6500",
+    "dark": "#a2d686",
+    "key": "call"
+  },
+  {
+    "n": 26,
+    "hue": 105,
+    "light": "#625700",
+    "dark": "#d0c967",
+    "key": "bald"
+  },
+  {
+    "n": 27,
+    "hue": 345,
+    "light": "#882d67",
+    "dark": "#fca4d6",
+    "key": "patrol"
+  },
+  {
+    "n": 28,
+    "hue": 300,
+    "light": "#623e96",
+    "dark": "#d0b2ff",
+    "key": "shout"
+  }
+]
