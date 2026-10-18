@@ -63,15 +63,15 @@ updated: 2026-10-19
 - [x] U4 생성기 (`lib/domain/weave.dart`): `weavePlan`·`weaveBuild`·`weaveRun`·`weaveNeutral`·`weaveEssential`·`weaveSweep`·`weaveCheck`·`weaveGenerate` 이식, mulberry32, 안정 정렬, 박자 한도
 - [x] U5 생성기 대조: JS 고정 자료 28노선 × 역 4 + 복습 판 6 = 118판 → Dart 결과(판·사람·기믹·검증·시도 수·돌린 박자 수) 글자 단위 일치(`test/weave_port_test.dart`). 변이 4가지 중 3가지 잡힘 — 정렬 동점 순서는 점수에 난수 항이 있어 이 118판에서 동점이 안 나 드러나지 않음
 - [x] U6 게임 연결 (`yawn_game.dart`·`yawn_config.dart`): `generate` = `Weaver.generate(노선, 계단, 시드, 복습)`, `measure` = 고르기 C 지표 6개(생성 판은 계획 풀이로 풀림 확인, 사람이 만든 역은 풀이기·타이밍 여유 1), 노선 28(`lineMechanics = weaveOrder`), 소개 판은 1호선 첫 역만(Q3), 대체 판 그대로, `Station.plan`·`g`(기믹 수) 저장, `Kit`에 `mastery: masteryDefaults`. 테스트 `yawn_game_test` 10개(노선 28 × 계단 0·8 생성·풀림, 결정성, 복습, JSON, Director 계단 흐름)
-- [ ] U7 실패 종류·고민 시간 + isolate
-- [ ] U8 노선 길이 연결(계단 n·졸업·복습·`Director` 역할 Q2)
-- [ ] U9 저장 v2(새로 시작) + 깨진 저장 견딤
+- [x] U7 실패 종류·고민 시간 + isolate: `RunController.thinkMs`(시도마다 판 시계 0 ~ 첫 조작, 일시정지 제외·한 틱 100ms 상한·시도마다 `idleCapMs`)·`tapped`, 진 시도마다 `failKind` = isolate `classifyFail`(1초 넘으면 모름). 앱을 다시 켜 이어 하는 역은 고민 시간 null
+- [x] U8 노선 길이 연결: `Kit.won`·`abandon`이 `Outcome.play`(PlayRecord: 도움·풀이/손/모름 실패·고민 시간·사람 수)를 넘김 → Director 계단·졸업·복습(패키지 `ladder_test`). 힌트 = 생성 판은 계획 풀이 첫 시작점(박자 0), 사람이 만든 역은 풀이기
+- [x] U9 저장 v2(새로 시작) + 깨진 저장 견딤: `yawn.map.v2` 기믹 id 키(`lines{id: {cleared, recent}}`·`selected`·`unseen`·`failsAt[id, played]`), v1 안 읽음, 순서 바뀐 노선 목록으로도 이어짐(`progress_test` 5개)
 - [ ] U10 렌더러 v4.7 + U11 기준 그림(164장 갱신·새 kind·작은 칸·FX 견본)
 - [ ] U12 판 화면(칸 44dp·lod·dense·좌석·수레 움직임·효과층·누른 칸 강조·힌트 계획 풀이·미리 만들기)
 - [ ] U13 노선도 28
-- [ ] U14 분석 필드
+- [x] U14 분석 필드: `adaptive_result`에 `level`·`evid`·`grad`·`c_pred`·`c_pick` + C 지표 6개(`f_*`), 24개(한도 25) — 고민 시간·실력 없음
 - [x] U15 후보 고르기 C (`difficulty.dart`): 원천 덩어리(타잔 강연결요소)·타이밍 여유·실패 종류 이식, 무게 = `lab/fit-model.js` 값(`yawn_config.defaultModel`). 대조 `test/difficulty_port_test.dart` — JS 고정 자료(`fixtures-difficulty.js`) 생성 판 118 + 엔진 판 841의 덩어리 전부 일치, 생성 판 118의 이긴 조합 수 일치, 실패 종류 = 생성기 sweep 판정 116판 일치(풀이 실수 111·손 실수 5)
-- [ ] U16 원격 조정값 키 + 기본값 + 범위 검사(`AdaptiveConfig.fromMap`처럼 틀린 값은 기본값)
+- [x] U16 원격 조정값: `app_adaptive`의 `model`(C 무게)·`mastery`(MasteryConfig)·`ladder_candidates`·`weave`(`cross`·`near`·`len`·`density`·`hide`·`hide_line`·`hide_n`, `WeaveTuning.fromMap` 범위 검사). 기본값 = 프로토타입(생성기 대조 118판 그대로 일치)
 - [ ] 화면 흐름 테스트: 호통 툭 거절, 수레 넘어짐 뒤 이어짐, 쩍벌 꼬리 툭, 졸업 → 새 노선, 복습 판, 저장 이전
 - [ ] 판 사진 도구(`tool/shots/boards_test.dart`): 7×11·46dp 판, 빌런 7종 판, 412·360 폭
 - [ ] 에뮬레이터 확인(프로필 빌드): 큰 판 생성 시간·노선도·빌런 효과
@@ -99,3 +99,4 @@ updated: 2026-10-19
 | 개발 도구 `tool/simulate.dart`·`tool/stress_hard.dart`(구 생성기용) | 삭제 | 시선 나무 생성기·`win_ratio` 지표에 묶여 있었다. 같은 역할은 프로토타입 난이도 실험실(`difficulty-lab.js`·`lab/selection-test.js`)과 대조 테스트(엔진·생성기·지표)가 맡는다 |
 | 풀이기 대조(`solver_equivalence_test`)의 생성 판 240개 | 엮기 생성 판 중 전수 시험이 되는 작은 판(계단 0~2, 24판) + 엔진 대조 판 중 작은 판 | 엮기 판은 툭 3~4·사람 20명 이상이 흔해 묶음 5만 개를 넘는다. 노선 기믹 28개가 모두 대조에 들어가는 것은 그대로 확인 |
 | `Station`의 판 크기 단계(`sizes`) | 형식상 1단계만 남김 | 계단 방식은 판 규모를 계단 높이가 정한다(Director가 첫 항목을 넘김) |
+| DE 저장 v2: `LineMastery`·`Pace`를 `yawn.map.v2`에 | 적응형 상태(`adaptive.yawn.v1`의 `ln`·`pc`)에 둠. `yawn.map.v2`는 노선도 진행(깬 역·최근 판·선택·실패 수)만 | 계단·졸업을 쓰는 Director와 같은 곳에 두어 저장 하나로 맞춘다(두 저장이 어긋날 일 없음). 기믹 id 키라 노선 순서 변경과 무관한 것은 같다 |
