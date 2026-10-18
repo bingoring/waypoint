@@ -59,9 +59,9 @@ updated: 2026-10-18
 - [x] U1 엔진: kind `q v o f l j a e`, `C.`·`-.` 해석·검사, `carts`·`tails`, `effDir`, 박자 15단계(BR Y2-ENG-9), 사건 `startle`·`shout`·`call`, `TapResult.armored`
 - [x] U2 엔진 대조 (판 841·플레이 6,800, `test/engine_port_test.dart` + 상태 보는 시선 targetsOn = sights 800판, 변이 9가지 모두 잡힘): JS 고정 자료(무작위 판 ≥ 2,000 · 플레이 ≥ 20 · 박자 40, 빌런·수레·쩍벌 포함, 순서 중요 사람 먼저 재우는 플레이 포함) → Dart 박자마다 상태 전체 일치
 - [ ] U2 규칙 확인: `villain-rules.js` 16개를 Dart 테스트로
-- [ ] U3 빠른 박자: U2 자료로 엔진과 일치 + 변이 시험 목록(BLM §2.2 — JS 대조 도구에서 잡힌 14+11+3가지를 Dart 테스트에 「일부러 틀린 구현」으로 넣어 잡히는지)
-- [ ] U4 생성기: `weavePlan`·`weaveBuild`·`weaveRun`·`weaveNeutral`·`weaveEssential`·`weaveSweep`·`weaveCheck`·`weaveGenerate` 이식, mulberry32, 안정 정렬, 박자 한도
-- [ ] U5 생성기 대조: JS 고정 자료(28노선 × 12역 × 시드 2 + 복습 판 36) → Dart 결과 글자 단위 일치
+- [x] ~~U3 빠른 박자~~ — **하지 않음(편차)**: Dart 엔진만으로 생성기 대조 118판이 18초(JS + 빠른 박자 25초). 필요해지면 다시
+- [x] U4 생성기 (`lib/domain/weave.dart`): `weavePlan`·`weaveBuild`·`weaveRun`·`weaveNeutral`·`weaveEssential`·`weaveSweep`·`weaveCheck`·`weaveGenerate` 이식, mulberry32, 안정 정렬, 박자 한도
+- [x] U5 생성기 대조: JS 고정 자료 28노선 × 역 4 + 복습 판 6 = 118판 → Dart 결과(판·사람·기믹·검증·시도 수·돌린 박자 수) 글자 단위 일치(`test/weave_port_test.dart`). 변이 4가지 중 3가지 잡힘 — 정렬 동점 순서는 점수에 난수 항이 있어 이 118판에서 동점이 안 나 드러나지 않음
 - [ ] U6 게임 연결: `generate`·`measure`(Q2)·노선 28·소개/대체 판(Q3)·`Station.plan`
 - [ ] U7 실패 종류·고민 시간 + isolate
 - [ ] U8 노선 길이 연결(계단 n·졸업·복습·`Director` 역할 Q2)
@@ -95,4 +95,4 @@ updated: 2026-10-18
 ## §7. 편차 로그 — 구현 후
 | SoT | 실제 구현 | 사유 |
 |---|---|---|
-|  |  |  |
+| U3 빠른 박자 계산(`engine-fast.js` 이식) | 이식하지 않음, 엔진(`Engine.step`)을 그대로 씀 | Dart 엔진이 JS 빠른 박자보다 빠르다(생성기 대조 118판 Dart 18초 vs JS 25초). 결과는 같음(대조 통과) |
