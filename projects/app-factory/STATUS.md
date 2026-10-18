@@ -69,7 +69,7 @@
 | 2-11 Yawn! 기믹 확장 (노선 7~20) · comprehensive | [11-yawn-mechanics.md](02-construction/11-yawn-mechanics.md) · [Build Spec](02-construction/yawn-mechanics/build-spec-index.md) | AI_PROPOSED (Build Spec `IMPLEMENTED` — 오너 확인 대기) |
 | 2-12 Yawn! 판 생성기 재설계 (엮인 판·커지는 규모·필수 기믹) · comprehensive | [12-yawn-generator.md](02-construction/12-yawn-generator.md) | IN_PROGRESS (엮기 생성기 3차 프로토타입: 21호선·신문 5호선·최적화 대조 통과, 디자인 요청서 v3 READY → Build Spec 대기) |
 | 2-13 노선 길이 적응 (익힘 판정 v2) · comprehensive | [13-line-mastery.md](02-construction/13-line-mastery.md) · [알고리즘 설명서](02-construction/adaptive/line-mastery.md) | APPROVED (오너 2026-10-18 — 간격 유지·복습 섞기 구현, 앱 연결은 2-12 Build Spec) |
-| 2-14 지하철 빌런 밈 → 기믹 · standard | [14-yawn-villains.md](02-construction/14-yawn-villains.md) | IN_PROGRESS (빌런 노선 22~28 프로토타입 끝 — 오너 플레이 검토·Q4 외형 결정 대기, 디자인 요청서 v4 초안) |
+| 2-14 지하철 빌런 밈 → 기믹 · standard | [14-yawn-villains.md](02-construction/14-yawn-villains.md) | IN_PROGRESS (빌런 노선 22~28 프로토타입 끝, Q4 일반 인물 → 디자인 요청서 v4 READY — 오너 플레이 검토 대기) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
