@@ -1,7 +1,7 @@
 ---
 build-spec: yawn-generator
 stage: 02-construction/12-yawn-generator (+ 13-line-mastery, 14-yawn-villains)
-status: QUESTIONS_OPEN
+status: READY
 depth: comprehensive
 updated: 2026-10-18
 ---
@@ -35,7 +35,8 @@ updated: 2026-10-18
 | U11 기준 그림 | `tool/sprites/export.py` v4.7, 164장 갱신 + 추가 | U10 | 기존 변경 |
 | U12 판 화면 `ui/board_view.dart`·`car_page.dart`·`run_controller.dart` | 칸 44dp·lod·dense 시선선·좌석·수레 조각 움직임·효과층·누른 칸 강조·힌트 = 계획 풀이·미리 만들기 | U1, U10 | 기존 변경 |
 | U13 노선도 `ui/line_map_page.dart`·`lines.dart` | 노선 28·색 28·아이콘 28·빌런 칸 표시 | U10 | 기존 변경 |
-| U14 분석 | `adaptive_result`에 `level`·`evidence`·`graduated` (익명) | U8 | 기존 확장 |
+| U14 분석 | `adaptive_result`에 `level`·`evidence`·`graduated` (익명) + 후보 3개 지표·뽑힌 판 | U8 | 기존 확장 |
+| U15 후보 고르기 C `domain/difficulty.dart` | 같은 계단 후보 3개 → `lab/graph.js` 이식(옮는 길·원천 덩어리), 타이밍 여유(`weaveSweep`), 선형식(무게 = 실험실 데이터 최소제곱, 2-12 §3.11·§3.12) → Director 목표에 맞는 판 | U4, U8 | 신규 |
 
 ## §2. 아티팩트 인덱스
 | 아티팩트 | 상태 | 링크 |
@@ -68,6 +69,7 @@ updated: 2026-10-18
 - [ ] U12 판 화면(칸 44dp·lod·dense·좌석·수레 움직임·효과층·누른 칸 강조·힌트 계획 풀이·미리 만들기)
 - [ ] U13 노선도 28
 - [ ] U14 분석 필드
+- [ ] U15 후보 고르기 C: 그래프 이식 + JS 고정 자료로 원천 덩어리 수·논리로 좁힘 일치, 무게 표
 - [ ] 화면 흐름 테스트: 호통 툭 거절, 수레 넘어짐 뒤 이어짐, 쩍벌 꼬리 툭, 졸업 → 새 노선, 복습 판, 저장 이전
 - [ ] 판 사진 도구(`tool/shots/boards_test.dart`): 7×11·46dp 판, 빌런 7종 판, 412·360 폭
 - [ ] 에뮬레이터 확인(프로필 빌드): 큰 판 생성 시간·노선도·빌런 효과
