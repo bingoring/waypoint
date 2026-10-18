@@ -7,6 +7,7 @@
 **Last updated:** 2026-10-16
 
 > ✅ **1-1 승인 (2026-10-13).** PRD v1.0 확정, P1~P6 채택, Q1~Q8 결정(조직 계정·한영 동시·Android 먼저·AdMob 단독·광고 제거 IAP 포함·Wave 1 순서 확정).
+> ⏳ **오너 작업 (Yawn! 데이터):** Firebase 콘솔에서 Analytics → **BigQuery 연결**(샌드박스 무료 범위) — 출시 뒤 후보 고르기 C 무게·노선 길이 설정을 실제 플레이로 다시 맞추는 데 쓴다.
 > ⏳ **오너 선행 작업:** 사업자등록 → D-U-N-S → Play 조직 계정 개설, KIPRIS 상표 확인 (3-1 전까지). `smallmatter.app` 결제 완료(2026-10-13, 가비아) — 레지스트리 반영은 3-1 전 재확인. 스튜디오명 Smallmatter, 앱 ID `app.smallmatter.<slug>` 확정.
 > ✅ **1-2 승인 (2026-10-13).** 코어/앱 경계·`app.yaml`·광고 정책·원격 설정·분석 계약 확정. 광고 제거 ₩2,500 / $1.99, 전면 광고 보수적 기본값, 보상형 실패 시 보상 지급.
 > ✅ **1-3 승인 (2026-10-13) → Inception 완료.** Flutter 3.47.7 + pub workspace·Melos 8.9, 앱별 독립 프로젝트·Firebase, GitHub Actions + fastlane, §7 품질 기준 확정.
