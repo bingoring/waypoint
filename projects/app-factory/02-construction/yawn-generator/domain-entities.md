@@ -94,7 +94,7 @@ JSON 키 `plan: [[r,c],…]`(없으면 생략).
   fails: int, failsAt: [mechanicId, played]? }
 ```
 - `cleared`는 화면용(노선도 역 번호), 생성 규모는 `m.l`(계단).
-- 이전 v1(노선 번호 배열) → 이전 노선 순서(2-11 `lineMechanics` 20개)로 기믹 id를 찾아 옮긴다. v1 지움은 하지 않는다(되돌리기 대비, 한 버전 뒤 정리).
+- 이전 v1(`yawn.map.v1`)은 **읽지 않는다** — 출시 전이라 새로 시작(오너 2026-10-18, Q4).
 - `adaptive.yawn.v1`(Glicko·기믹 노출)은 그대로 — 기믹 id 기준이라 순서 변경과 무관.
 
 ### `PlayRecord` 채우기 (BR Y2-MAS-4·5)
