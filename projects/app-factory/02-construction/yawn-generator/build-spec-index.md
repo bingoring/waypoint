@@ -66,7 +66,7 @@ updated: 2026-10-19
 - [x] U7 실패 종류·고민 시간 + isolate: `RunController.thinkMs`(시도마다 판 시계 0 ~ 첫 조작, 일시정지 제외·한 틱 100ms 상한·시도마다 `idleCapMs`)·`tapped`, 진 시도마다 `failKind` = isolate `classifyFail`(1초 넘으면 모름). 앱을 다시 켜 이어 하는 역은 고민 시간 null
 - [x] U8 노선 길이 연결: `Kit.won`·`abandon`이 `Outcome.play`(PlayRecord: 도움·풀이/손/모름 실패·고민 시간·사람 수)를 넘김 → Director 계단·졸업·복습(패키지 `ladder_test`). 힌트 = 생성 판은 계획 풀이 첫 시작점(박자 0), 사람이 만든 역은 풀이기
 - [x] U9 저장 v2(새로 시작) + 깨진 저장 견딤: `yawn.map.v2` 기믹 id 키(`lines{id: {cleared, recent}}`·`selected`·`unseen`·`failsAt[id, played]`), v1 안 읽음, 순서 바뀐 노선 목록으로도 이어짐(`progress_test` 5개)
-- [ ] U10 렌더러 v4.7 + U11 기준 그림(164장 갱신·새 kind·작은 칸·FX 견본)
+- [x] U10 렌더러 v4.7 + U11 기준 그림 (메인 `ad18ee8`): `character.dart`에 몸 경로 3개·뒷모습·선 몸·작은 칸(`small`, 선 1.3배 — 굵기를 직접 준 선은 그대로)·z `side` 쪽·짐수레 주인 짐표·빌런 7종(소품·얼굴·대머리·왕관·다음 방향 배지, 쩍벌 128×64)·`Mood.shout`·짐수레 타일(6조각, 흐트러짐 진행 `fall` 0~1)·`paintFx` 11종·`paintVillainMark`. 기준 그림 `tool/sprites/export.py`를 v4.7로(신발 버그 고침 가정 삭제) 164 → **260장**(빌런 40·짐수레 3·작은 칸 15·타일 10·FX 18 추가), **260장 모두 일치**. 판 화면 외형 매핑 교체(쩍벌은 두 칸 배치라 U12). 글자(z·배지 숫자·「버럭!」·「!」)는 기준 그림에서 숨기므로 코드로 대조
 - [ ] U12 판 화면(칸 44dp·lod·dense·좌석·수레 움직임·효과층·누른 칸 강조·힌트 계획 풀이·미리 만들기)
 - [ ] U13 노선도 28
 - [x] U14 분석 필드: `adaptive_result`에 `level`·`evid`·`grad`·`c_pred`·`c_pick` + C 지표 6개(`f_*`), 24개(한도 25) — 고민 시간·실력 없음
