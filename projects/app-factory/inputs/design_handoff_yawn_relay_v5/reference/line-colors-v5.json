@@ -1,0 +1,82 @@
+{
+  "note": "v5: 1–28 = v4 그대로. mix = 섞기 장(항상 맨 끝, 번호 없음). 새 노선은 28과 mix 사이에 끼운다.",
+  "lines": [
+    {
+      "n": 22,
+      "hue": 260,
+      "light": "#2151a1",
+      "dark": "#96c5ff",
+      "key": "speaker"
+    },
+    {
+      "n": 23,
+      "hue": 20,
+      "light": "#932a33",
+      "dark": "#ffa4a4",
+      "key": "spread"
+    },
+    {
+      "n": 24,
+      "hue": 55,
+      "light": "#8d3800",
+      "dark": "#ffaf76",
+      "key": "chicken"
+    },
+    {
+      "n": 25,
+      "hue": 135,
+      "light": "#2e6500",
+      "dark": "#a2d686",
+      "key": "call"
+    },
+    {
+      "n": 26,
+      "hue": 105,
+      "light": "#625700",
+      "dark": "#d0c967",
+      "key": "bald"
+    },
+    {
+      "n": 27,
+      "hue": 345,
+      "light": "#882d67",
+      "dark": "#fca4d6",
+      "key": "patrol"
+    },
+    {
+      "n": 28,
+      "hue": 300,
+      "light": "#623e96",
+      "dark": "#d0b2ff",
+      "key": "shout"
+    }
+  ],
+  "mix": {
+    "key": "mix",
+    "tier": "E",
+    "oklch_light": [
+      0.3,
+      0.14,
+      235
+    ],
+    "oklch_dark": [
+      0.86,
+      0.1,
+      235
+    ],
+    "light": "#003268",
+    "dark": "#8ddcff",
+    "fg_light": "#FFFFFF",
+    "fg_dark": "#14161C",
+    "contrast_light_fg": 12.68,
+    "contrast_dark_fg": 11.9,
+    "nearest_light": {
+      "line": 17,
+      "oklab": 0.081
+    },
+    "nearest_dark": {
+      "line": 22,
+      "oklab": 0.062
+    }
+  }
+}

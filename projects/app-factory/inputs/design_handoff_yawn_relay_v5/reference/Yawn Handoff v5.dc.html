@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Gaegu:wght@700&display=swap" rel="stylesheet">
+<script src="./yawn-render.js"></script>
+<style>
+body{margin:0;background:#e6e1d7;font-family:'IBM Plex Sans KR',system-ui,sans-serif;color:#1d1f27;-webkit-font-smoothing:antialiased}
+a{color:#1d1f27}a:hover{color:#5a5e6b}
+@keyframes v5-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes v5-pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes v5-fade{from{opacity:0}to{opacity:1}}
+@keyframes v5-head{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+@keyframes v5-ping{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.4);opacity:0}}
+@keyframes v5-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes v5-glint{from{stroke-dashoffset:28}to{stroke-dashoffset:0}}
+@keyframes v5-push{from{transform:translateY(-88px)}to{transform:none}}
+@keyframes v5-sheet{from{transform:translateY(100%)}to{transform:none}}
+@keyframes v5-ready{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:1ms!important;animation-delay:0ms!important;animation-iteration-count:1!important}}
+</style>
+</helmet>
+<section data-screen-label="v5 노선도 개편" style="display:flex;flex-direction:column;gap:28px;padding:56px;box-sizing:border-box;width:max-content;min-width:100%">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:1000px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5a5e6b;letter-spacing:.06em">YAWN! · 핸드오프 v5 (요청서 개정 2) · 2026-10-19</div>
+    <div style="font-size:36px;font-weight:700;letter-spacing:-0.03em;line-height:1.15">5역 줄 · 줄 끝 환승 · 지난 역 미리 보기 · 순환선</div>
+    <div style="font-size:16px;line-height:1.6;color:#3d404b;text-wrap:pretty">역은 5개씩 한 줄, 줄 끝 모서리 칸이 환승 자리. 다음 노선은 조건을 채운 뒤 <b>그 줄의 5번째 역을 깬 순간</b> 열리고, 환승역은 그 줄 끝에 남는다. 노선은 열린 뒤에도 아래로 늘고, 그 아래 노선들은 한 줄씩 밀린다. 4줄을 넘는 앞쪽 줄은 첫 역 위 점 5개로 접힌다. 글자는 번호뿐. 승객·판·FX 그림은 v4.7과 같다.</div>
+  </div>
+
+  <div id="A" style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;box-sizing:border-box;max-width:1500px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#ffcf5a;color:#1d1f27;border-radius:8px;padding:3px 9px">A · E · F</div>
+      <div style="font-size:22px;font-weight:700">노선도 한 화면 — 1 · 2 · 4줄 노선, 합계 숫자, 어려운 역</div>
+    </div>
+    <div style="font-size:13.5px;line-height:1.55;color:#c9ccd4;max-width:1000px;text-wrap:pretty">4호선 1줄(줄 끝에서 5호선 개통). 5호선 2줄(둘째 줄 끝에서 6호선 개통). 환승역에서 노선이 끝나고 다음 노선만 이어진다 — 앞 노선에 빈 줄이 새로 생기지 않는다. 6호선 6줄 중 뒤 4줄(앞 2줄은 첫 역 위 점 5개), 지금 역이 어려운 역, 줄 끝은 「이번 줄에서 열림」(②). 머리줄 오른쪽 숫자 = 깬 역 합계.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;width:400px;background:{{ paper }};border-radius:26px;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px 4px">
+          <div style="font-size:20px;font-weight:700;color:{{ ink }}">노선도</div>
+          <div style="display:flex;align-items:center;gap:7px;color:{{ ink }}">
+            <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="currentColor"></circle><circle cx="8" cy="8" r="2.4" fill="{{ paper }}"></circle></svg>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;letter-spacing:-0.02em">347</div>
+          </div>
+        </div>
+        <div style="padding:0 10px 10px">{{ mapMain }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:420px">
+        <div style="font-size:14px;font-weight:700">E · 깬 역 합계</div>
+        <div style="font-size:13px;line-height:1.55;color:#c9ccd4;text-wrap:pretty">제목 「노선도」와 같은 줄 오른쪽 끝. IBM Plex Mono 600 22px, 앞에 깬 역 동그라미(속 빈 채움 원 16) 하나. 노선 색 없이 먹색 — 특정 노선 것이 아니라 전체 합계라서. 4자리(9999)까지 같은 자리, 늘면 왼쪽으로 자란다.</div>
+        <div style="font-size:14px;font-weight:700;margin-top:6px">F · 어려운 역 — 겹 테두리 + 반짝 별</div>
+        <div style="font-size:13px;line-height:1.55;color:#c9ccd4;text-wrap:pretty">역 동그라미 바깥 5.5에 노선 색 옅은 겹 테두리(불투명 0.55) + 오른쪽 위 노랑 4갈래 별(먹 외곽 1.5). 빨강·느낌표·해골 없음 — 「반짝이는 도전」. 별은 먹 외곽이 대비를 맡아 노선 색 28개 + 섞기 색 모두 위에서 같은 모양.</div>
+        <div style="background:#f3efe6;border-radius:14px;padding:12px">{{ hardStrip }}</div>
+        <div style="background:#1b1f28;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px">{{ hardStripDark }}</div>
+        <div style="font-size:12px;font-weight:600;color:#a9adb8">객차 역 표지판 (번호 동그라미에 같은 표시, 크기만 줄임)</div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <sc-for list="{{ signs }}" as="sg" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:10px;background:#232833;border-radius:14px;padding:8px 14px 8px 10px">{{ sg.el }}</div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;line-height:1.5;color:#a9adb8;text-wrap:pretty">표지판 그림은 앱 것을 그대로 두고 번호 동그라미에만 <span style="font-family:'IBM Plex Mono',monospace">hardMark</span>를 붙인다(위는 자리 확인용 간이 그림).</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;margin-top:6px">
+      <sc-for list="{{ cornerOpts }}" as="c" hint-placeholder-count="2">
+        <div id="{{ c.id }}" style="display:flex;flex-direction:column;gap:10px;width:400px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;background:#e9e6dd;color:#1d1f27;border-radius:7px;padding:2px 8px">{{ c.id }}</div>
+            <div style="font-size:15px;font-weight:700">{{ c.name }}</div>
+          </div>
+          <div style="background:{{ paper }};border-radius:18px;padding:10px">{{ c.el }}</div>
+          <div style="font-size:12.5px;line-height:1.5;color:#a9adb8;text-wrap:pretty">{{ c.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="B" style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;box-sizing:border-box;max-width:1500px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#ffcf5a;color:#1d1f27;border-radius:8px;padding:3px 9px">B</div>
+      <div style="font-size:22px;font-weight:700">줄 끝 환승역 3상태</div>
+    </div>
+    <div style="font-size:13.5px;line-height:1.55;color:#c9ccd4;max-width:1000px;text-wrap:pretty">핵심은 ②. 줄 끝 동그라미가 <b>다음 노선 색</b>으로 바뀌어 천천히 숨 쉬고, 지금 역에서 줄 끝까지 레일 위로 다음 노선 색 빛 조각이 흘러간다 — 「이 줄 끝에 새 색이 기다린다」. ①은 회색 점선 고리(자리만), ③은 이중 원 + 다음 노선 레일.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+      <sc-for list="{{ xferStates }}" as="x" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:8px;width:400px">
+          <div style="font-size:14px;font-weight:700">{{ x.name }}</div>
+          <div style="background:{{ paper }};border-radius:18px;padding:10px">{{ x.el }}</div>
+          <div style="font-size:12.5px;line-height:1.5;color:#a9adb8;text-wrap:pretty">{{ x.note }}</div>
+        </div>
+      </sc-for>
+      <div style="display:flex;flex-direction:column;gap:8px;width:400px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-size:14px;font-weight:700">② → ③ 개통 (약 1.5초)</div>
+          <button onClick="{{ replayOpen }}" style="height:32px;border:0;border-radius:10px;background:#ffcf5a;color:#1d1f27;font:600 13px 'IBM Plex Sans KR',sans-serif;padding:0 12px;cursor:pointer">다시 재생</button>
+        </div>
+        <div style="background:{{ paper }};border-radius:18px;padding:10px">{{ mapOpenLine }}</div>
+        <div style="font-size:12.5px;line-height:1.5;color:#a9adb8;text-wrap:pretty">5번째 역 깸 → 줄 끝이 톡 커지며 이중 원(③) → 연결선 → 새 노선 레일 → 역 · 머리 → 열차.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="C" style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;box-sizing:border-box;max-width:1500px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#ffcf5a;color:#1d1f27;border-radius:8px;padding:3px 9px">C</div>
+      <div style="font-size:22px;font-weight:700">노선이 밀릴 때</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px;width:400px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-size:14px;font-weight:700">{{ pushLabel }}</div>
+          <button onClick="{{ togglePush }}" style="height:32px;border:0;border-radius:10px;background:#ffcf5a;color:#1d1f27;font:600 13px 'IBM Plex Sans KR',sans-serif;padding:0 12px;cursor:pointer">{{ pushBtn }}</button>
+        </div>
+        <div style="background:{{ paper }};border-radius:18px;padding:10px">{{ mapPush }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:520px;font-size:13.5px;line-height:1.6;color:#c9ccd4;text-wrap:pretty">
+        <div><b style="color:#e9e6dd">언제 밀리나</b> — 개통만으로는 앞 노선이 늘지 않는다(5호선은 환승역에서 끝, 6호선만 생김). 6호선이 열린 뒤 플레이어가 <b>5호선을 골라 더 탔을 때만</b> 5호선에 줄이 생긴다(요청서 1-3).</div>
+        <div><b style="color:#e9e6dd">밀림</b> — 5호선이 한 줄 늘면 6호선부터 아래 전부가 한 줄 높이(88)만큼 300ms 동안 미끄러져 내려간다. 새 줄의 역은 차례로 톡.</div>
+        <div><b style="color:#e9e6dd">연결선이 비켜 가는 길</b> — 환승 줄이 그 노선의 마지막 줄이면 환승역에서 곧게 아래로. 아래에 줄이 더 생기면 환승역에서 바깥 길(오른쪽 x 368 · 왼쪽 x 12, 줄 꺾임보다 22 바깥)로 나가 내려가다 새 노선 첫 역으로 들어간다. 새 노선은 늘 연결선이 내려오는 쪽에서 시작하고, 번호 칩·아이콘은 반대쪽에 둔다.</div>
+        <div><b style="color:#e9e6dd">미끄러지는 동안</b> — 연결선은 위 조각(고정)과 아래 조각(함께 미끄러짐)이 바깥 길에서 겹쳐 있어 끊기지 않는다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="D" style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;box-sizing:border-box;max-width:1500px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#ffcf5a;color:#1d1f27;border-radius:8px;padding:3px 9px">D</div>
+      <div style="font-size:22px;font-weight:700">지난 역 미리 보기 카드</div>
+    </div>
+    <div style="font-size:13.5px;line-height:1.55;color:#c9ccd4;max-width:1000px;text-wrap:pretty">깬 역을 누르면 아래에서 올라온다(380ms). 판 그림은 <b>모두 잠든 마지막 모습</b> — 깬 기억이 그대로 보이고, 처음 모습은 다시 할 때 볼 수 있으니. 판 칸 크기 = min(40, (카드 폭 − 40) ÷ 열 수, 330 ÷ 행 수), 작은 칸 단계(lod s). 5×7은 칸 40, 7×11은 칸 30으로 카드 안에 들어간다. 기록: 다시 하기 화살표 + 시도 수, 도움(힌트)을 썼으면 전구. 「다시」 큰 버튼, 닫기 44.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end">
+      <sc-for list="{{ sheets }}" as="sh" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:12.5px;color:#a9adb8">{{ sh.label }}</div>
+          <div style="width:380px;background:#8a8679;border-radius:26px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding-top:40px">
+            <div style="background:#fffaf0;color:#1d1f27;border-radius:28px 28px 0 0;padding:10px 20px 24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 -8px 30px rgba(0,0,0,.25);animation:v5-sheet 380ms cubic-bezier(.2,.9,.3,1) both">
+              <div style="width:40px;height:5px;border-radius:3px;background:#d6d0c2;align-self:center"></div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:44px;height:44px;border-radius:50%;background:{{ sh.color }};color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600">{{ sh.num }}</div>
+                <div style="width:26px;height:22px;border-radius:6px;background:{{ sh.color }};color:#ffffff;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600">{{ sh.line }}</div>
+                <div style="flex:1"></div>
+                <button style="width:44px;height:44px;border:0;border-radius:50%;background:#efe9dc;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3 L13 13 M13 3 L3 13" stroke="#1d1f27" stroke-width="2.4" stroke-linecap="round"></path></svg>
+                </button>
+              </div>
+              <div style="align-self:center">{{ sh.board }}</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:22px">
+                <div style="display:flex;align-items:center;gap:7px">
+                  <svg width="22" height="22" viewBox="0 0 22 22"><path d="M17.5 11 A6.5 6.5 0 1 1 15.2 6" fill="none" stroke="#1d1f27" stroke-width="2.2" stroke-linecap="round"></path><path d="M12.2 3.6 L16.4 5.6 L14.6 9.8" fill="none" stroke="#1d1f27" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">{{ sh.tries }}</div>
+                </div>
+                <sc-if value="{{ sh.help }}" hint-placeholder-val="{{ true }}">
+                  <svg width="22" height="22" viewBox="0 0 22 22"><path d="M11 3 A6 6 0 0 1 14.6 13.8 L14.2 15.6 L7.8 15.6 L7.4 13.8 A6 6 0 0 1 11 3 Z" fill="#ffcf5a" stroke="#1d1f27" stroke-width="1.8" stroke-linejoin="round"></path><path d="M8.4 18.4 L13.6 18.4" stroke="#1d1f27" stroke-width="2" stroke-linecap="round"></path></svg>
+                </sc-if>
+              </div>
+              <button style="height:56px;border:0;border-radius:16px;background:#1d1f27;color:#fffaf0;font:700 18px 'IBM Plex Sans KR',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer">
+                <svg width="20" height="20" viewBox="0 0 22 22"><path d="M17.5 11 A6.5 6.5 0 1 1 15.2 6" fill="none" stroke="#fffaf0" stroke-width="2.4" stroke-linecap="round"></path><path d="M12.2 3.6 L16.4 5.6 L14.6 9.8" fill="none" stroke="#fffaf0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <span>다시</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="G" style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;box-sizing:border-box;max-width:1500px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#ffcf5a;color:#1d1f27;border-radius:8px;padding:3px 9px">G · J</div>
+      <div style="font-size:22px;font-weight:700">섞기 장 — 예고 · 순환선 · 개통</div>
+    </div>
+    <div style="font-size:13.5px;line-height:1.55;color:#c9ccd4;max-width:1000px;text-wrap:pretty">왼쪽: 28호선 진행 중, 맨 아래 흐린 고리 예고. 가운데: 열림 — 28호선 줄 끝 환승역에서 내려온 레일이 고리 가장자리에 닿아 그대로 고리가 된다. 역 10개(깬 4 · 지금 1 · 잠긴 5), 열차가 2초마다 트랙을 따라 다음 역으로(350ms). 오른쪽: 개통 약 1.5초.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:8px;width:400px">
+        <div style="font-size:14px;font-weight:700">28호선 진행 중 + 고리 예고</div>
+        <div style="background:{{ paper }};border-radius:22px;padding:10px">{{ mapProgress }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:400px">
+        <div style="font-size:14px;font-weight:700">섞기 장 열림 (선택됨)</div>
+        <div style="background:{{ paper }};border-radius:22px;padding:10px">{{ mapLoop }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:400px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-size:14px;font-weight:700">처음 열릴 때</div>
+          <button onClick="{{ replay }}" style="height:32px;border:0;border-radius:10px;background:#ffcf5a;color:#1d1f27;font:600 13px 'IBM Plex Sans KR',sans-serif;padding:0 12px;cursor:pointer">다시 재생</button>
+        </div>
+        <div style="background:{{ paper }};border-radius:22px;padding:10px">{{ mapOpen }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="H" style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;box-sizing:border-box;max-width:1500px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#ffcf5a;color:#1d1f27;border-radius:8px;padding:3px 9px">H · I</div>
+      <div style="font-size:22px;font-weight:700">섞기 장 머리와 색</div>
+    </div>
+    <div style="font-size:13.5px;line-height:1.55;color:#c9ccd4;max-width:1000px;text-wrap:pretty">번호 자리에 <b>고리 기호</b>: 닫힌 둥근 고리 + 도는 방향 화살촉 + 역 점 3(작은 칸에서는 점 뺌). 아이콘 = 휴대폰·호통·기본 승객 셋이 겹친 얼굴. 색은 단계 E — 아주 깊은 남색 / 밝은 하늘. 초록 아님.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:stretch">
+      <sc-for list="{{ heads }}" as="hd" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:12px;background:{{ hd.bg }};color:{{ hd.ink }};border-radius:16px;padding:16px 18px;min-width:300px">
+          <div style="font-size:12px;font-weight:600;opacity:.75">{{ hd.label }}</div>
+          <div style="display:flex;align-items:center;gap:18px">{{ hd.el }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px">{{ hd.hex }}</div>
+          <div style="font-size:12px;line-height:1.45;opacity:.8">{{ hd.note }}</div>
+        </div>
+      </sc-for>
+      <div style="display:flex;flex-direction:column;gap:10px;background:#252a35;border-radius:16px;padding:16px 18px;min-width:280px;max-width:360px">
+        <div style="font-size:12px;font-weight:600;color:#a9adb8">28색과의 거리 (OKLab)</div>
+        <div style="font-size:13px;line-height:1.55;color:#c9ccd4;text-wrap:pretty">라이트 가장 가까운 17호선 0.081 · 다크 가장 가까운 22호선 0.062. 기존 28색끼리 최소 0.023. 흰 기호 12.7:1, <span style="font-family:'IBM Plex Mono',monospace">#14161C</span> 기호 11.9:1.</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <sc-for list="{{ swatches }}" as="sw" hint-placeholder-count="29">
+            <div style="width:18px;height:18px;border-radius:5px;background:{{ sw.c }};outline:{{ sw.o }}"></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="K" style="display:flex;flex-direction:column;gap:14px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;box-sizing:border-box;max-width:1500px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:#ffcf5a;color:#1d1f27;border-radius:8px;padding:3px 9px">K</div>
+      <div style="font-size:22px;font-weight:700">다른 테마에서도 「닫힌 고리 = 마지막 장」</div>
+    </div>
+    <div style="font-size:13.5px;line-height:1.55;color:#c9ccd4;max-width:1000px;text-wrap:pretty">구현하지 않는 스케치. 규칙: 마지막 장만 닫힌 모양, 끝 표시 없음, 도는 방향 화살촉 하나, 머리는 고리 칩 + 섞인 얼굴.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:20px">
+      <sc-for list="{{ sketches }}" as="sk" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:8px;width:400px">
+          <div style="font-size:14px;font-weight:700">{{ sk.name }}</div>
+          <div style="background:#f3efe6;border-radius:18px;padding:10px">{{ sk.el }}</div>
+          <div style="font-size:12.5px;line-height:1.5;color:#a9adb8;text-wrap:pretty">{{ sk.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="M" style="display:flex;flex-direction:column;gap:12px;background:#1b1f28;color:#e9e6dd;border-radius:20px;padding:22px 26px 26px;box-sizing:border-box;max-width:1100px">
+    <div style="font-size:22px;font-weight:700">움직임</div>
+    <sc-for list="{{ motion }}" as="m" hint-placeholder-count="8">
+      <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 100px;gap:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;font-size:13.5px;line-height:1.5">
+        <div style="font-weight:700">{{ m.k }}</div>
+        <div style="color:#c9ccd4;text-wrap:pretty">{{ m.v }}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;color:#ffcf5a">{{ m.t }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;corner&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;round&quot;, &quot;square&quot;], &quot;default&quot;: &quot;round&quot;, &quot;tsType&quot;: &quot;'round' | 'square'&quot;}, &quot;dark&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { loopCur: 3, from: null, p: 1, replayKey: 0, openKey: 0, pushed: false, pushKey: 0 };
+  componentDidMount() {
+    this.wait = setInterval(() => { if (window.YawnRender) { clearInterval(this.wait); this.forceUpdate(); } }, 50);
+    this.reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.tick = setInterval(() => this.advance(), 2000);
+  }
+  componentWillUnmount() { clearInterval(this.wait); clearInterval(this.tick); cancelAnimationFrame(this.raf); }
+  get Y() { if (!this._Y && window.YawnRender) this._Y = window.YawnRender(React.createElement); return this._Y; }
+  advance() {
+    const from = this.state.loopCur, to = (from + 1) % 10;
+    if (this.reduce) return this.setState({ loopCur: to, from: null, p: 1 });
+    const t0 = performance.now();
+    const step = (t) => { const p = Math.min(1, (t - t0) / 350); this.setState({ loopCur: to, from, p }); if (p < 1) this.raf = requestAnimationFrame(step); };
+    this.raf = requestAnimationFrame(step);
+  }
+  pal() {
+    return this.props.dark
+      ? { paper: '#1b1f28', ink: '#e9e6dd', muted: '#a9adb8', gray: '#4a505e', chipFg: '#14161c', dark: true }
+      : { paper: '#f3efe6', ink: '#1d1f27', muted: '#5a5e6b', gray: '#b9b4a8', chipFg: '#ffffff', dark: false };
+  }
+  col(n) { const Y = this.Y, c = n === 'mix' || n > 28 ? Y.MIX_COLOR : Y.LINE_COLORS[n - 1]; return this.pal().dark ? c.dark : c.light; }
+
+  // lines: [{ n, rows, xferRow, cur:{r,j}, frontier, ready, sel, hard, fresh, toMix }]
+  // o: { top, vbTop, pad, corner, pushAfter, newRow, mixTeaser, loop:{sel,cur,curNum,first,fresh}, trainAt }
+  map(lines, o) {
+    const h = React.createElement, Y = this.Y, INK = Y.INK, P = this.pal(), W = 380;
+    const RR = (o.corner || this.props.corner || 'round') === 'square' ? 0 : 18;
+    const CX = (side, j) => side === 'L' ? 60 + j * 52 : 320 - j * 52;
+    const XC = s => s === 'R' ? 346 : 34, LANE = s => s === 'R' ? 368 : 12, opp = s => s === 'L' ? 'R' : 'L';
+    const halo = { paintOrder: 'stroke', stroke: P.paper, strokeWidth: 4, strokeLinejoin: 'round' };
+    const fixed = { u: [], r: [], f: [] }, slid = { u: [], r: [], f: [] };
+    const turn = (x, y1, y2, side) => {
+      const xc = XC(side), sg = side === 'R' ? 1 : -1;
+      if (!RR) return `M${x} ${y1} L${xc} ${y1} L${xc} ${y2} L${x} ${y2}`;
+      const sw = side === 'R' ? 1 : 0;
+      return `M${x} ${y1} L${xc - sg * RR} ${y1} A${RR} ${RR} 0 0 ${sw} ${xc} ${y1 + RR} L${xc} ${y2 - RR} A${RR} ${RR} 0 0 ${sw} ${xc - sg * RR} ${y2} L${x} ${y2}`;
+    };
+    const draw = (on, d0, dur) => on ? { pathLength: 1, strokeDasharray: 1, style: { animation: `v5-draw ${dur}ms ${d0}ms cubic-bezier(.4,0,.2,1) both` } } : {};
+    const popS = (on, ms) => on ? { animation: `v5-pop 360ms ${ms}ms cubic-bezier(.2,1.6,.4,1) both`, transformBox: 'fill-box', transformOrigin: 'center' } : null;
+    const station = (k, sx, sy, s, c, num, lab, ex) => {
+      ex = ex || {};
+      const it = [];
+      if (s === 'cur') {
+        it.push(h('circle', { key: 'ping', cx: sx, cy: sy, r: 12, fill: c, style: { animation: 'v5-ping 1.8s ease-out infinite', transformBox: 'fill-box', transformOrigin: 'center' } }));
+        it.push(h('circle', { key: 'c', cx: sx, cy: sy, r: 12, fill: P.paper, stroke: c, strokeWidth: 6 }));
+      } else if (s === 'next') it.push(h('circle', { key: 'c', cx: sx, cy: sy, r: 10, fill: P.paper, stroke: c, strokeWidth: 4 }));
+      else if (s === 'done') it.push(h('circle', { key: 'c', cx: sx, cy: sy, r: 10, fill: c, stroke: P.paper, strokeWidth: 3 }));
+      else if (s === 'lock') it.push(h('circle', { key: 'c', cx: sx, cy: sy, r: 9, fill: P.paper, stroke: P.gray, strokeWidth: 3 }));
+      else if (s === 'xfer') it.push(h('circle', { key: 'c', cx: sx, cy: sy, r: 12, fill: P.paper, stroke: P.ink, strokeWidth: 3 }), h('circle', { key: 'c2', cx: sx, cy: sy, r: 6, fill: ex.nc }));
+      else if (s === 'endNone') it.push(h('circle', { key: 'c', cx: sx, cy: sy, r: 8, fill: P.paper, stroke: P.gray, strokeWidth: 2.4, strokeDasharray: '3 3.3' }));
+      else if (s === 'endReady') {
+        it.push(h('circle', { key: 'ping', cx: sx, cy: sy, r: 11, fill: ex.nc, style: { animation: 'v5-ping 2.2s ease-out infinite', transformBox: 'fill-box', transformOrigin: 'center' } }));
+        it.push(h('g', { key: 'rg', style: { animation: 'v5-ready 2.2s ease-in-out infinite', transformBox: 'fill-box', transformOrigin: 'center' } },
+          h('circle', { cx: sx, cy: sy, r: 11, fill: P.paper, stroke: ex.nc, strokeWidth: 4 }), h('circle', { cx: sx, cy: sy, r: 4.5, fill: ex.nc })));
+      }
+      if (ex.hard) it.push(Y.hardMark({ key: 'hd', cx: sx, cy: sy, r: s === 'cur' ? 12 : 10, color: c }));
+      if (s === 'cur' && ex.train) it.push(this.train(sx, sy, c, 'tr'));
+      if (s !== 'cur' && num != null) it.push(h('text', { key: 'no', x: lab[0] - (ex.hard ? 5 : 0), y: lab[1], textAnchor: lab[2], style: { ...halo, fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, fill: P.muted } }, String(num).padStart(2, '0')));
+      return h('g', { key: k, style: ex.pop != null ? popS(true, ex.pop) : null }, it);
+    };
+
+    let y = o.top || 84, S = o.startSide || 'L', pc = null, lastInfo = null;
+    lines.forEach((L, li) => {
+      const G = o.pushAfter != null && li > o.pushAfter ? slid : fixed;
+      const c = this.col(L.n), nc = this.col(L.toMix ? 'mix' : L.n + 1), sel = !!L.sel, sw = sel ? 10 : 7, F = !!L.fresh;
+      if (lastInfo) y = lastInfo.bottom + 150;
+      if (pc) S = pc.side;
+      const rows = L.rows; let f = 0; if (rows > 4) { f = rows - 4; if (f % 2) f += 1; }
+      const ry = r => y + (r - f) * 88, rs = r => (r % 2 === 0) ? S : opp(S), lastR = rows - 1, y0 = ry(f), x0 = CX(S, 0);
+      // 들어오는 연결선
+      if (pc) {
+        const { x: tx, y: ty, side: E, last } = pc, LX = LANE(E), sg = E === 'R' ? 1 : -1, cc = sw;
+        const into = pc.G;
+        if (last) into.r.push(h('path', { key: 'cn' + li, d: turn(tx, ty, y0, E), stroke: c, strokeWidth: cc, fill: 'none', strokeLinecap: 'round', ...draw(F, 0, 400) }));
+        else if (o.pushAfter === li - 1) {
+          const dy = 88;
+          fixed.r.push(h('path', { key: 'cnA' + li, d: `M${tx} ${ty} L${LX - sg * 14} ${ty} Q${LX} ${ty} ${LX} ${ty + 14} L${LX} ${y0 - dy - 14}`, stroke: c, strokeWidth: cc, fill: 'none', strokeLinecap: 'round' }));
+          slid.r.push(h('path', { key: 'cnB' + li, d: `M${LX} ${y0 - dy - 24} L${LX} ${y0 - 14} Q${LX} ${y0} ${LX - sg * 14} ${y0} L${x0} ${y0}`, stroke: c, strokeWidth: cc, fill: 'none', strokeLinecap: 'round' }));
+        } else into.r.push(h('path', { key: 'cn' + li, d: `M${tx} ${ty} L${LX - sg * 14} ${ty} Q${LX} ${ty} ${LX} ${ty + 14} L${LX} ${y0 - 14} Q${LX} ${y0} ${LX - sg * 14} ${y0} L${x0} ${y0}`, stroke: c, strokeWidth: cc, fill: 'none', strokeLinecap: 'round', ...draw(F, 0, 400) }));
+      }
+      pc = null;
+      const lastY = ry(lastR);
+      if (sel) G.u.push(h('rect', { key: 'band' + li, x: 4, y: y0 - 80, width: W - 8, height: lastY - y0 + 120, rx: 20, fill: c, fillOpacity: 0.1, stroke: c, strokeOpacity: 0.45, strokeWidth: 1.5, style: F ? { animation: 'v5-fade 300ms 1100ms both' } : null }));
+      // 레일
+      const d = [];
+      for (let r = f; r <= lastR; r++) {
+        const side = rs(r), yy = ry(r), endJ = (r === lastR && !L.frontier && L.xferRow !== r) ? 4 : 5;
+        d.push(`M${CX(side, 0)} ${yy} L${CX(side, endJ)} ${yy}`);
+        if (r < lastR) d.push(turn(CX(side, 5), yy, yy + 88, opp(side)));
+      }
+      G.r.push(h('path', { key: 'rl' + li, d: d.join(' '), stroke: c, strokeWidth: sw, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round', ...draw(F, 400, 500) }));
+      // 접힌 앞줄: 첫 역 위 가는 꼬리 + 점 5
+      if (f > 0) {
+        G.r.push(h('path', { key: 'fl' + li, d: `M${x0} ${y0 - 12} L${x0} ${y0 - 58}`, stroke: c, strokeWidth: 3, strokeOpacity: 0.4, strokeLinecap: 'round' }));
+        for (let i = 0; i < 5; i++) G.f.push(h('circle', { key: 'fd' + li + i, cx: x0, cy: y0 - 18 - i * 9.5, r: 3.4, fill: c, fillOpacity: 0.84 - i * 0.16 }));
+      }
+      // ② 빛 조각
+      if (L.frontier && L.ready && L.cur) {
+        const side = rs(lastR), yy = ry(lastR);
+        G.r.push(h('path', { key: 'gl' + li, d: `M${CX(side, L.cur.j)} ${yy} L${CX(side, 5)} ${yy}`, stroke: nc, strokeWidth: 3.4, fill: 'none', strokeLinecap: 'round', strokeDasharray: '6 8', style: { animation: 'v5-glint 1.1s linear infinite' } }));
+      }
+      // 머리
+      const hs = opp(S), chipX = hs === 'L' ? 16 : W - 42, iconX = hs === 'L' ? 48 : W - 42 - 42;
+      const headG = [h('rect', { key: 'chip', x: chipX, y: y0 - 64, width: 26, height: 22, rx: 6, fill: c }),
+        h('text', { key: 'cn', x: chipX + 13, y: y0 - 48.5, textAnchor: 'middle', style: { fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13, fill: P.chipFg } }, L.n),
+        h('g', { key: 'ic', transform: `translate(${iconX} ${y0 - 76})` }, Y.GIMMICKS[L.n - 1].icon(34))];
+      G.f.push(h('g', { key: 'hd' + li, style: F ? { animation: 'v5-head 350ms 1150ms both', transformBox: 'fill-box', transformOrigin: 'center' } : null }, headG));
+      // 역
+      let k = 0;
+      for (let r = f; r <= lastR; r++) {
+        const side = rs(r), yy = ry(r);
+        for (let j = 0; j < 5; j++) {
+          const sx = CX(side, j), num = r * 5 + j + 1;
+          let st = 'done';
+          if (L.cur) { if (r > L.cur.r) st = 'lock'; else if (r === L.cur.r) st = j < L.cur.j ? 'done' : j === L.cur.j ? (sel ? 'cur' : 'next') : 'lock'; }
+          let lab = [sx, yy - 20, 'middle'];
+          if (j === 0 && (r > f || f > 0)) lab = sx > W / 2 ? [sx - 14, yy - 18, 'end'] : [sx + 14, yy - 18, 'start'];
+          const pop = F ? 1000 + k * 40 : (o.newRow && o.newRow[0] === li && o.newRow[1] === r ? 80 + j * 40 : null);
+          G.f.push(station('s' + li + '_' + r + '_' + j, sx, yy, st, c, num, lab, { hard: L.hard && (st === 'cur' || st === 'next'), train: true, pop }));
+          k++;
+        }
+        const ex = CX(side, 5);
+        if (L.xferRow === r) {
+          G.f.push(station('x' + li, ex, yy, 'xfer', c, null, null, { nc, pop: L.popXfer ? 0 : null }));
+          pc = { x: ex, y: yy, side: opp(side), last: r === lastR, G };
+        } else if (r === lastR && L.frontier && !o.mixTeaserNoEnd) G.f.push(station('e' + li, ex, yy, L.ready ? 'endReady' : 'endNone', c, null, null, { nc }));
+      }
+      lastInfo = { bottom: lastY, endX: CX(rs(lastR), 5), endSide: opp(rs(lastR)), pc };
+    });
+
+    // 섞기 장
+    let bottom = lastInfo.bottom;
+    const lp = o.loop, teaser = o.mixTeaser;
+    if (lp || teaser) {
+      const c = lp ? this.col('mix') : P.gray, R = 64, cxL = 98, cxR = 282, S2 = cxR - cxL;
+      const from = lp ? pc : { x: lastInfo.endX, y: lastInfo.bottom, side: lastInfo.endSide };
+      const right = from.x > W / 2, ex = right ? 346 : 34, sgx = right ? 1 : -1;
+      const cy = teaser ? from.y + 92 + R + 30 : from.y + 60 + R, Lp = 2 * Math.PI * R + 2 * S2, base = right ? Math.PI * R + S2 : 0;
+      const pt = (t) => { t = ((t + base) % Lp + Lp) % Lp; const q = Math.PI * R / 2;
+        if (t < q) { const a = Math.PI + t / R; return [cxL + R * Math.cos(a), cy + R * Math.sin(a)]; } t -= q;
+        if (t < S2) return [cxL + t, cy - R]; t -= S2;
+        if (t < Math.PI * R) { const a = -Math.PI / 2 + t / R; return [cxR + R * Math.cos(a), cy + R * Math.sin(a)]; } t -= Math.PI * R;
+        if (t < S2) return [cxR - t, cy + R]; t -= S2;
+        const a = Math.PI / 2 + t / R; return [cxL + R * Math.cos(a), cy + R * Math.sin(a)]; };
+      const loopD = right
+        ? `M346 ${cy} A${R} ${R} 0 0 1 ${cxR} ${cy + R} L${cxL} ${cy + R} A${R} ${R} 0 0 1 ${cxL} ${cy - R} L${cxR} ${cy - R} A${R} ${R} 0 0 1 346 ${cy}`
+        : `M34 ${cy} A${R} ${R} 0 0 1 ${cxL} ${cy - R} L${cxR} ${cy - R} A${R} ${R} 0 0 1 ${cxR} ${cy + R} L${cxL} ${cy + R} A${R} ${R} 0 0 1 34 ${cy}`;
+      if (teaser) {
+        [0, 1, 2].forEach(i => fixed.f.push(h('circle', { key: 'gap' + i, cx: from.x, cy: from.y + 36 + i * 16, r: 2.6, fill: P.gray })));
+        fixed.f.push(h('g', { key: 'mt', style: { opacity: 0.55, filter: 'blur(1.2px)' } },
+          h('path', { key: 'lp', d: loopD, stroke: c, strokeWidth: 7, fill: 'none', strokeDasharray: '2 12', strokeLinecap: 'round' }),
+          h('rect', { key: 'chip', x: 140, y: cy - 14, width: 40, height: 28, rx: 8, fill: c }),
+          h('g', { key: 'mk', transform: `translate(146 ${cy - 14})` }, Y.mixMark({ size: 28, fg: P.paper, lod: 's' })),
+          h('circle', { key: 's1', cx: 196, cy: cy - 8, r: 6, fill: c }), h('circle', { key: 's2', cx: 218, cy: cy - 8, r: 6, fill: c }), h('circle', { key: 's3', cx: 207, cy: cy - 2, r: 7, fill: c }), h('path', { key: 's4', d: `M194 ${cy + 16} q13 -14 26 0 Z`, fill: c })));
+        bottom = cy + R;
+      } else {
+        const Fr = !!lp.fresh, sw = lp.sel ? 10 : 7;
+        if (lp.sel) fixed.u.push(h('rect', { key: 'lband', x: 4, y: cy - R - 40, width: W - 8, height: 2 * R + 76, rx: 24, fill: c, fillOpacity: 0.1, stroke: c, strokeOpacity: 0.45, strokeWidth: 1.5, style: Fr ? { animation: 'v5-fade 300ms 1100ms both' } : null }));
+        fixed.r.push(h('path', { key: 'mcn', d: RR ? `M${from.x} ${from.y} L${ex - sgx * RR} ${from.y} A${RR} ${RR} 0 0 ${right ? 1 : 0} ${ex} ${from.y + RR} L${ex} ${cy}` : `M${from.x} ${from.y} L${ex} ${from.y} L${ex} ${cy}`, stroke: c, strokeWidth: sw, fill: 'none', strokeLinecap: 'round', ...draw(Fr, 0, 400) }));
+        fixed.r.push(h('path', { key: 'loop', d: loopD, stroke: c, strokeWidth: sw, fill: 'none', strokeLinecap: 'round', ...draw(Fr, 400, 700) }));
+        const chev = (x, yy, dir, k) => h('path', { key: k, d: `M${x - dir * 5} ${yy - 7} L${x + dir * 4} ${yy} L${x - dir * 5} ${yy + 7}`, stroke: P.paper, strokeWidth: 3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round', style: Fr ? { animation: 'v5-fade 300ms 1150ms both' } : null });
+        fixed.f.push(chev(190, cy - R, 1, 'cv1'), chev(190, cy + R, -1, 'cv2'));
+        const N = 10, cur = lp.cur, curNum = lp.curNum;
+        for (let j = 0; j < N; j++) {
+          const [sx, sy] = pt(j * Lp / N), ahead = (j - cur + N) % N, st = lp.first ? (j === cur ? 'cur' : 'lock') : ahead === 0 ? 'cur' : ahead <= 5 ? 'lock' : 'done';
+          const num = lp.first ? curNum + ahead : ahead <= 5 ? curNum + ahead : curNum - (N - ahead);
+          const dx = sx - (sx < cxL ? cxL : sx > cxR ? cxR : sx), dy = sy - cy, Ln = Math.hypot(dx, dy) || 1, ux = dx / Ln, uy = dy / Ln;
+          const lab = [sx + ux * 24, sy + uy * 24 + 3.5, Math.abs(ux) < 0.35 ? 'middle' : ux > 0 ? 'start' : 'end'];
+          fixed.f.push(station('l_' + j, sx, sy, st, c, num, lab, { train: !o.trainAt, pop: Fr ? 1000 + j * 40 : null }));
+        }
+        if (o.trainAt) {
+          const s = this.state, a = (s.from == null ? cur : s.from), b = cur;
+          let ta = a * Lp / N, tb = b * Lp / N; if (tb < ta) tb += Lp;
+          const e = 1 - Math.pow(1 - s.p, 3), [tx, ty] = pt(ta + (tb - ta) * e);
+          fixed.f.push(h('g', { key: 'trn' }, this.train(tx, ty, c, 'lt')));
+        }
+        fixed.f.push(h('g', { key: 'mh', style: Fr ? { animation: 'v5-head 350ms 1150ms both', transformOrigin: `190px ${cy}px` } : null },
+          h('rect', { key: 'chip', x: 138, y: cy - 15, width: 42, height: 30, rx: 8, fill: c }),
+          h('g', { key: 'mk', transform: `translate(144 ${cy - 15})` }, Y.mixMark({ size: 30, fg: P.chipFg })),
+          h('g', { key: 'ic', transform: `translate(192 ${cy - 26})` }, Y.MIX.icon(46))));
+        bottom = cy + R;
+      }
+    }
+    const Ht = bottom + (o.pad == null ? 56 : o.pad), T = o.vbTop || 0;
+    const slideG = h('g', { key: 'slide' + (o.pushKey || 0), style: o.pushAfter != null && o.animatePush ? { animation: 'v5-push 300ms cubic-bezier(.3,.7,.3,1) both' } : null }, slid.u, slid.r, slid.f);
+    return h('svg', { key: o.key, width: '100%', viewBox: `0 ${T} ${W} ${Ht - T}`, style: { display: 'block', overflow: T ? 'hidden' : 'visible', fontFamily: 'IBM Plex Sans KR, system-ui, sans-serif' } },
+      h('g', { key: 'fx' }, fixed.u), slid.u.length ? null : null, h('g', { key: 'fr' }, fixed.r), slideG, h('g', { key: 'ff' }, fixed.f));
+  }
+  train(sx, sy, c, k) {
+    const h = React.createElement, INK = this.Y.INK;
+    return h('g', { key: k, style: { animation: 'v5-bob 1.6s ease-in-out infinite' } },
+      h('rect', { x: sx - 15, y: sy - 44, width: 30, height: 20, rx: 7, fill: c, stroke: INK, strokeWidth: 2 }),
+      h('rect', { x: sx - 10, y: sy - 40, width: 8, height: 7, rx: 2, fill: '#f3efe6', stroke: INK, strokeWidth: 1.3 }),
+      h('rect', { x: sx + 2, y: sy - 40, width: 8, height: 7, rx: 2, fill: '#f3efe6', stroke: INK, strokeWidth: 1.3 }),
+      h('circle', { cx: sx - 8, cy: sy - 28, r: 1.6, fill: '#ffcf5a' }), h('circle', { cx: sx + 8, cy: sy - 28, r: 1.6, fill: '#ffcf5a' }));
+  }
+  miniBoard(cols, rowsN, seed) {
+    const h = React.createElement, Y = this.Y, cs = Math.min(40, Math.floor(340 / cols), Math.floor(330 / rowsN));
+    let s = seed; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    const kinds = [undefined, undefined, undefined, 'P', 'C', 'M', 'S'], dirs = ['d', 'l', 'r', 'u'], kids = [];
+    for (let r = 0; r < rowsN; r++) for (let c = 0; c < cols; c++) {
+      if (rnd() < 0.16) continue;
+      const x = c * cs, y = r * cs;
+      kids.push(h('div', { key: 's' + r + '_' + c, style: { position: 'absolute', left: x + 2, top: y + 3, width: cs - 4, height: cs - 4, borderRadius: 6, background: '#323b4e' } }));
+      kids.push(h('div', { key: 'p' + r + '_' + c, style: { position: 'absolute', left: x, top: y } }, Y.P({ a: Math.floor(rnd() * 6), kind: kinds[Math.floor(rnd() * kinds.length)], dir: dirs[Math.floor(rnd() * 4)], st: 'asleep', f: 0, side: rnd() < 0.5 ? 1 : -1, size: cs, uid: 'mb' + seed + '_' + r + '_' + c, lod: 's' })));
+    }
+    return h('div', { style: { padding: 8, borderRadius: 14, background: 'repeating-linear-gradient(90deg,#252a35 0 24px,#232833 24px 48px)' } }, h('div', { style: { position: 'relative', width: cols * cs, height: rowsN * cs } }, kids));
+  }
+  hardRow(dark) {
+    const h = React.createElement, Y = this.Y, paper = dark ? '#1b1f28' : '#f3efe6';
+    const cols = Y.LINE_COLORS.map(c => dark ? c.dark : c.light).concat([dark ? Y.MIX_COLOR.dark : Y.MIX_COLOR.light]);
+    const step = 33, W = 10 * step + 10, rows = Math.ceil(cols.length / 10);
+    return h('svg', { width: '100%', viewBox: `0 0 ${W} ${rows * 38 + 8}`, style: { display: 'block' } }, cols.map((c, i) => {
+      const x = 20 + (i % 10) * step, y = 22 + Math.floor(i / 10) * 38;
+      return h('g', { key: i }, h('circle', { cx: x, cy: y, r: 10, fill: paper, stroke: c, strokeWidth: 4 }), Y.hardMark({ cx: x, cy: y, r: 10, color: c, star: 6 }));
+    }));
+  }
+  sign(n, num, hard) {
+    const h = React.createElement, Y = this.Y, c = this.col(n);
+    return [h('div', { key: 'ch', style: { width: 26, height: 22, borderRadius: 6, background: c, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13 } }, n),
+      h('svg', { key: 'nm', width: 44, height: 44, viewBox: '-22 -22 44 44', style: { overflow: 'visible' } }, h('circle', { r: 14, fill: '#fffaf0', stroke: c, strokeWidth: 4 }), h('text', { y: 4.5, textAnchor: 'middle', style: { fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600, fontSize: 13, fill: '#1d1f27' } }, num), hard ? Y.hardMark({ cx: 0, cy: 0, r: 14, color: c, star: 6, ring: false }) : null)];
+  }
+  sketch(kind) {
+    const h = React.createElement, Y = this.Y, c = Y.MIX_COLOR.light, gray = '#b9b4a8', paper = '#f3efe6', INK = Y.INK;
+    const head = (x, y) => [h('rect', { key: 'hc', x, y, width: 40, height: 28, rx: 8, fill: c }), h('g', { key: 'hm', transform: `translate(${x + 6} ${y})` }, Y.mixMark({ size: 28 })), h('g', { key: 'hi', transform: `translate(${x + 46} ${y - 12})` }, Y.MIX.icon(42))];
+    if (kind === 'bus') {
+      const d = 'M80 90 L300 90 A40 40 0 0 1 300 170 L80 170 A40 40 0 0 1 80 90 Z';
+      const st = [[110, 90], [170, 90], [230, 90], [290, 90], [340, 130], [290, 170], [230, 170], [170, 170], [110, 170], [40, 130]];
+      return h('svg', { width: '100%', viewBox: '0 0 380 230', style: { display: 'block' } },
+        h('path', { key: 'rd', d, stroke: '#d8d2c4', strokeWidth: 26, fill: 'none' }),
+        h('path', { key: 'ln', d, stroke: c, strokeWidth: 7, fill: 'none', strokeDasharray: '18 8' }),
+        st.map(([x, y], i) => h('rect', { key: 'b' + i, x: x - 8, y: y - 8, width: 16, height: 16, rx: 4, fill: i < 4 ? c : paper, stroke: i < 4 ? paper : gray, strokeWidth: 3 })),
+        h('g', { key: 'bus' }, h('rect', { x: 296, y: 56, width: 36, height: 22, rx: 6, fill: c, stroke: INK, strokeWidth: 2 }), h('rect', { x: 301, y: 60, width: 9, height: 7, rx: 2, fill: paper, stroke: INK, strokeWidth: 1.2 }), h('rect', { x: 313, y: 60, width: 9, height: 7, rx: 2, fill: paper, stroke: INK, strokeWidth: 1.2 }), h('circle', { cx: 304, cy: 79, r: 3, fill: INK }), h('circle', { cx: 324, cy: 79, r: 3, fill: INK })),
+        h('path', { key: 'cv', d: 'M186 83 L195 90 L186 97', stroke: paper, strokeWidth: 3, fill: 'none', strokeLinecap: 'round' }),
+        head(120, 116));
+    }
+    const desks = []; for (let r = 0; r < 2; r++) for (let q = 0; q < 3; q++) desks.push(h('rect', { key: 'd' + r + q, x: 108 + q * 64, y: 96 + r * 44, width: 46, height: 26, rx: 4, fill: '#e2dccd', stroke: '#c9c1ae', strokeWidth: 2 }));
+    const d = 'M70 60 L310 60 Q330 60 330 80 L330 180 Q330 200 310 200 L70 200 Q50 200 50 180 L50 80 Q50 60 70 60 Z';
+    const st = [[100, 60], [190, 60], [280, 60], [330, 110], [330, 160], [280, 200], [190, 200], [100, 200], [50, 160], [50, 110]];
+    return h('svg', { width: '100%', viewBox: '0 0 380 240', style: { display: 'block' } },
+      h('rect', { key: 'bd', x: 140, y: 20, width: 100, height: 14, rx: 3, fill: '#5d6b5a' }), desks,
+      h('path', { key: 'ln', d, stroke: c, strokeWidth: 6, fill: 'none', strokeDasharray: '1 11', strokeLinecap: 'round' }),
+      st.map(([x, y], i) => h('circle', { key: 's' + i, cx: x, cy: y, r: 8, fill: i < 3 ? c : paper, stroke: i < 3 ? paper : gray, strokeWidth: 3 })),
+      h('path', { key: 'cv', d: 'M232 53 L241 60 L232 67', stroke: c, strokeWidth: 3, fill: 'none', strokeLinecap: 'round' }),
+      head(146, 160));
+  }
+
+  renderVals() {
+    const Y = this.Y;
+    if (!Y) return {};
+    const P = this.pal(), h = React.createElement, s = this.state, M = Y.MIX_COLOR;
+    const mapMain = this.map([
+      { n: 4, rows: 1, xferRow: 0 },
+      { n: 5, rows: 2, xferRow: 1 },
+      { n: 6, rows: 6, frontier: true, ready: true, cur: { r: 5, j: 2 }, sel: true, hard: true },
+    ], { key: 'mm', top: 84, pad: 30 });
+    const crop = (corner) => this.map([{ n: 9, rows: 3, frontier: true, cur: { r: 2, j: 1 }, sel: true }], { key: 'c' + corner, corner, pad: 26 });
+    const xferStates = [
+      { name: '① 아직 안 열림', el: this.map([{ n: 7, rows: 1, frontier: true, cur: { r: 0, j: 2 }, sel: true }], { key: 'x1', pad: 24 }), note: '맨 앞 노선의 지금 줄 끝. 회색 점선 고리 r8 — 「여기가 열릴 수 있는 자리」만 알림. 조건을 아직 못 채움.' },
+      { name: '② 이번 줄에서 열림 예정', el: this.map([{ n: 7, rows: 1, frontier: true, ready: true, cur: { r: 0, j: 2 }, sel: true }], { key: 'x2', pad: 24 }), note: '조건을 채움. 줄 끝이 다음 노선 색 고리(r11, 굵기 4 + 속 점 4.5)로 바뀌어 2.2초마다 숨 쉬고 퍼짐, 지금 역 → 줄 끝 레일 위로 다음 노선 색 빛 조각(6/8 점선, 1.1초에 한 칸)이 흐른다.' },
+      { name: '③ 열림', el: this.map([{ n: 7, rows: 1, xferRow: 0 }, { n: 8, rows: 1, frontier: true, cur: { r: 0, j: 0 }, sel: true }], { key: 'x3', pad: 24 }), note: '이중 원(먹 테두리 3 + 다음 노선 색 속 점 6). 연결선이 다음 노선 색으로 이어진다.' },
+    ];
+    const mapOpenLine = h('div', { key: 'ol' + s.openKey }, this.map([{ n: 7, rows: 1, xferRow: 0, popXfer: true }, { n: 8, rows: 1, frontier: true, cur: { r: 0, j: 0 }, sel: true, fresh: true }], { key: 'ol', pad: 24 }));
+    const mapPush = this.map([
+      { n: 5, rows: s.pushed ? 3 : 2, xferRow: 0 },
+      { n: 6, rows: 1, frontier: true, cur: { r: 0, j: 2 }, sel: true },
+    ], { key: 'mpu', pad: 30, pushAfter: 0, animatePush: s.pushed && s.pushKey > 0, pushKey: s.pushKey, newRow: s.pushed ? [0, 2] : null });
+    const sheets = [
+      { label: '판 5×7 — 칸 40', num: '12', line: 6, color: this.col(6), board: this.miniBoard(5, 7, 11), tries: 3, help: true },
+      { label: '판 7×11 — 칸 30 (가장 큰 판)', num: '27', line: 6, color: this.col(6), board: this.miniBoard(7, 11, 29), tries: 1, help: false },
+    ];
+    const mapProgress = this.map([{ n: 27, rows: 1, xferRow: 0 }, { n: 28, rows: 2, frontier: true, cur: { r: 1, j: 1 }, sel: true }], { key: 'mp', mixTeaser: true, vbTop: 50 });
+    const mapLoop = this.map([{ n: 27, rows: 1, xferRow: 0 }, { n: 28, rows: 1, xferRow: 0, toMix: true }], { key: 'ml', loop: { sel: true, cur: s.loopCur, curNum: 14 + s.loopCur }, trainAt: true, vbTop: 50 });
+    const mapOpen = h('div', { key: 'op' + s.replayKey }, this.map([{ n: 27, rows: 1, xferRow: 0 }, { n: 28, rows: 1, xferRow: 0, toMix: true }], { key: 'mo', loop: { sel: true, fresh: true, first: true, cur: 0, curNum: 1 }, vbTop: 50 }));
+    const headEl = (dark) => {
+      const c = dark ? M.dark : M.light, fgc = dark ? '#14161c' : '#ffffff';
+      return [h('svg', { key: 'big', width: 84, height: 60, viewBox: '0 0 84 60' }, h('rect', { x: 0, y: 0, width: 84, height: 60, rx: 16, fill: c }), h('g', { transform: 'translate(12 0)' }, Y.mixMark({ size: 60, fg: fgc }))),
+        h('svg', { key: 'chip', width: 42, height: 30, viewBox: '0 0 42 30' }, h('rect', { x: 0, y: 0, width: 42, height: 30, rx: 8, fill: c }), h('g', { transform: 'translate(6 0)' }, Y.mixMark({ size: 30, fg: fgc }))),
+        h('svg', { key: 'small', width: 26, height: 22, viewBox: '0 0 26 22' }, h('rect', { x: 0, y: 0, width: 26, height: 22, rx: 6, fill: c }), h('g', { transform: 'translate(2 0)' }, Y.mixMark({ size: 22, fg: fgc, lod: 's' }))),
+        h('div', { key: 'ic' }, Y.MIX.icon(64)), h('div', { key: 'ics' }, Y.MIX.icon(34, 's'))];
+    };
+    return {
+      paper: P.paper, ink: P.ink,
+      mapMain, hardStrip: this.hardRow(false), hardStripDark: this.hardRow(true),
+      signs: [{ el: this.sign(6, '30', true) }, { el: this.sign(22, '08', true) }],
+      cornerOpts: [
+        { id: 'A1', name: '직각 모서리 · 번호 바깥 옆 (지금 앱)', el: crop('square'), note: '꺾이는 역 번호가 레일 바깥 옆이라 위아래로 꺾이는 레일 바로 옆에 붙는다. 직각은 칸이 나뉜 표처럼 보여 한 선으로 덜 읽힌다.' },
+        { id: 'A2', name: '둥근 모서리 r18 · 번호 안쪽 위 (추천)', el: crop('round'), note: '모서리 반지름 18. 줄 첫 역(위에서 꺾여 들어오는 역)의 번호를 안쪽 위(역에서 14 안쪽, 18 위)로. 가운데 역은 바로 위. 줄 끝 칸(환승 자리)은 번호 없음.' },
+      ],
+      xferStates, mapOpenLine, replayOpen: () => this.setState(st => ({ openKey: st.openKey + 1 })),
+      mapPush, pushLabel: s.pushed ? '5호선 3줄 — 6호선이 한 줄 밀림' : '5호선 2줄', pushBtn: s.pushed ? '되돌리기' : '5호선 한 줄 더',
+      togglePush: () => this.setState(st => ({ pushed: !st.pushed, pushKey: st.pushKey + 1 })),
+      sheets,
+      mapProgress, mapLoop, mapOpen, replay: () => this.setState(st => ({ replayKey: st.replayKey + 1 })),
+      heads: [
+        { label: '라이트 · 칩 크게 / 노선도 / 작은 칸 · 아이콘 / 작은 칸', bg: '#f3efe6', ink: '#1d1f27', hex: M.light + ' · 흰 기호', el: headEl(false), note: '단계 E 라이트 oklch(0.30, 0.14, 235)' },
+        { label: '다크 · 같은 순서', bg: '#1b1f28', ink: '#e9e6dd', hex: M.dark + ' · #14161C 기호', el: headEl(true), note: '단계 E 다크 oklch(0.86, 0.10, 235)' },
+      ],
+      swatches: Y.LINE_COLORS.map(c => ({ c: c.light, o: 'none' })).concat([{ c: M.light, o: '2px solid #ffcf5a' }]),
+      sketches: [
+        { name: '버스 — 회차 노선', el: this.sketch('bus'), note: '가는 차선과 오는 차선이 양 끝에서 둥글게 돌아 닫힌다. 정류장 = 둥근 사각, 레일 = 도로 위 점선.' },
+        { name: '교실·도서관 — 둘레 길', el: this.sketch('room'), note: '책상 줄 둘레를 한 바퀴 도는 발자국 점선. 칠판 쪽이 위. 끝 표시가 없어 계속 도는 길로 읽힌다.' },
+      ],
+      motion: [
+        { k: '② 열림 예정', v: '줄 끝 고리 숨쉬기(scale 1 ↔ 1.12) + 퍼짐(ping), 레일 위 빛 조각이 줄 끝 쪽으로 흐름.', t: '2.2s / 1.1s 반복' },
+        { k: '줄 끝 환승 개통', v: '5번째 역 깸 → 줄 끝 톡(③) → 연결선(400) → 새 노선 레일(500) → 역 차례로 톡(40 간격) · 머리 → 열차.', t: '약 1.5s' },
+        { k: '노선 밀림', v: '아래 노선 전부 한 줄(88)만큼 미끄러져 내려감. 새 줄 역은 차례로 톡. 연결선은 위·아래 조각이 겹쳐 끊기지 않음.', t: '300ms' },
+        { k: '미리 보기 카드', v: '아래에서 올라옴(translateY 100% → 0). 닫을 때 반대.', t: '380ms' },
+        { k: '섞기 장 열차', v: '기존 열차 흔들림 + 트랙을 따라 다음 역으로(곡선 위를 따라감). ease-out cubic.', t: '350ms' },
+        { k: '섞기 장 개통', v: '연결선(0–400) → 고리 한 바퀴(400–1100) → 역 톡(1000–1400) → 머리·화살촉·띠(1150–1500) → 열차.', t: '약 1.5s' },
+        { k: '움직임 줄이기', v: '모두 바로 최종 모습. 빛 조각·숨쉬기 멈춤(② 고리는 다음 노선 색 그대로라 정지 화면에서도 읽힘).', t: '—' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
