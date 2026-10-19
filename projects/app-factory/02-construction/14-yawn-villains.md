@@ -1,8 +1,8 @@
 ---
 phase: 02-construction
 stage: 14-yawn-villains
-status: IN_PROGRESS
-updated: 2026-10-18
+status: AI_PROPOSED
+updated: 2026-10-19
 ---
 
 # [Stage 2-14] 밈 차용 — 「지하철 빌런」을 승객 기믹으로
@@ -107,7 +107,7 @@ AI 권고: **A로 기믹을 먼저 검증**(엔진·생성기·플레이), 반�
 
 1. ~~프로토타입 엔진·생성기~~ (끝, §4.6)
 2. 디자인 요청서 v4 READY([`yawn-relay/design-brief-v4-2026-10-18.md`](yawn-relay/design-brief-v4-2026-10-18.md), Q4 일반 인물) → Claude Design. 오너 플레이 검토(프로토타입 「생성 22~28호선」)
-3. 2-12 Build Spec에 빌런 노선 포함 여부 결정
+3. ~~2-12 Build Spec에 빌런 노선 포함 여부 결정~~ — 포함(출시 노선 28개, 2-12 Q1). 엔진·생성기·렌더러·판 화면·노선도까지 2-12 U1~U13에서 구현·검증 끝(빌런 규칙 16개 JS·Dart 통과, 빌런 화면 흐름 테스트 4개). 이 단계는 2-12와 함께 닫기를 제안한다 (2026-10-19)
 
 ## 검토 게이트 (Human Gate)
 
