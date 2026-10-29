@@ -476,7 +476,7 @@ updated: 2026-10-26
 - [x] 장치 판 B 오너 확인 → 동굴·성·보스 장치 판 15장 (2026-10-28)
 - [x] 성 장치 판 행진 층 다시 짜기(층 86 · 성벽 줄 · 감시탑 사슬) (2026-10-29)
 - [ ] 오너 플레이 — 장치 판 15장·난이도
-- [ ] 적 체계 재설계(다키스트 던전식 진형) — 설계안 v2 [`enemy-formation-2026-10-29.md`](ball-roguelite/enemy-formation-2026-10-29.md)(적 동사 24 · 대응 26 · 적 42종) + 구슬·유물 재검토 [`orb-relic-review-2026-10-29.md`](ball-roguelite/orb-relic-review-2026-10-29.md) → 오너 승인 → 얇은 조각
+- [ ] 적 체계 재설계(다키스트 던전식 진형) — 설계안 v2 [`enemy-formation-2026-10-29.md`](ball-roguelite/enemy-formation-2026-10-29.md)(적 동사 24 · 대응 26 · 적 44종) + 구슬·유물 재검토 [`orb-relic-review-2026-10-29.md`](ball-roguelite/orb-relic-review-2026-10-29.md) → 오너 승인 → 얇은 조각
 - [ ] Build Spec (Flutter, 물리·런 저장·시뮬레이션 봇)
 
 ## 다음 단계
