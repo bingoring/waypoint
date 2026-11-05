@@ -32,7 +32,7 @@
 |---|---|---|---|
 | **P1** | **런 구조**(이 문서) | 3지역 × 7마디(21마디 · 18전투), 갈림길·쉼터, 섞인 보상, 엘리트 유물, 보스 구슬 + 유물, 봇이 끝까지 돎 | §5-1 |
 | **P1b** | **고르는 머리 바탕** | 구슬 순서 고르기(한 바퀴 안에서 남은 칸 중 고름 · 화면 버튼 · 봇은 지금의 섞인 순서를 기본으로) · 「아끼는 구슬」 유물 · 페그 늘리기(장치 판 페그 약 60 → 100~120, 작은 크기를 진형 기본으로) + 적 체력·한 발 시간 다시 맞춤 · 단지 복사본 힘 나누기 실험 설정(기본 꺼짐) | §5-2 가 · 다 · 라 |
-| P2 | 계열 틀 | 계열 17 표 · 아이템마다 계열 · 개수 세기 · 단계 2/4/6 갈고리 · 보상 끌림 1.5/2.5배 · 열쇠 없는 보상 막기 · 갈림길 「계열 문」 · 계열 봇(`PICK=family`) · 화면에 계열 단계 · 이전 태그/변신은 v1에만 | §2 · §7 |
+| **P2** | **계열 틀**(2026-11-05 계획) | 계열 17 표 · 아이템마다 계열 · 개수 세기 · 단계 2/4/6 갈고리 · 계열 고르게 뽑기 · 보상 끌림 1.5/2.5배 · 열쇠 없는 보상 막기 · 갈림길 「계열 문」 · 계열 봇(`PICK=family`) · 화면에 계열 단계 · 이전 태그/변신은 v1에만 | §2 · §3-1 · §7 |
 | P3 | 판을 바꾸는 계열 | 기계 · 화상 · 얼음 · 페그 밭(씨뿌리개 구슬) | §3 |
 | P4 | 상태이상 · 공격 모양 | 독 · 출혈 · 레이저(착지 가로 레이저) · 폭탄 · 거대·무게 | §3 |
 | P5 | 구슬 수 · 표적 | 물량 · 다시 발동 · 크리 · 처형·사냥 · 보물 | §3 |
@@ -197,5 +197,149 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
 - [x] 브라우저 375px: 구슬 버튼 · 아끼는 구슬 창 · 촘촘한 판 모양, 콘솔 오류 없음
 - [x] 기록 `15-ball-roguelite.md` §30 · 체크리스트 · STATUS → waypoint 커밋·푸시 → 서브모듈 포인터 → 브랜치 푸시 · PR(#17 위)
 
+## P2. 계열 틀 (2026-11-05)
+
+**Goal:** 진형에서 아이템마다 계열이 붙고, 개수·단계(2/4/6)를 세며, 보상이 계열 고르게 뽑기 · 보상 끌림 · 열쇠 규칙을 따른다. 갈림길에 계열 문이, 봇에 계열 몰기가 생긴다. 계열 효과(단계마다 하는 일)는 P3~P6이 `famStage()`에 걸어 넣는다.
+
+**Spec:** [`build-families-2026-11-03.md`](build-families-2026-11-03.md) §2(세는 방식 · 보상 끌림 · 계열 고르게 뽑기) · §3(계열마다 「열쇠」 줄) · §3-1(아이템 배치 — 오너 확정 2026-11-05 「46개 그대로」) · §5-1(갈림길 문) · §6(계열 봇) · §7 3·4·8·9. 브랜치 `ball-roguelite/families`(`ball-roguelite/choose` 위, PR 기준도 그 브랜치).
+
+**범위:** 지금 있는 구슬 40 · 유물 76만 계열에 넣는다. 새 아이템 46은 P3~P6에서 각 계열 효과와 함께 넣는다. 그래서 P2가 끝나도 계열 크기는 §3-1 「있는 구슬 · 있는 유물」 열 그대로다(보물 1 · 출혈 2 …). 6단계에 닿는 계열은 아직 일부뿐이다.
+
+**계획에서 정한 것(설계서가 비워 둔 자리 — 구현자 판단, §32에 적는다):**
+1. **계열 키**(코드 안 이름, 화면은 한국어): `mech` 기계 · `fire` 화상 · `ice` 얼음 · `field` 페그 밭 · `poison` 독 · `bleed` 출혈 · `laser` 레이저 · `bomb` 폭탄 · `mass` 거대·무게 · `swarm` 물량 · `resound` 메아리 · `crit` 크리 · `hunt` 처형·사냥 · `loot` 보물 · `summon` 소환 · `guard` 수호 · `blood` 피의 대가. 공용은 `common`(아이템에 `fam`이 없음). `ORBS`·`RELICS` 키와 겹치지 않게 골랐다(`echo`·`heavy`·`weight`는 이미 구슬·유물 키).
+2. **열쇠·보상:** 구슬은 모두 열쇠(§7 8). 유물은 §3 계열마다 「열쇠」 줄에 이름이 있는 것만 열쇠, 나머지는 보상. 두 계열에 걸친 유물은 한 계열에서라도 열쇠면 열쇠다(벌집: 소환 열쇠 → 독에서도 열쇠).
+3. **선택의 두루마리는 임시 열쇠.** 보물에는 P5 전까지 다른 아이템이 없다. 보상으로 두면 진형에서 영영 나오지 않으므로, P5에서 행운의 금박이 들어올 때 보상으로 바꾼다.
+4. **세기는 늘 지금 가진 것으로.** 쉼터 버리기 · 합성으로 열쇠가 빠지면 개수·단계가 내려가고, 그 계열의 보상 유물이 다시 막힌다. 이미 가진 보상 유물은 계속 듣는다. 융합 구슬(레시피 없는 합성)은 두 재료의 계열을 모두 받는다(같은 계열이면 1).
+5. **고르게 뽑기는 새 구슬 카드와 유물 카드에만.** 가진 구슬의 강화 · 복제 카드는 지금 그대로 섞는다(계열을 고르는 카드가 아니라서).
+6. **계열 문:** 갈림길 문 후보가 「구슬 · 유물 · 강화」에서 「구슬 · 유물 · 강화 · 계열」로 넷이 된다(그중 둘 + 30% 엘리트, 지금과 같음). 계열 문의 계열 = 가진 개수가 가장 많은 계열(같으면 `FAM` 순서) 중 보상에 나올 카드가 3장 이상인 것. 그런 계열이 없으면 「보상 카드 3장 이상」인 계열 가운데 무작위. 그것도 없으면 계열 문을 후보에서 뺀다. 빈 문은 생기지 않는다.
+7. **계열 봇:** 몰 계열 = `fam` 인자(`FAM` 환경 변수) → 없으면 첫 보상에서 공용이 아닌 첫 카드의 첫 계열. 고르는 순서는 그 계열 구슬의 복제·강화 → 그 계열 새 구슬 → 그 계열 유물 → 아무 강화 → 공용 유물 → 첫 카드. 갈림길은 그 계열 문 → (주력 구슬이 있으면) 강화 문 → 구슬 문 → 첫 문.
+
+**Review Focus(P2):**
+- **이전 규칙(v1)이 쓰는 함수** — `relicCands` · `rewardCards` · `checkTrans` · `cardHtml`은 v1도 쓴다. 계열 거르기 · 고르게 뽑기를 여기 넣으면 v1 지문 `fdf868b7…`이 깨진다. 진형 경로(`rewardCardsR`)에만 넣고, v1 결과가 같은지 시험으로 고정한다. (Task 2 · 3 시험, Task 5 지문)
+- **후보가 모자랄 때** — 유물을 거의 다 가졌거나 열쇠 없는 보상이 다 빠져서, 뽑을 수 있는 카드가 3장보다 적거나 0장이어도 뽑기가 멈추지 않고 있는 만큼만 낸다. (Task 2 시험)
+- **열쇠를 잃을 때** — 쉼터에서 계열의 하나뿐인 구슬을 버리면 단계가 내려가고, 그 계열 보상 유물이 더미에서 빠지되 이미 가진 것은 남는다. (Task 1 · 2 시험)
+- **갈림길 문을 부르는 두 곳**(`UI.fork` · 봇 `UI.fork`) — 같은 시드 · 같은 가방이면 같은 문(계열까지 같음). 계열 문 보상은 늘 3장. (Task 4 시험)
+- **375px 화면** — 카드의 계열 표시(계열 둘 + 열쇠/보상)와 HUD 계열 줄이 판과 버튼을 가리지 않는다. (Task 3 브라우저 확인)
+
+### Task 1: 계열 자료 · 세기 · 단계
+**Files:** `index.html`(`ORBS` 143~187줄 · `RELICS` 235~328줄 · `TAGS` 옆 330줄 · `applyCard` · `doSynth` · `restPick`) · 새 시험 `lab/family.js`(`lab/choose.js`와 같은 `check()` 형식)
+**Interfaces (Produces):**
+- `FAM`: `{ mech: '기계', fire: '화상', …, blood: '피의 대가' }`(위 「정한 것 1」 순서 그대로 17개)
+- 아이템 자료: 계열이 있는 `ORBS[k].fam: string[]` · `RELICS[k].fam: string[]` · 열쇠 유물 `RELICS[k].key: true`. `tags`는 그대로 둔다(v1과 구슬 능력 `orbRole`이 씀).
+- `famsOf(o): string[]` — 구슬 객체(융합은 재료 합집합) · 유물 키 문자열 모두 받음. 공용이면 `[]`
+- `famCount(f): number` — 가진 구슬 **종류**(`kindKey` 기준, 조약돌 제외) 중 f가 붙은 것 + 가진 유물 중 f가 붙은 것
+- `famStage(f): 0 | 2 | 4 | 6` · `famKeyed(f): boolean`(f가 붙은 구슬이 가방에 있거나 f가 붙은 열쇠 유물이 있음) · `isPayoff(k): boolean`(유물이고 `key`가 없고 `fam`이 있음)
+- `famCheck()`: 진형에서만, 단계가 오른 계열마다 `FX.texts`에 「{계열} {단계}단계」(봇이면 생략). `RUN.famSeen = { [f]: 최고 단계 }`로 오름만 알림. `applyCard` · `doSynth` 끝의 `checkTrans()` 옆에서 부른다.
+
+**자료(§3-1 「있는」 열 + §3 「열쇠」 줄 — 이대로 넣는다):**
+| 계열 | 구슬 | 열쇠 유물 | 보상 유물 |
+|---|---|---|---|
+| mech | bolt, storm | rubber, drill, drumstick, cement | wandergate, gatekey, wideframe, doubledoor, secretmap, gatebell, goggles |
+| fire | ember, cauldron, volcano | — | tinder, brazier, firewick |
+| ice | frost, storm | icebell | bindchain |
+| field | seed, ghost, moss, bell, garden, redring | — | rain, rebirth, hourglass, dance, clover, crystalseed |
+| poison | sting, brew, cauldron | sporepouch, hive | — |
+| bleed | briar, rose | — | — |
+| laser | prism, redring | — | hunter |
+| bomb | sticky, hammer, volcano | arsenal, powder, fuse | — |
+| mass | heavy, giant, twins | weight | lead, bedrock, pierce, glove |
+| swarm | twin, egg, cricket, frogking, echo, twins | dandelion, starsplit | dew, arrow, swarmflag, voidmaw, revolving |
+| resound | boomer, swirl, echo | — | memory |
+| crit | dagger, rose | whet, gardener | gambler, marksman, midas, goldhinge |
+| hunt | scythe, chainweight, rift | horn, crookhook | axe, vinewrap |
+| loot | — | scroll(임시) | — |
+| summon | hornet | flies, hive | — |
+| guard | holywater, catclaw, yarn | halo, mantle, holyflask | shell, spring, catbell, herb |
+| blood | — | laststand, crown | leash, ninecat, fist |
+
+공용(`fam` 없음): 구슬 stone · bouncy · firefly, 유물 spyglass · starmap · favorite · pioneer · soy · mushroom · antidote · lantern · cateye · fullpod · podfield.
+
+- [ ] 시험 `lab/family.js`:
+  - 계열마다 붙은 아이템 수 = 위 표: `{ mech: 13, fire: 6, ice: 4, field: 12, poison: 5, bleed: 2, laser: 3, bomb: 6, mass: 8, swarm: 13, resound: 4, crit: 8, hunt: 7, loot: 1, summon: 3, guard: 10, blood: 5 }`
+  - 공용이 위 목록과 정확히 같다(`fam` 없는 구슬 3 · 유물 11, 이름으로 비교) · `FAM` 키가 `ORBS`·`RELICS` 키와 겹치지 않는다 · `fam`의 값은 모두 `FAM`에 있다
+  - 가방 `[bolt, bolt, stone, stone]` + 유물 rubber → `famCount('mech') === 2`(복제는 세지 않음), `famStage('mech') === 2`
+  - 가방에 storm 하나 → mech · ice 둘 다 1 · 융합 구슬 `{ kind: 'fusion', parts: ['ember', 'sting'] }` → fire · poison 각 1, `{ parts: ['ember', 'volcano'] }` → fire 1
+  - 4 · 6 경계: mech 아이템 3개 → 2단계, 4개 → 4단계, 5개 → 4단계, 6개 → 6단계
+  - 계열의 하나뿐인 구슬을 `restPick('drop', i)`로 버리면 `famCount`가 1 줄고 `famKeyed`가 거짓이 된다(ember 하나 + brazier: 버리기 전 fire 2 · 열쇠 있음 → 뒤 1 · 열쇠 없음, brazier는 `RUN.relics`에 남음)
+  - `famCheck`: 진형에서 mech를 1 → 2로 올리는 `applyCard` 뒤 `FX.texts`에 「기계 2단계」, 같은 단계로 다시 오르면(버렸다 다시 얻음) 알리지 않음, v1에서는 아무것도 안 함
+- [ ] 실패 확인: `node lab/family.js` / Expected: `FAM is not defined`류로 실패
+- [ ] 구현 → `node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js` 모두 통과
+- [ ] 커밋 `prototype(ball-roguelite): 계열 틀 1 — 계열 17 자료 · 세기 · 단계(2/4/6)`
+
+### Task 2: 보상 — 계열 고르게 뽑기 · 보상 끌림 · 열쇠 없는 보상 막기
+**Files:** `index.html`(`relicCands` 옆 · `rewardCardsR` 2788줄) · `lab/family.js`
+**Interfaces:**
+- Consumes: `famsOf` · `famCount` · `famKeyed` · `isPayoff`
+- Produces:
+  - `FAM_PULL = [[4, 2.5], [2, 1.5]]` · `famPull(f): number`(`common`은 1)
+  - `famWeights(cands: { fams: string[] }[]): number[]` — 아래 식
+  - `famPick(cands, r, n): cand[]` — 무게대로 하나 뽑고 빼고 무게를 다시 계산하기를 n번(후보가 바닥나면 거기까지)
+  - `relicCandsR(): string[]` = `relicCands()`에서 `isPayoff(k) && !famsOf(k).some(famKeyed)`인 것을 뺀 것(진형 전용, `relicCands`는 손대지 않음)
+  - `rewardCardsR(r, kind, fam?)` — 새 구슬 카드는 `famPick(fresh, r, 3)`, 유물 카드는 `famPick(relicCandsR(), r, 4)`로 순서를 정한다. 그 밖(구슬 40% · 유물 60% 칸 고르기, 강화·복제 카드, `relic`·`orb`·`up` 종류)은 지금 그대로
+
+무게 식(§2): 후보 i의 계열 목록 `F_i`(빈 배열이면 `['common']`), 계열 f에 걸친 지금 후보 수 `n_f`라 하면
+`w_i = Σ_{f ∈ F_i} famPull(f) / (|F_i| × n_f)`
+
+- [ ] 시험(`lab/family.js`에 덧붙임):
+  - `famWeights` 고정값: 가진 것 없이 `[mech, mech, fire]` → `[0.5, 0.5, 1]` · `[fire, fire+poison]` → `[0.5, 0.75]` · 공용 하나 → `[1]` · mech 개수 2일 때 `[mech, mech, fire]` → `[0.75, 0.75, 1]` · 4일 때 `[1.25, 1.25, 1]`
+  - 결정성: 같은 시드 `rng`로 `rewardCardsR` 두 번 → 같은 카드
+  - 끌림 빈도: 가방 `[bolt, ember, stone, stone]` + 유물 rubber(mech 2 · fire 1, 둘 다 열쇠 있음)로 `rewardCardsR(rng(s), 'relic')`을 시드 1~2000 → **첫 카드만** 세어 (mech 유물 횟수) ÷ (fire 유물 횟수) = 1.5 ± 0.25(계열 무게 1.5 대 1)
+  - 열쇠 없는 보상 막기: 가방이 조약돌뿐이면 `relicCandsR()`에 tinder·brazier·firewick(fire 보상)이 없다 · ember를 넣으면 셋 다 있다 · scroll은 아무것도 없어도 있다 · 진형에서 ember를 버리면 다시 빠진다
+  - v1은 그대로: `S.foe = 'v1'`에서 `relicCands()`에 tinder가 있다(이 함수는 계열을 보지 않음)
+  - 모자랄 때: 유물을 다 가진 런(`RUN.relics`에 `relicCandsR()` 전부)에서 `rewardCardsR(r, 'relic')`이 `[]`, `'mixed'`가 구슬 쪽만으로 3장 이하 · `famPick([], r, 3)`이 `[]`
+- [ ] 실패 확인 → 구현 → `node lab/family.js && node lab/route.js && node lab/choose.js && node lab/formation.js` 통과(`route.js`가 특정 카드를 고정해 두었다면 기대값을 새 뽑기에 맞춰 고치고 커밋 메시지에 적는다)
+- [ ] 커밋 `prototype(ball-roguelite): 계열 틀 2 — 보상을 계열 고르게 뽑기 · 끌림 1.5/2.5배 · 열쇠 없는 보상 막기`
+
+### Task 3: 이전 태그 · 변신은 v1에만 + 화면에 계열
+**Files:** `index.html`(`trans` · `checkTrans` 344~357줄 · `cardHtml` 2827줄 · 승리 화면 `tagLine` 2886줄 · 런 끝 2921줄 · HUD `#area`) · `lab/family.js`
+**Interfaces:**
+- Consumes: `FAM` · `famsOf` · `famCount` · `famStage` · `isPayoff`
+- Produces: `famLine(max = 3): string` — 개수 1 이상인 계열을 많은 순(같으면 `FAM` 순)으로 `max`개, `기계 4·4단계 · 화상 1` 꼴(단계 0이면 개수만)
+- 진형이면 `checkTrans()`가 아무것도 하지 않고 `trans(t)`가 늘 거짓. v1은 한 글자도 바꾸지 않는다. 변신이 진형에서 하던 일(`TRANS_R`)은 P3~P6에서 계열 단계로 옮긴다(§7 4). 구슬의 `tags`로 정하는 능력(칼날 처형 · 벌집의 벌레 구슬 등)은 그대로 둔다.
+
+- [ ] 시험:
+  - 진형: `tags`에 `'blade'`가 있는 구슬·유물 3개를 가진 뒤 `checkTrans()` → `RUN.trans`가 비어 있고 `trans('blade') === false` · v1에서 같은 일 → `trans('blade') === true`
+  - `cardHtml`: 진형 유물 카드 tinder에 「화상 보상」, rubber에 「기계 열쇠」, storm 구슬 카드에 「기계·얼음」, 공용 카드에는 계열 글이 없고, 진형 카드에 `[칼날` 같은 태그 글이 없다. v1 카드는 지금과 같은 문자열(태그 글 있음)
+  - `famLine()`: mech 4 · fire 1 · crit 2 → `'기계 4·4단계 · 크리 2·2단계 · 화상 1'`
+- [ ] 구현: 진형이면 카드의 태그 글 자리에 계열(+ 유물이면 「열쇠」·「보상」), 승리 화면 「변신:」 줄 자리에 「계열: {famLine(17)}」, 런 끝 요약에 「계열:」 줄, HUD `#area`에 `famLine(3)`(진형 · 조준 중, P1b 구슬 버튼 위 한 줄)
+- [ ] 통과: `node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js`
+- [ ] 브라우저: `preview_start ball-prototype` → 진형 새 런 → 보상 카드 · 승리 화면 · HUD 계열 줄이 보이고, 375px에서 카드 글이 넘치지 않으며 HUD가 판을 가리지 않음, 콘솔 오류 없음
+- [ ] 커밋 `prototype(ball-roguelite): 계열 틀 3 — 태그·변신은 이전 규칙에만 · 카드 · 승리 화면 · HUD에 계열 단계`
+
+### Task 4: 갈림길 「계열 문」
+**Files:** `index.html`(`forkDoors` 473줄 · `DOOR_NAME` 474줄 · `UI.fork` 2890줄 · `winFight` 2853~2856줄) · `lab/family.js`
+**Interfaces:**
+- Consumes: `famCount` · `famPick` · `relicCandsR` · `rewardCardsR`
+- Produces:
+  - `famDoorFam(r): string | null` — 「정한 것 6」 규칙. 「보상에 나올 카드」 = 그 계열이 붙은 새 구슬(가방에 없는 기본 구슬) + `relicCandsR()` 중 그 계열
+  - `forkDoors(r)` → 문 객체 배열, 계열 문은 `{ reward: 'family', fam }`
+  - `doorName(d): [string, string]` — 계열 문이면 `[FAM[d.fam], `${FAM[d.fam]} 카드 3장 중 하나`]`, 아니면 `DOOR_NAME[d.reward]`
+  - `rewardCardsR(r, 'family', fam)` → 그 계열 후보에서 `famPick` 3장(새 구슬 + 유물을 한 후보 목록으로)
+  - `winFight`가 `d?.fam`을 `rewardCardsR`에 넘긴다
+- [ ] 시험:
+  - 같은 시드 · 같은 가방이면 `forkDoors` 두 번이 같은 문(계열까지)
+  - 가방에 bolt · rubber · drill(mech 3), ember(fire 1) → 계열 문이 나오면 그 계열은 `mech`
+  - mech 아이템을 다 가져 mech 후보가 3장 미만이면 계열 문은 다른 계열(후보 3장 이상)
+  - 모든 계열의 후보가 3장 미만인 런(가진 것을 크게 늘린 시험 상태)에서는 계열 문이 없고 문은 늘 2개 이상
+  - `rewardCardsR(r, 'family', 'mech')` → 3장, 모두 `famsOf`에 `mech`가 있음
+  - 시드 1~200에서 계열 문이 한 번 이상 나온다(문 후보 넷 중 둘)
+- [ ] 구현 → `node lab/family.js && node lab/route.js` 통과
+- [ ] 브라우저: 시험용 「숲 갈림길부터」 → 계열 문 카드 글 · 고른 뒤 그 계열 보상 3장, 375px
+- [ ] 커밋 `prototype(ball-roguelite): 계열 틀 4 — 갈림길 계열 문(가장 많이 가진 계열의 카드 3장)`
+
+### Task 5: 계열 봇 · 측정 · 기록
+**Files:** `index.html`(`botRun` 3348줄) · `lab/foebot.js` · `lab/family.js` · waypoint `15-ball-roguelite.md` · `STATUS.md`
+**Interfaces:**
+- Consumes: Task 1~4 전부
+- Produces: `botRun(seed, { …, pick: 'family', fam: string | null })` — 「정한 것 7」 규칙, 결과에 `fam`(몬 계열) · `fams`(끝났을 때 `famCount` 1 이상인 계열, `mech:5,fire:1` 꼴) 추가. `lab/foebot.js`는 `PICK=family`와 `FAM=<계열 키>`를 받는다.
+- [ ] 시험: `botRun(s, { opts: { foe: 'rank' }, pick: 'family', fam: 'mech' })` 시드 1~3 → 예외 없이 끝남 · `pf`가 21마디 · 결과 `fams`에서 mech가 가장 크다 · `fam` 없이 → `fam`이 `FAM` 키 하나로 정해짐
+- [ ] 회귀:
+  - `node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js` → `모두 통과`
+  - v1 지문: 스냅샷을 `_curN.html`로 링크하고 `FILE=_curN.html FOE=v1 PICK=mixed` 40런(scratchpad `batch.sh`) → `fp` = `fdf868b7bc18e2e04d7e176a25b21310e2286ac3`, 21승
+  - `selfTest()` 이전 스냅샷 대 지금 → BAD 없음(`same` · `angleDiffers`)
+- [ ] 측정(기록만 — 균형은 P8): 진형 40런 × `PICK=mixed` · `focus` · `family`(계열 자동). 승수 · 진 곳 · 끝났을 때 가장 큰 계열의 단계 분포(0/2/4/6). 그리고 `PICK=family FAM=<17개 각각>` 4런씩 → 계열마다 닿은 최고 단계. 지금 아이템이 6개 미만인 계열(ice 4 · bleed 2 · laser 3 · resound 4 · loot 1 · summon 3 · poison 5 · blood 5)은 6단계에 못 닿는 것이 맞다(P3~P6에서 채움)
+- [ ] 기록: `15-ball-roguelite.md` §32(계열 틀: 「정한 것」 1~7 · 자료 표 요약 · 고르게 뽑기 식 · 계열 문 · 봇 숫자 · 변신이 진형에서 빠져 생긴 차이), 체크리스트, STATUS → waypoint 커밋·푸시 → 앱 저장소 서브모듈 포인터
+- [ ] 커밋 · PR: `git commit -am "prototype(ball-roguelite): 계열 틀 5 — 계열 봇(PICK=family · FAM) · 측정"` → `ball-roguelite/families` 푸시 → PR(기준 `ball-roguelite/choose`, 본문에 트레일러·AI 서명 없음). 병합 순서는 #16 → #17 → #18 → 이 PR
+
 ## 다음 계획
-P1이 끝나면 P1b(고르는 머리 바탕) 계획을, 그다음 P2(계열 틀) 계획을 같은 형식으로 쓴다. P2 계획을 쓰기 전에 지금 구슬 41종·유물 75종 안팎을 계열 17에 나누는 표(계열마다 열쇠 3~4 · 보상 2~3, 모자란 계열의 새 아이템 목록)를 먼저 만들어 오너에게 보여 준다 — 콘텐츠 범위가 정해지는 자리라서.
+P2가 끝나면 P3(판을 바꾸는 계열: 기계 · 화상 · 얼음 · 페그 밭 + 새 아이템 8) 계획을 같은 형식으로 쓴다. P3부터는 계열마다 §3 단계 효과를 `famStage(f)`에 걸고, §3-1 표의 새 아이템을 그 덩어리에서 넣는다. 적 체력은 P3 뒤에 「무작위 덱 4~6발 · 계열 덱 2~3발」을 기준으로 맞춘다(§31).
