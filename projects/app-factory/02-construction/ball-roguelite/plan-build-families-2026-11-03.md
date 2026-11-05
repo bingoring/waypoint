@@ -283,7 +283,7 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
 - [ ] 시험(`lab/family.js`에 덧붙임):
   - `famWeights` 고정값: 가진 것 없이 `[mech, mech, fire]` → `[0.5, 0.5, 1]` · `[fire, fire+poison]` → `[0.5, 0.75]` · 공용 하나 → `[1]` · mech 개수 2일 때 `[mech, mech, fire]` → `[0.75, 0.75, 1]` · 4일 때 `[1.25, 1.25, 1]`
   - 결정성: 같은 시드 `rng`로 `rewardCardsR` 두 번 → 같은 카드
-  - 끌림 빈도: 가방 `[bolt, ember, stone, stone]` + 유물 rubber(mech 2 · fire 1, 둘 다 열쇠 있음)로 `rewardCardsR(rng(s), 'relic')`을 시드 1~2000 → **첫 카드만** 세어 (mech 유물 횟수) ÷ (fire 유물 횟수) = 1.5 ± 0.25(계열 무게 1.5 대 1)
+  - 끌림 빈도: 가방 `[bolt, ember, stone, stone]` + 유물 rubber(mech 2 · fire 1, 둘 다 열쇠 있음)로 `rewardCardsR(rng(s), 'relic')`을 시드 1~5000 → **첫 카드만** 세어 (mech 유물 횟수) ÷ (fire 유물 횟수) = 1.5 ± 0.25(계열 무게 1.5 대 1, 표준오차 약 0.1)
   - 열쇠 없는 보상 막기: 가방이 조약돌뿐이면 `relicCandsR()`에 tinder·brazier·firewick(fire 보상)이 없다 · ember를 넣으면 셋 다 있다 · scroll은 아무것도 없어도 있다 · 진형에서 ember를 버리면 다시 빠진다
   - v1은 그대로: `S.foe = 'v1'`에서 `relicCands()`에 tinder가 있다(이 함수는 계열을 보지 않음)
   - 모자랄 때: 유물을 다 가진 런(`RUN.relics`에 `relicCandsR()` 전부)에서 `rewardCardsR(r, 'relic')`이 `[]`, `'mixed'`가 구슬 쪽만으로 3장 이하 · `famPick([], r, 3)`이 `[]`
@@ -323,7 +323,7 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
   - 모든 계열의 후보가 3장 미만인 런(가진 것을 크게 늘린 시험 상태)에서는 계열 문이 없고 문은 늘 2개 이상
   - `rewardCardsR(r, 'family', 'mech')` → 3장, 모두 `famsOf`에 `mech`가 있음
   - 시드 1~200에서 계열 문이 한 번 이상 나온다(문 후보 넷 중 둘)
-- [ ] 구현 → `node lab/family.js && node lab/route.js` 통과
+- [ ] 구현 → `node lab/family.js && node lab/route.js` 통과(`route.js`가 문 종류를 `orb · relic · up · elite`로 고정해 두었다면 `family`를 더하고 커밋 메시지에 적는다)
 - [ ] 브라우저: 시험용 「숲 갈림길부터」 → 계열 문 카드 글 · 고른 뒤 그 계열 보상 3장, 375px
 - [ ] 커밋 `prototype(ball-roguelite): 계열 틀 4 — 갈림길 계열 문(가장 많이 가진 계열의 카드 3장)`
 
