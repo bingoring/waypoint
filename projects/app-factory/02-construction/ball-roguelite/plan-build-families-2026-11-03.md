@@ -386,83 +386,83 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
 - `setDaze(e, n): void` — `e.daze = n`(지금 세 곳과 같은 값), Task 3이 냉기를 더한다
 - `MECH_R` · `FIRE_R` · `ICE_R` · `FIELD_R`(「정한 것」의 값) · `FAM_STAGE = { mech: { 2: '설치 — …', 4: '전류 — …', 6: '장치 성장 — …' }, fire: …, ice: …, field: … }` · `famStageLines(): string[]`(2단계 이상, `FAM_STAGE`에 있는 계열만)
 - 새 페그 그리기: 얼음(`p.ice`, 하늘색 테) · 씨앗(`'seed'`, 작은 초록 점) · 열매(`p.fruit`, 금색 테)
-- [ ] 시험: `family.js` 개수 → `mech: 14, fire: 8, ice: 8, field: 13`(나머지 그대로) · 새 8개 모두 `rank: true` · 이전 규칙 `relicCands()`와 `rewardCards` 구슬 후보에 새 키가 없다 · `stages.js`: 각 장치를 맞히는 발에서 `devHit`가 그 `kind`로 불린다(시험용으로 감싸 셈) · 기절 세 곳이 `setDaze`를 거친다(값은 지금과 같음) · `famStageLines()`가 mech 4단계에서 「설치」 · 「전류」 두 줄 · 마른 발 하나 뒤 `B.pegs` 상태와 `RUN` 기록이 같다
-- [ ] 실패 확인 → 구현 → `node lab/stages.js && node lab/family.js && node lab/choose.js && node lab/formation.js` 통과
-- [ ] 커밋 `prototype(ball-roguelite): 판 계열 0 — 새 아이템 8 자료 · 장치 맞힘 · 기절 걸기 · 새 페그 · 단계 글`
+- [x] 시험: `family.js` 개수 → `mech: 14, fire: 8, ice: 8, field: 13`(나머지 그대로) · 새 8개 모두 `rank: true` · 이전 규칙 `relicCands()`와 `rewardCards` 구슬 후보에 새 키가 없다 · `stages.js`: 각 장치를 맞히는 발에서 `devHit`가 그 `kind`로 불린다(시험용으로 감싸 셈) · 기절 세 곳이 `setDaze`를 거친다(값은 지금과 같음) · `famStageLines()`가 mech 4단계에서 「설치」 · 「전류」 두 줄 · 마른 발 하나 뒤 `B.pegs` 상태와 `RUN` 기록이 같다
+- [x] 실패 확인 → 구현 → `node lab/stages.js && node lab/family.js && node lab/choose.js && node lab/formation.js` 통과
+- [x] 커밋 `prototype(ball-roguelite): 판 계열 0 — 새 아이템 8 자료 · 장치 맞힘 · 기절 걸기 · 새 페그 · 단계 글`
 
 ### Task 1: 기계 — 설치 · 전류 · 장치 성장 · 회로 · 태엽 구슬
 **Files:** `index.html`(`devHit` · `startFight` 599~621줄 · 포인터 3366~3368줄 · `newBoard` 다시 깔기 약 2540줄 · `multiply` 단지 배수 · 버섯 튕김 1997줄 · `botRun`) · `lab/stages.js`
 **Interfaces:**
 - Consumes: `devHit` 자리 · `MECH_R` · `famStage`
 - Produces: `RUN.devLv: { [kind]: number }`(없으면 1) · `devLv(kind): number` · `placeDevice(kind, x, y): boolean`(놓았으면 참) · `UI.place(next)`(설치 창) · `MODE === 'place'` · `B.placed: { kind, x, y } | null`
-- [ ] 시험:
+- [x] 시험:
   - 설치: mech 2단계 진형 전투 시작 → `UI.place`가 열림 · `placeDevice('bumper', 90, 120)` → `B.bumpers`에 하나 늘고 반경 8 안 페그가 없음 · 판 밖 좌표는 범위 안으로 자름 · mech 1단계에서는 열리지 않음 · 판을 새로 깔면 `B.placed`가 다시 놓임 · 봇은 `(90, 119)`에 범퍼
   - 전류: mech 4단계에서 범퍼를 맞힌 발 → 1번 칸 적 체력이 맞힌 수 × 1만큼 더 줄고 `shot.dmg`에 들어감 · 마른 발도 `shot.dmg`는 같고 적 체력은 그대로 · 한 발 60번에서 멈춤 · 3단계에서는 없음
   - 장치 성장: mech 6단계에서 한 범퍼를 한 발에 10번 → `RUN.devLv.bumper === 2`, 같은 발에 20번이어도 2 · 마른 발에서는 오르지 않음 · 단지 레벨 2면 배수가 하나 더 · 회로: 장치 둘이 있을 때 하나를 맞히면 다른 하나의 전류도, 한 발 20번에서 멈춤
   - 태엽 구슬: 장치에 맞을 때마다 힘 +2(Lv1), 구슬마다 10번까지 · 단계와 상관없이 들음
-- [ ] 실패 확인 → 구현 → `node lab/stages.js && node lab/choose.js && node lab/route.js` 통과
-- [ ] 브라우저: mech 2단계 런 → 「설치할 장치」 창 · 판을 눌러 범퍼가 놓이고 그 누름으로 발사되지 않음 · 375px에서 창과 구슬 버튼이 겹치지 않음 · 콘솔 오류 없음
-- [ ] 커밋 `prototype(ball-roguelite): 판 계열 1 — 기계(설치 · 전류 · 장치 성장 · 회로) · 태엽 구슬`
+- [x] 실패 확인 → 구현 → `node lab/stages.js && node lab/choose.js && node lab/route.js` 통과
+- [x] 브라우저: mech 2단계 런 → 「설치할 장치」 창 · 판을 눌러 범퍼가 놓이고 그 누름으로 발사되지 않음 · 375px에서 창과 구슬 버튼이 겹치지 않음 · 콘솔 오류 없음
+- [x] 커밋 `prototype(ball-roguelite): 판 계열 1 — 기계(설치 · 전류 · 장치 성장 · 회로) · 태엽 구슬`
 
 ### Task 2: 화상 — 불씨 · 들불 · 대화재 · 부싯돌 · 기름통
 **Files:** `index.html`(`breakPeg` 2147줄 · `endShot` 2499줄 · `regen` 약 2805줄 · `landMods` 2332줄 · 벽 튕김 1971줄 · `devHit` · `onDeath` 2721줄 · `startFight`) · `lab/stages.js`
 **Interfaces:**
 - Consumes: `devHit` · `FIRE_R` · 불 페그 `'fire'`
 - Produces: `B.flameQ: peg[]` · `RUN.ember: number` · `ignite(p): void`(일반 페그를 불 페그로, 마른 발이면 `jot`) · `fireSpread(): number`(옮긴 수) · `inferno(): boolean`
-- [ ] 시험:
+- [x] 시험:
   - 불씨: fire 2단계, 화상을 실은 구슬이 일반 페그 10개를 깬 발 → 발 끝에 그중 6개가 불 페그로 살아남 · 화상 없는 구슬은 0 · 1단계는 0 · 마른 발 뒤 `B.flameQ` 비어 있음
   - 들불: fire 4단계, 불 페그 3개 · 옆에 일반 페그 → `regen` 뒤 불 페그 6개(각 하나씩) · 한 턴 8개까지 · 숨은 페그로는 안 옮음 · 화상 4중첩 적에게 착지 100 → 112, 갑옷 5인 적은 갑옷 1로 계산
   - 대화재: fire 6단계, 불 페그 31개 → `regen` 뒤 0개 · 줄의 적마다 화상 +31 · `RUN.ember === 1` · 30개면 일어나지 않음 · 다음 전투 시작 때 불 페그 1개
   - 부싯돌: 벽에 한 번 튕기면 가장 가까운 일반 페그 2개가 불 페그(Lv1) · 구슬마다 8개까지 · 단계와 상관없이
   - 기름통: 화상 5인 적이 쓰러지면 줄의 다른 적마다 화상 +5
-- [ ] 실패 확인 → 구현 → `node lab/stages.js && node lab/formation.js` 통과
-- [ ] 커밋 `prototype(ball-roguelite): 판 계열 2 — 화상(불씨 · 들불 · 대화재) · 부싯돌 · 기름통`
+- [x] 실패 확인 → 구현 → `node lab/stages.js && node lab/formation.js` 통과
+- [x] 커밋 `prototype(ball-roguelite): 판 계열 2 — 화상(불씨 · 들불 · 대화재) · 부싯돌 · 기름통`
 
 ### Task 3: 얼음 — 서리 · 얼음 감옥 · 영구 동토 · 고드름 · 눈사람 · 동상 · 서리 거울
 **Files:** `index.html`(`hitPeg` 2086줄 · `land` 2271줄 · `landMods` · `enemyTurn` 기절 풀림 2757줄 · `setDaze` · `startFight`) · `lab/stages.js`
 **Interfaces:**
 - Consumes: `setDaze` · `ICE_R`
 - Produces: `p.ice` · `f.jail` · `RUN.chill`
-- [ ] 시험:
+- [x] 시험:
   - 서리: ice 2단계, 빙결을 실은 구슬이 일반 페그를 맞힘 → 페그가 살아 있고 `p.ice === 1`, 충전은 됨 · 그 얼음 페그를 다시 맞힘 → 깨지고 구슬 빙결 +1 · 속도 ×1.15 · 마른 발 뒤 `p.ice` 그대로
   - 얼음 감옥: ice 4단계, 기절한 적에게 착지 → 크리로 계산 · 기절 동안 받은 착지 피해 200 → 기절이 풀리는 적 턴에 60 더
   - 영구 동토: ice 6단계, `setDaze` 두 번 → `RUN.chill === 2` · 다음 전투 시작 때 적마다 빙결 2 · `RUN.chill = 9`여도 빙결 5 · 기절이 풀린 뒤 면역 1턴
   - 고드름: 이 발 첫 착지 적에 빙결 2(Lv1) · 기절한 적에 착지 ×1.5 · 눈사람: 전투 시작 때 얼음 페그 5 · 동상: 빙결 3 이상 적은 착지 ×1.3 · 서리 거울: 기절한 적에게 크리 착지 100 → 줄의 다른 적마다 30
-- [ ] 실패 확인 → 구현 → `node lab/stages.js && node lab/formation.js` 통과
-- [ ] 커밋 `prototype(ball-roguelite): 판 계열 3 — 얼음(서리 · 얼음 감옥 · 영구 동토) · 고드름 · 눈사람 · 동상 · 서리 거울`
+- [x] 실패 확인 → 구현 → `node lab/stages.js && node lab/formation.js` 통과
+- [x] 커밋 `prototype(ball-roguelite): 판 계열 3 — 얼음(서리 · 얼음 감옥 · 영구 동토) · 고드름 · 눈사람 · 동상 · 서리 거울`
 
 ### Task 4: 페그 밭 — 씨뿌리기 · 자라남 · 과수원 · 씨뿌리개
 **Files:** `index.html`(`regen` 2805~2812줄 · `breakPeg` · `charge` · `rollSpecials` 1879줄 · `landMods` · `startFight` · `march` 2792줄) · `lab/stages.js`
 **Interfaces:**
 - Consumes: `B.seedQ` · `FIELD_R` · `B.normal0`
 - Produces: `'seed'` 페그 · `p.age` · `p.fruit` · `RUN.fruits` · `B.peg0`
-- [ ] 시험:
+- [x] 시험:
   - 씨뿌리기: field 2단계, 씨앗 대기열 3개 → `regen` 뒤 `'seed'` 페그 3(첫 하나는 약초 그대로면 2) · 씨앗 페그를 깨면 충전 2배 · 1단계는 `'norm'`
   - 자라남: field 4단계, 씨앗 페그가 `regen` 3번 뒤 열매(크리 · 약초 · 폭탄 중 하나, `keep`) · `rollSpecials`가 열매를 되돌리지 않음 · 열매를 깨면 충전 3배 · `RUN.fruits` +1(마른 발은 그대로) · 일반 페그가 `B.normal0`의 절반 아래면 `regen`에서 사라진 일반 페그의 30%가 돋음, 절반 이상이면 안 돋음
   - 과수원: field 6단계, `RUN.fruits = 41` → 다음 전투 시작 때 열매 2 · 살아 있는 페그가 시작보다 10개 많으면 착지 100 → 110
   - 씨뿌리개: 30px마다 씨앗 대기열 하나(Lv1), 한 발 10개까지 · 단계와 상관없이 · 성 행진 판에서 씨앗 · 열매가 행진과 함께 내려감
-- [ ] 실패 확인 → 구현 → `node lab/stages.js && node lab/formation.js && node lab/choose.js` 통과
-- [ ] 커밋 `prototype(ball-roguelite): 판 계열 4 — 페그 밭(씨뿌리기 · 자라남 · 과수원) · 씨뿌리개`
+- [x] 실패 확인 → 구현 → `node lab/stages.js && node lab/formation.js && node lab/choose.js` 통과
+- [x] 커밋 `prototype(ball-roguelite): 판 계열 4 — 페그 밭(씨뿌리기 · 자라남 · 과수원) · 씨뿌리개`
 
 ### Task 5: 봇 · 측정 · 기록
 **Files:** `index.html`(`botRun`) · `lab/foebot.js` · 새 측정 `lab/stagebot.js` · waypoint `15-ball-roguelite.md` · `STATUS.md`
 **Interfaces:**
 - Consumes: Task 0~4 전부
 - Produces: `botRun(seed, { …, bag: orb[] | null })`(시작 가방을 덮어씀) · `lab/stagebot.js`: 계열 × 단계(2 · 4 · 6)마다 그 단계가 켜지는 가방 · 유물로 시작하는 진형 봇을 돌려 지역마다 한 전투 평균 발 수 · 한 발 최장 시간을 낸다
-- [ ] 시험: `botRun(1, { opts: { foe: 'rank' }, bag: [{ kind: 'flint', lv: 1 }, …] })`의 첫 가방이 그 가방 · `stagebot.js`가 4계열 × 3단계 표를 낸다
-- [ ] 회귀: `node lab/stages.js && node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js` · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 이전 스냅샷과 같음
-- [ ] 측정(기록): 진형 40런 × mixed · focus · family(자동) · family `FAM=` mech · fire · ice · field 각 10런 → 승수 · 6단계 런 수. `stagebot.js` 표(계열 × 단계 × 지역 → 평균 발 수 · 한 발 최장 시간). 한 발이 10초를 넘는 조합이 있으면 그 계열 상한을 낮추고 다시 잰다
-- [ ] 기록 `15-ball-roguelite.md` §33(「정한 것」 1~14 · 측정 표), 체크리스트, STATUS → waypoint 커밋·푸시 → 서브모듈 포인터
-- [ ] 커밋 `prototype(ball-roguelite): 판 계열 5 — 시작 가방 봇 · 단계별 발 수 측정`
+- [x] 시험: `botRun(1, { opts: { foe: 'rank' }, bag: [{ kind: 'flint', lv: 1 }, …] })`의 첫 가방이 그 가방 · `stagebot.js`가 4계열 × 3단계 표를 낸다
+- [x] 회귀: `node lab/stages.js && node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js` · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 이전 스냅샷과 같음
+- [x] 측정(기록): 진형 40런 × mixed · focus · family(자동) · family `FAM=` mech · fire · ice · field 각 10런 → 승수 · 6단계 런 수. `stagebot.js` 표(계열 × 단계 × 지역 → 평균 발 수 · 한 발 최장 시간). 한 발이 10초를 넘는 조합이 있으면 그 계열 상한을 낮추고 다시 잰다
+- [x] 기록 `15-ball-roguelite.md` §33(「정한 것」 1~14 · 측정 표), 체크리스트, STATUS → waypoint 커밋·푸시 → 서브모듈 포인터
+- [x] 커밋 `prototype(ball-roguelite): 판 계열 5 — 시작 가방 봇 · 단계별 발 수 측정`
 
 ### Task 6: 적 체력 1차 (진형)
 **Files:** `index.html`(적 체력 세 곳 609 · 2659 · 2729줄) · `lab/stagebot.js`
 **Interfaces:** Produces `REGION_HP_R: { forest, cave, castle }`(진형에서만 `REGION_HP`에 더 곱함) · `regionHp(): number`(세 곳이 함께 씀)
-- [ ] 정하기: Task 5의 무작위 봇 「동굴 · 성 한 전투 중앙 발 수」가 4~6이 되는 배율을 0.25 간격으로 찾는다(숲은 §7 5 「아무 구슬로도 넘김」 — 1 그대로, 숲 엘리트부터 벽). 같은 배율에서 `stagebot.js`의 6단계 계열 덱 발 수를 적는다. 둘 다 맞출 수 없으면(계열 덱이 3발을 넘음) 무작위 기준만 넣고 차이를 기록한다(P4~P6 계열이 들어온 뒤 다시)
-- [ ] 시험: 진형에서 `regionHp()`가 표 값, 이전 규칙은 1(지문 그대로) · `route.js` 통과
-- [ ] 측정: 진형 40런 × mixed · family 다시 → 승수 기록
-- [ ] 기록 §33에 배율 · 앞뒤 숫자 → waypoint → 포인터
-- [ ] 커밋 · PR: `prototype(ball-roguelite): 판 계열 6 — 진형 적 체력 1차(지역 배율)` → `ball-roguelite/board-families` 푸시 → PR(기준 `ball-roguelite/families`, 본문에 트레일러·AI 서명 없음). 병합 순서 #16 → #17 → #18 → #19 → 이 PR
+- [x] 정하기: Task 5의 무작위 봇 「동굴 · 성 한 전투 중앙 발 수」가 4~6이 되는 배율을 0.25 간격으로 찾는다(숲은 §7 5 「아무 구슬로도 넘김」 — 1 그대로, 숲 엘리트부터 벽). 같은 배율에서 `stagebot.js`의 6단계 계열 덱 발 수를 적는다. 둘 다 맞출 수 없으면(계열 덱이 3발을 넘음) 무작위 기준만 넣고 차이를 기록한다(P4~P6 계열이 들어온 뒤 다시)
+- [x] 시험: 진형에서 `regionHp()`가 표 값, 이전 규칙은 1(지문 그대로) · `route.js` 통과
+- [x] 측정: 진형 40런 × mixed · family 다시 → 승수 기록
+- [x] 기록 §33에 배율 · 앞뒤 숫자 → waypoint → 포인터
+- [x] 커밋 · PR: `prototype(ball-roguelite): 판 계열 6 — 진형 적 체력 1차(지역 배율)` → `ball-roguelite/board-families` 푸시 → PR(기준 `ball-roguelite/families`, 본문에 트레일러·AI 서명 없음). 병합 순서 #16 → #17 → #18 → #19 → 이 PR
 
 ## 다음 계획
 P3가 끝나면 P4(상태이상 · 공격 모양: 독 · 출혈 · 레이저 · 폭탄 · 거대·무게 + 새 아이템 16) 계획을 같은 형식으로 쓴다. P4 · P5 · P6이 끝날 때마다 Task 5의 `lab/stagebot.js`로 계열 덱 발 수를 다시 재고, 적 체력 배율(`REGION_HP_R`)은 P8에서 최종으로 맞춘다.
