@@ -1,7 +1,7 @@
 ---
 build-spec: yawn-swap
 stage: 02-construction/16-yawn-swap (갈래 A)
-status: READY
+status: IN_PROGRESS
 depth: comprehensive
 updated: 2026-11-09
 ---
@@ -68,30 +68,32 @@ AI가 정한 것(오너가 바꿀 수 있음, 편차 후보):
 
 ## §4. 구현 체크리스트
 
-- [ ] U1 `swap-core.js` 분리, `arrange.html` 동작 그대로(실험판 화면으로 확인)
-- [ ] U2 대조 자료 생성
-- [ ] U3 `cartOwners`·`X.` + 엔진 단위 테스트(기존 엔진 테스트 전부 통과)
-- [ ] U4 배치 층 + `chain` 캐시
-- [ ] U5 `generateSwap`·`swapSpec`
-- [ ] U6 대조 테스트 통과(판·연쇄 글자 단위 일치)
-- [ ] U7 `ArrangeController` + 단위 테스트(상태 전이, SW-MOVE-1~8, 힌트 SW-HINT-1·2)
-- [ ] U8 판 그림 7층 + 골든
-- [ ] U9 판 화면 연결
-- [ ] U10 `Kit` 연결·`PlayRecord` 매핑·원격 설정 키
-- [ ] U11 저장 v3·이어 하기
-- [ ] U12 분석 이벤트
-- [ ] U13 탭 방식 제거(분석 0·사용하지 않는 코드 0)
-- [ ] U14 화면 흐름 테스트·기준 그림
-- [ ] U15 디자인 요청서 v6
+worktree `yawn/arrange-progress` → 메인 `60b9456`(U1~U6), `913b5d7`(U7~U14), `056d2bc`·`5977963`(짐표·화면 사진).
+
+- [x] U1 `swap-core.js` 분리, `arrange.html` 동작 그대로 (브라우저 확인: 판·연결 수·콘솔 오류 0)
+- [x] U2 대조 자료 생성 — `prototypes/yawn-relay/fixtures-swap.js` → `test/fixtures/swap_port.json` (설계 값 5,600 · 판 600(만든 판 590) · 무작위 배치 연쇄 11,800)
+- [x] U3 `cartOwners`·`X.` + 기존 엔진 테스트 전부 통과
+- [x] U4 배치 층 `domain/swap/swap.dart` + `ChainCache`
+- [x] U5 `generateSwap`·`swapSpec` `domain/swap/generator.dart`, 적응형 어댑터 `domain/swap/swap_game.dart`
+- [x] U6 대조 테스트 `test/swap_port_test.dart` — 판·연쇄가 실험판과 글자 단위로 같음. 변이 시험 4개(나무 키우기 확률·짐표 번호·수레 주인 무시·짐 상자 통과) 모두 실패로 잡힘
+- [x] U7 `ui/arrange_controller.dart` + `test/arrange_controller_test.dart` 9개
+- [x] U8 판 그림 — `BoardPainter`에 `SwapOverlay` 층(§7 편차 2)
+- [x] U9 판 화면 `ui/car_page.dart` (숫자 막대·버튼 막대·도착 요약·힌트 광고·칸 낭독)
+- [x] U10 `Kit` 연결·`PlayRecord` 매핑·원격 설정 `app_adaptive.swap`
+- [x] U11 저장 v3·이어 하기 `data/progress.dart`
+- [x] U12 분석 이벤트 `swap_clear`·`swap_leave` (`app.yaml` → codegen)
+- [x] U13 탭 방식 제거 — `solver.dart`·`difficulty.dart`·`weave.dart`·`YawnGame`·패배 카드·한 번 더 툭·툭 표시, 관련 테스트·도구. 엔진 kind 23종·렌더러·`RunController`(연쇄 재생)는 남김
+- [x] U14 화면 흐름 테스트 `flow_test`(6)·`progress_flow_test`(3)·`map_v5_test`(5)·`board_paint_test`, 화면 사진 도구 교환 판 장면
+- [x] U15 디자인 요청서 v6 초안 `yawn-relay/design-brief-v6-2026-11-09.md` (오너 확인 뒤 발송)
 
 ## §5. 검증 계획
 
-- [ ] 저장소 루트 `flutter analyze` 0 · `dart format` 변경 0
-- [ ] 단위·대조: U6(생성기 판 300개 이상·연쇄 1만 배치 일치), U7 상태 전이, U3 엔진 회귀(기존 테스트 전부)
-- [ ] 불변식 시험: 노선 1~28 설계 값 × 씨앗 50 → I-2(고정 승객 = 정답 칸)·I-3(`solved` 풀림)·SW-GEN-4(고정물 모두 쓰임)·SW-GEN-9(섞인 배치 안 풀림)·생성 실패 0
-- [ ] 화면 흐름: 첫 역 끌어서 풀기 → 도착 → 다음 역, 되돌리기·처음 배치, 힌트(광고 가짜), 백그라운드 → 이어 하기, 5역 줄 끝 → 다음 노선 열림, 섞기 장
-- [ ] 에뮬레이터 직접 플레이(ko·en·다크·글자 130%·애니메이션 끔), 7×11 판에서 끌기 손맛, 스크린숏을 오너에게
-- [ ] §6 NFR 측정
+- [x] 저장소 루트 `flutter analyze` 0 · `dart format` 변경 0
+- [x] 단위·대조: U6(판 590개·연쇄 11,800 배치 일치), U7 상태 전이, U3 엔진 회귀 — Yawn! 테스트 98개 · `factory_adaptive` 73개 통과
+- [~] 불변식 시험: 노선 1·10·28 × 고정물 5 × 계단 8 × 씨앗 1 (`swap_port_test` 「불변식」) — Build Spec의 「노선 28 × 씨앗 50」보다 좁다. 생성 실패는 성능 측정 200판에서 0
+- [x] 화면 흐름: 끌어서 풀기 → 도착 → 다음 역, 두 번 눌러 바꾸기·되돌리기·처음 배치, 힌트(광고 가짜), 일시정지 → 이어 하기, 5역 줄 끝 → 다음 노선 개통, 복습 판, 섞기 장 저장 이전
+- [~] 에뮬레이터 직접 플레이: 1호선 1역을 끌어서 깨고 연쇄 재생 → 도착까지 확인(영어). 고정물 판은 화면 사진 도구로 확인. **남음:** ko·다크·글자 130%·애니메이션 끔, 7×11 판 끌기 손맛, 오너 플레이
+- [~] §6 NFR — 호스트 측정 끝, 기기(프로필 빌드) 측정 남음
 
 ## §6. NFR · 성능
 
@@ -106,8 +108,31 @@ AI가 정한 것(오너가 바꿀 수 있음, 편차 후보):
 
 에뮬레이터 성능 측정은 `-gpu host`, 부하 2 미만, 기준 앱과 같은 부팅에서 3회씩 잰다(기존 측정 조건).
 
-## §7. 편차 로그
+### §6 측정 (2026-11-09, 호스트 CPU — 기기 측정 전 사전 확인)
 
-| SoT | 실제 구현 | 사유 |
-|---|---|---|
-|  |  |  |
+| 항목 | 목표 | 측정 | 도구 |
+|---|---|---|---|
+| 연쇄 재계산 (캐시 없이) | 46명 p95 ≤ 2ms | 45명 7×9: p50 0.05ms · p95 0.18ms · 최대 0.91ms | `tool/bench_swap.dart` |
+| 판 생성 | p95 ≤ 400ms, 최대 1s | 28호선 고정물 전부 계단 1~20 × 씨앗 10: p50 1.4ms · p95 17ms · 최대 43ms · 실패 0/200 | `tool/bench_swap.dart` |
+| 끄는 동안 프레임 (미리 보기 + 그림 기록) | p95 ≤ 16ms | 46명 7×9: 평균 3.4ms · p95 8.4ms · 최대 22.7ms (칸이 바뀌는 프레임) | `tool/bench_paint_test.dart` |
+| 연쇄 재생 프레임 (그림 기록) | p95 ≤ 16ms | 평균 2.7ms · p95 5.2ms · 최대 17.2ms | 같음 |
+
+## §7. 편차 로그 (Deviations)
+
+| # | SoT | 실제 구현 | 사유 |
+|---|---|---|---|
+| 1 | U2 `tool/fixtures/swap_trace.js`, 테스트 `swap_generator_test`·`swap_chain_test` | `prototypes/yawn-relay/fixtures-swap.js`, 테스트 `swap_port_test.dart` 하나 | 기존 대조 도구 관례(`fixtures-weave.js`·`load.js`)를 따름 |
+| 2 | FC: 새 `SwapBoardView`·`SwapBoardPainter`, `SightPainter` 분리 | 기존 `BoardPainter`에 `SwapOverlay` 층을 더하고, 배치가 바뀔 때마다 그 배치로 `RunController`를 다시 만든다. 클리어는 시작 자리 승객을 0박자에 툭 해 기존 연쇄 연출로 재생 | 하품·잠·소리·안내 방송·도착 흐름을 그대로 재사용, 그림 코드 중복 없음. 판 시계는 `origin`으로 이어 숨쉬기가 튀지 않게 |
+| 3 | FC 층 목록 | **바라보는 방향 삼각형**을 더함 (실험판 `person()`에 있던 것) | 바로 앞이 벽인 승객은 시선선이 없어 방향을 알 수 없었다(에뮬레이터 확인) |
+| 4 | 엔진 시선 | `Board.sights(toWall:)` — 아무도 못 본 시선도 벽(짐 상자) 앞 칸까지 | 실험판 「시선 늘 보임」. 탭 방식 그림은 그대로(기본값 false) |
+| 5 | FC 버튼 막대 아이콘 버튼 | 글자 있는 알약 버튼, 좁은 화면에서 막대 전체가 줄어듦 | 꺼진 아이콘 버튼이 어두운 객차에서 보이지 않았다. 힌트 문구가 길어 411dp에서 넘침(테스트로 발견) |
+| 6 | DE `Station.locked` | `Station.cartOwners`만 더함, 고정은 `Rider.locked` | 엔진 역은 그림·재생용이라 고정 여부가 필요 없다 |
+| 7 | BLM §5 원격 설정 키 5개(최상위) | `app_adaptive.swap` 안에 `lock_ratio`·`hint_after_ms`·`hint_after_moves`·`move_fail_unit` | `app.yaml` 원격 기본값을 바꾸지 않고 기존 `app_adaptive` JSON에 둠. 빈자리 비율은 0 고정(키 없음) |
+| 8 | SW-LINE-2 n = 계단 높이 | `swapNOf`: 0·1단계 → n 1·2, 꼭대기(11단계)에서 그 호선 승객 상한에 닿게 늘림 | 계단은 0~11이라 n = 높이 + 1이면 28호선이 25명에서 멈춘다. 쉬어 가는 판은 실험판처럼 n이 5의 배수일 때(깬 역 수가 아님 — 생성 요청에 역 수가 없다) |
+| 9 | SW-LINE-7 「v1은 노선 기믹만」 | 복습 기믹이 고정물이면 `창문+짐수레`처럼 함께 넣는다(종류마다 18명당 하나, 첫 두 역은 노선 기믹만) | 2-13에서 승인된 복습 섞기가 동작하게(진행 흐름 테스트) |
+| 10 | 분석 `swap_abandon` | `swap_leave` (역을 나감 — 이어 하므로 포기가 아님), `use_extra_tap` 삭제 | 이름이 뜻에 맞게 |
+| 11 | — | 끌기는 손가락이 처음 닿은 칸에서 시작(`DragStartBehavior.down`) | 기본값은 끌기로 인정된 지점이라 칸 경계에서 옆 승객이 집혔다(진행 흐름 테스트로 발견) |
+| 12 | — | 짐수레 주인 짐표를 모든 외형에 그림 (`character.dart`, 짐꾼 외형만이던 조건을 넓힘) | 교환 방식은 누구나 주인. 기준 그림 519장 변화 없음 |
+| 13 | — | `assets/stations.json`을 `test/fixtures/`로 옮김(앱에 넣지 않음) | 앱이 더는 쓰지 않는다. 엔진·그림 테스트만 읽음 |
+| 14 | SW-GEN-12 「그래도 실패면 승객 −1」 | 씨앗 8번 → 적응형 대체 판 묶음(기본 노선 작은 판 3개) | 측정에서 실패 0. 묶음은 `Director._fallback`이 이미 처리 |
+| 15 | DE `ClearedStation` 필드 | 판은 저장 형식(`json`)으로 들고 미리 보기를 열 때 만든다 | 앱을 켤 때 수십 판을 다시 만들지 않게 |
