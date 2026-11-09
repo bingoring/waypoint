@@ -662,63 +662,63 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
 ### Task 0: 공통 바탕 — 새 아이템 자료 · 수치 표 · 단계 글 · 처형 하나로 모음
 **Files:** `index.html`(`ORBS` · `RELICS` · `FAM_ITEMS` · `FAM_STAGE` · `JOT_KEYS` · `land` 처형 두 자리) · `lab/stages.js`(P5 절, 67부터) · `lab/family.js`(개수)
 **Interfaces (Produces):** 「정한 것」 1 · 2의 키와 표 · `execTh(f, ab)` · `canExec(f, b, shot)` · `execute(f)` · `JOT_KEYS`에 `keep`(이미 있으면 그대로) · `magpie`
-- [ ] 시험: `family.js` 개수 → `resound: 8, crit: 9, hunt: 8, loot: 8, swarm: 13` · 새 13개 + 황금왕 `rank: true`, 이전 규칙 보상 후보에 없음 · 키가 기존 키와 겹치지 않음 · 열쇠: `echobox` · `luckfoil`, `scroll`은 보상 · 황금왕은 계열 밖 · `famStageLines()`가 크리 4단계에서 「조준점」 · 「연속 크리」 두 줄 · `execTh`가 지금 문턱과 같음(낫 Lv1 0.25 · 도끼 +0.1 · 기본 0.15) · 이전 규칙에서 칼날 아닌 구슬의 크리 착지는 처형 안 함
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && NOBOT=1 node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js`(보물 문이 생겨 바뀐 기대는 진형에서만인지 보고 고침)
-- [ ] 커밋 `prototype(ball-roguelite): 표적 계열 0 — 새 아이템 13 · 황금왕 자료 · 수치 표 · 단계 글 · 처형 하나로 모음`
+- [x] 시험: `family.js` 개수 → `resound: 8, crit: 9, hunt: 8, loot: 8, swarm: 13` · 새 13개 + 황금왕 `rank: true`, 이전 규칙 보상 후보에 없음 · 키가 기존 키와 겹치지 않음 · 열쇠: `echobox` · `luckfoil`, `scroll`은 보상 · 황금왕은 계열 밖 · `famStageLines()`가 크리 4단계에서 「조준점」 · 「연속 크리」 두 줄 · `execTh`가 지금 문턱과 같음(낫 Lv1 0.25 · 도끼 +0.1 · 기본 0.15) · 이전 규칙에서 칼날 아닌 구슬의 크리 착지는 처형 안 함
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && NOBOT=1 node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js`(보물 문이 생겨 바뀐 기대는 진형에서만인지 보고 고침)
+- [x] 커밋 `prototype(ball-roguelite): 표적 계열 0 — 새 아이템 13 · 황금왕 자료 · 수치 표 · 단계 글 · 처형 하나로 모음`
 
 ### Task 1: 물량 — 분봉 · 군단 · 둥지
 **Files:** `index.html`(`multiply` · `land` · `endShot` · `newShot`) · `lab/stages.js`
 **Interfaces:** Produces `RUN.eggs`
-- [ ] 시험:
+- [x] 시험:
   - 분봉: 물량 2, 단지 ×2 → 3 · 단지 열쇠까지 → 4 · 보라 열매는 그대로 · 1단계는 그대로
   - 군단: 물량 4, 안 빠진 구슬 10개일 때 착지 ×1.1 · 100개면 ×1.6
   - 둥지: 물량 6, 진짜 발 구슬 30개 → `RUN.eggs` 1 · 29개면 0 · 5에서 멈춤 · 알 2면 다음 발 구슬 +2 · 마지막 착지 구슬은 힘 + 그 발 착지 수, 마지막이 아니면 그대로
   - 마른 발(물량 6): 판 · 런 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 표적 계열 1 — 물량(분봉 · 군단 · 둥지)`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 표적 계열 1 — 물량(분봉 · 군단 · 둥지)`
 
 ### Task 2: 메아리 — 되울림 · 잔상 · 메아리 모음 · 메아리 구슬 · 잔향 상자 · 황혼 북 · 소리굽쇠
 **Files:** `index.html`(`land` · `step` 앞 · `spawnBall` · `newShot` · `endShot`) · `lab/stages.js`
 **Interfaces:** Produces `landReps(shot, b): number` · `B.echoQ: number[][][]` · `RUN.echo` · `RUN.echoN` · `b.phantom` · `B.lastLanded`
-- [ ] 시험:
+- [x] 시험:
   - 되울림: 메아리 2, 이 발 첫 착지 피해 10 → 적 체력 −20(목숨 토큰 적은 첫 번에 버티고 둘째에 −) · 둘째 착지는 한 번 · 1단계는 한 번
   - 황혼 북: 이번 바퀴 마지막 칸 구슬의 착지가 모두 두 번 · 되울림과 겹친 첫 착지는 세 번(곱 아님) · 소리굽쇠: 두 번 친 착지는 힘 +3, 한 번은 그대로
   - 메아리 모음: 메아리 6, 두 번 친 착지 100 → `RUN.echo` 1 · 5에서 멈춤 · 상태이상(중독 2)을 실은 두 번 착지 → 중독 +4 · 메아리 4면 +2
   - 유령: 메아리 4 진짜 발 뒤 `B.echoQ` 길 1(페그를 가장 많이 맞힌 구슬) → 다음 발 `shot.balls`에 유령 · 유령은 길 위 페그를 깨고 끝에서 착지, 피해 ×0.5 · 단지에 안 들어감 · 갈라진 구슬의 `path`가 부모와 따로 · 메아리 구슬 Lv3 길이면 ×0.7 · 잔향 상자는 전투 첫 발 뒤에만 · 한 발 유령 2개까지 · 판이 바뀌어도(행진 · 다시 돋음) 끝까지 감
   - 마른 발(메아리 6 · 메아리 구슬): `B.echoQ` · 런 그대로, 마른 발 `shot.dmg`에 유령 피해가 들어감
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 브라우저 375px: 유령 구슬이 반투명으로 길을 따라감
-- [ ] 커밋 `prototype(ball-roguelite): 표적 계열 2 — 메아리(되울림 · 잔상 · 메아리 모음) · 메아리 구슬 · 잔향 상자 · 황혼 북 · 소리굽쇠`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 브라우저 375px: 유령 구슬이 반투명으로 길을 따라감
+- [x] 커밋 `prototype(ball-roguelite): 표적 계열 2 — 메아리(되울림 · 잔상 · 메아리 모음) · 메아리 구슬 · 잔향 상자 · 황혼 북 · 소리굽쇠`
 
 ### Task 3: 크리 — 조준점 · 연속 크리 · 칼날 갈기 · 도둑 까치
 **Files:** `index.html`(`hitPeg` · `land` · `newShot` critBonus · `endShot` · 조준 HUD · 판 누름 · `botRun` 쏘기) · `lab/stages.js`
 **Interfaces:** Produces `aimCrit(p): void` · `MODE 'critpick'` · `RUN.critPlus` · `shot.critAdd`
-- [ ] 시험:
+- [x] 시험:
   - 조준점: 크리 2, `aimCrit(일반 페그)` → 그 페그 크리 · 가장 가까운 크리 페그 일반 · 크리 페그 수 그대로 · 한 발에 두 번 안 됨 · 1단계는 버튼 없음 · 봇 런(크리 2 가방)에서 발마다 첫 맞힌 페그가 크리
   - 연속 크리: 크리 4, 크리 페그 3개 맞힌 구슬 착지 → 크리 배율 + 0.6
   - 칼날 갈기: 크리 6, 진짜 발 크리 착지 120 → `RUN.critPlus` 0.5 · 3에서 멈춤 · 중독 있는 적에게 크리 착지 → 출혈 1(중독은 그대로)
   - 도둑 까치: 크리 페그를 맞힌 뒤 일반 페그 3개가 깨지지 않고 크리(`keep`) · 넷째는 깨짐 · `rollSpecials` 뒤에도 남음 · 맞히면 사라짐
   - 마른 발(크리 6 · 도둑 까치): 판 · 런 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 브라우저 375px: 「조준점」 버튼 → 페그 누름 → 크리 페그 옮김 · 취소 · 쏘기
-- [ ] 커밋 `prototype(ball-roguelite): 표적 계열 3 — 크리(조준점 · 연속 크리 · 칼날 갈기) · 도둑 까치`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 브라우저 375px: 「조준점」 버튼 → 페그 누름 → 크리 페그 옮김 · 취소 · 쏘기
+- [x] 커밋 `prototype(ball-roguelite): 표적 계열 3 — 크리(조준점 · 연속 크리 · 칼날 갈기) · 도둑 까치`
 
 ### Task 4: 처형·사냥 — 사냥 표식 · 전리품 · 보스 사냥 · 사냥꾼의 일지
 **Files:** `index.html`(`execTh` · `canExec` · `land` · `enemyTurn` 가호 · 체력 · `newShot` 날벌레 · `rollSpecials` 크리 수 · `startFight`) · `lab/stages.js`
 **Interfaces:** Produces `e.hunts` · `spoilOf(kind): string` · `B.spoils` · `RUN.trophies` · `RUN.execPerm` · `RUN.journal: string[]`
-- [ ] 시험:
+- [x] 시험:
   - 사냥 표식: 사냥 2, 칼날 아닌 구슬(사슬 추)의 크리 착지가 체력 14% 적을 처형 · 1단계는 안 함 · 표식 10이면 25% 적 처형 · 표식 40이어도 문턱 0.40
   - 전리품: 사냥 4, 방패 적 처형 → 적 턴에 가호 +1 · 치유 적 → 체력 +2 · 소환 적 → 다음 발 날벌레 +3 · 표식 적 → 크리 페그 +1 · 공격만 있는 적 → 착지 +2 · 다음 전투엔 없음 · 엘리트 처형은 다음 전투에도
   - 보스 사냥: 사냥 6, 체력 7%인 보스 처형(문턱 0.15 × 0.5 = 0.075) · 8%면 안 함 · 처형마다 `RUN.execPerm` +0.01 · 살덩이 부위 처형 → 네 부위 모두 쓰러지고 승리 한 번 · 목숨 토큰 적도 벗김
   - 사냥꾼의 일지: 슬라임 처형 → 다음 슬라임 문턱 +0.1 · 다른 종류는 그대로
   - 마른 발(사냥 6): 적 · 런 그대로, `shot.exec`로 봇이 처형을 봄(사냥 2면 칼날 아닌 구슬도)
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js && node lab/route.js`
-- [ ] 커밋 `prototype(ball-roguelite): 표적 계열 4 — 처형·사냥(사냥 표식 · 전리품 · 보스 사냥) · 사냥꾼의 일지`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js && node lab/route.js`
+- [x] 커밋 `prototype(ball-roguelite): 표적 계열 4 — 처형·사냥(사냥 표식 · 전리품 · 보스 사냥) · 사냥꾼의 일지`
 
 ### Task 5: 보물 — 보물 적 · 큰 보물 · 황금 · 황금왕 · 도굴꾼 삽 · 욕심쟁이 손 · 행운의 금박 · 황금 우상 · 장물 자루 · 해적 깃발 · 청동 저울
 **Files:** `index.html`(`startFight` · `onDeath0` · `land` · `rewardCardsR` · `winFight` · `UI.reward` · `famCount` · `famPull` · `relicCandsR` · 적 그림 · `botRun` 보상) · `lab/stages.js`
 **Interfaces:** Produces `e.loot` · `B.lootKills` · `chestCands(): famPick 후보` · `rewardCardsR(r, kind, fam, extra = 0)` · `UI.reward(cards, f, next, again)` · `RUN.stash` · `famCount0(f)`(황금왕 전 개수)
-- [ ] 시험:
+- [x] 시험:
   - 보물 적: 보물 2 전투 시작 → `e.loot` 하나(보스 아닌 적) · 황금 우상이면 둘 · 1단계는 없음 · 보물 적이 독 · 폭발로 쓰러져도 보상 3 → 4장(섞인 · 엘리트 · 보스 · 계열 문 각각) · 도굴꾼 삽 첫 착지 적이 보물 적
   - 큰 보물: 보물 4, 보물 적 셋을 쓰러뜨림 → 강화 · 다시 뽑기 · 보물상자가 시드대로 · 보물상자 카드는 가진 계열 카드만
   - 황금: 보물 6, 보물 유물 4개 → 착지 ×1.2 · 황금왕이 보상 후보에 나옴(6단계 아래면 안 나옴) · 황금왕을 가지면 기계 3 → 4(단계 4) · 없는 계열은 0 그대로
@@ -729,17 +729,17 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
   - 청동 저울: 4개 가진 계열 끌림 4 · 3개면 1.5 그대로
   - 창 겹침: 변이 → 보물상자 → 보상 → 합성 순서로 모두 뜨고 끝나면 다음 마디
   - 마른 발(보물 6 · 도굴꾼 삽): `e.loot` · 런 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/route.js && node lab/choose.js && node lab/formation.js`
-- [ ] 브라우저 375px: 금화 표식 · 보상 창 「다시 뽑기」 · 「장물」 카드 · 보물상자 창
-- [ ] 커밋 `prototype(ball-roguelite): 표적 계열 5 — 보물(보물 적 · 큰 보물 · 황금 · 황금왕) · 도굴꾼 삽 · 욕심쟁이 손 · 행운의 금박 · 황금 우상 · 장물 자루 · 해적 깃발 · 청동 저울`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/route.js && node lab/choose.js && node lab/formation.js`
+- [x] 브라우저 375px: 금화 표식 · 보상 창 「다시 뽑기」 · 「장물」 카드 · 보물상자 창
+- [x] 커밋 `prototype(ball-roguelite): 표적 계열 5 — 보물(보물 적 · 큰 보물 · 황금 · 황금왕) · 도굴꾼 삽 · 욕심쟁이 손 · 행운의 금박 · 황금 우상 · 장물 자루 · 해적 깃발 · 청동 저울`
 
 ### Task 6: 봇 · 측정 · 검토 · 기록 · PR
 **Files:** `lab/stagebot.js`(KIT에 다섯 계열) · waypoint `15-ball-roguelite.md` · `STATUS.md`
-- [ ] `lab/stagebot.js` KIT: 물량 `['twin', 'egg'] / ['dandelion', 'starsplit', 'dew', 'arrow']` · 메아리 `['boomer', 'reverb'] / ['echobox', 'memory', 'duskdrum', 'tuning']` · 크리 `['dagger', 'magpie'] / ['whet', 'gardener', 'gambler', 'marksman']` · 처형·사냥 `['scythe', 'chainweight'] / ['horn', 'crookhook', 'axe', 'journal']` · 보물 `['shovel', 'greedhand'] / ['luckfoil', 'goldidol', 'sack', 'bronzescale']`
-- [ ] 회귀: `lab/stages.js` · `family` · `choose` · `route` · `formation` 모두 · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 결정성(`base-p5.html` 기준)
-- [ ] 측정(기록, 균형은 P8): `stagebot.js` 다섯 계열 × 2 · 4 · 6 × 6런 → 지역별 한 전투 발 수 · 30초 발 · 진형 40런 × mixed · focus · family · `FAM=` 다섯 계열 각 12런. P4 표와 나란히
-- [ ] 브랜치 전체 검토(새 검토자, 가장 강한 모델) → Critical · Important 고침(시험 RED → GREEN) · Minor 기록
-- [ ] 기록 `15-ball-roguelite.md` §35 · 체크리스트 · STATUS → waypoint → 포인터 → PR(PR #21 머지 뒤 `main` 기준, 트레일러 · AI 서명 없음)
+- [x] `lab/stagebot.js` KIT: 물량 `['twin', 'egg'] / ['dandelion', 'starsplit', 'dew', 'arrow']` · 메아리 `['boomer', 'reverb'] / ['echobox', 'memory', 'duskdrum', 'tuning']` · 크리 `['dagger', 'magpie'] / ['whet', 'gardener', 'gambler', 'marksman']` · 처형·사냥 `['scythe', 'chainweight'] / ['horn', 'crookhook', 'axe', 'journal']` · 보물 `['shovel', 'greedhand'] / ['luckfoil', 'goldidol', 'sack', 'bronzescale']`
+- [x] 회귀: `lab/stages.js` · `family` · `choose` · `route` · `formation` 모두 · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 결정성(`base-p5.html` 기준)
+- [x] 측정(기록, 균형은 P8): `stagebot.js` 다섯 계열 × 2 · 4 · 6 × 6런 → 지역별 한 전투 발 수 · 30초 발 · 진형 40런 × mixed · focus · family · `FAM=` 다섯 계열 각 12런. P4 표와 나란히
+- [x] 브랜치 전체 검토(새 검토자, 가장 강한 모델) → Critical · Important 고침(시험 RED → GREEN) · Minor 기록
+- [x] 기록 `15-ball-roguelite.md` §35 · 체크리스트 · STATUS → waypoint → 포인터 → PR(PR #21 머지 뒤 `main` 기준, 트레일러 · AI 서명 없음)
 
 ## 다음 계획
 P5가 끝나면 P6(생존·대가 · 계열 잇기: 소환 · 수호 · 피의 대가 · 디버프 종류 보너스 · 듀오 유물 · 변환 · 복사 · 확률 두 배 · 비움 보상 + 새 아이템 9) 계획을 같은 형식으로 쓴다. P5 · P6이 끝날 때마다 `lab/stagebot.js`로 계열 덱 발 수를 다시 재고, 적 체력 배율(`REGION_HP_R`)은 P8에서 최종으로 맞춘다.
