@@ -522,14 +522,14 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
 ### Task 0: 공통 바탕 — 새 아이템 자료 · 수치 표 · 새 페그 · 단계 글 · 쓰러짐 연쇄 상한
 **Files:** `index.html`(`ORBS` · `RELICS` · `FAM_ITEMS` · `FAM_STAGE` · `JOT_KEYS` · `drawPeg` · `onDeath`) · `lab/stages.js`(P4 절) · `lab/family.js`(개수)
 **Interfaces (Produces):** 「정한 것」 1 · 2의 키와 표 · 페그 `'toxic'`(보라 테 · 깨지지 않음) · `'blood'`(붉은 점) · `p.big`(큰 폭탄) · `DEATH_CHAIN` · `B.deathDepth`(onDeath가 늘리고 줄임) · `JOT_KEYS`에 `big` · `laserHit`
-- [ ] 시험: `family.js` 개수 → `poison: 8, bleed: 8, laser: 8, bomb: 8, mass: 8` · 새 16개 `rank: true`, 이전 규칙 보상 후보에 없음 · 키가 기존 키와 겹치지 않음 · 열쇠: `fumes` · `tridagger`, 나머지 유물 보상 · `famStageLines()`가 독 4단계에서 「배양」 · 「번식」 두 줄 · `onDeath`가 `DEATH_CHAIN` 깊이를 넘으면 더 부르지 않음(일부러 서로 부르는 가짜 연쇄로)
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && NOBOT=1 node lab/family.js && node lab/choose.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 상태 계열 0 — 새 아이템 16 자료 · 수치 표 · 독·피 페그 · 단계 글 · 쓰러짐 연쇄 상한`
+- [x] 시험: `family.js` 개수 → `poison: 8, bleed: 8, laser: 8, bomb: 8, mass: 8` · 새 16개 `rank: true`, 이전 규칙 보상 후보에 없음 · 키가 기존 키와 겹치지 않음 · 열쇠: `fumes` · `tridagger`, 나머지 유물 보상 · `famStageLines()`가 독 4단계에서 「배양」 · 「번식」 두 줄 · `onDeath`가 `DEATH_CHAIN` 깊이를 넘으면 더 부르지 않음(일부러 서로 부르는 가짜 연쇄로)
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && NOBOT=1 node lab/family.js && node lab/choose.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 상태 계열 0 — 새 아이템 16 자료 · 수치 표 · 독·피 페그 · 단계 글 · 쓰러짐 연쇄 상한`
 
 ### Task 1: 독 — 배양 · 번식 · 변이 · 독안개 주머니 · 촉매 · 독 연기
 **Files:** `index.html`(`hitPeg` 앞 · `boardStart` · `regen`/`famRegen` · `land` · `enemyTurn` 중독 2905줄 · `landMods` · `onDeath` · `winFight` · `UI`) · `lab/stages.js`
 **Interfaces:** Produces `B.toxQ` · `B.poisonDealt` · `RUN.mutations: string[]` · `UI.mutate(next)` · `mutateOn(): boolean`(이 전투가 변이 창 조건인가)
-- [ ] 시험:
+- [x] 시험:
   - 배양: 독 2단계 전투 시작 → 독 페그 3 · 독 페그를 지난 구슬은 튕기지 않고 중독 +1(같은 페그 두 번은 +1만) · 페그는 그대로 · 1단계는 0
   - 독안개 주머니: 충전 12마다 `B.toxQ` 하나 → `regen` 뒤 독 페그 · 판에 8개 넘게 돋지 않음 · 마른 발은 `B.toxQ` 그대로
   - 번식: 독 4, 중독 3인 적에게 착지 → 4 · 적 턴 중독 피해 3 → 6(두 번) · 3단계는 한 번
@@ -537,63 +537,63 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
   - 변이 효과: 맹독(중독 10 → 적 턴 뒤 15 · 70 → 99) · 부식(중독 10 · 갑옷 3 → 착지 갑옷 1) · 신경독(중독 30 → 적 턴에 기절, 면역이면 안 함) · 포자(중독된 적이 쓰러지면 독 페그 3)
   - 촉매: 이 발 첫 착지가 그 적 중독 2배(두 번째 착지는 그대로) · 독 연기: 적 턴마다 모든 적 중독 +1
   - 마른 발(독 6 · 독안개 주머니): 판 · 런 · 적 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/route.js && node lab/formation.js`
-- [ ] 브라우저 375px: 변이 창(네 줄 설명) · 고른 뒤 보상 창
-- [ ] 커밋 `prototype(ball-roguelite): 상태 계열 1 — 독(배양 · 번식 · 변이) · 독안개 주머니 · 촉매 · 독 연기`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/route.js && node lab/formation.js`
+- [x] 브라우저 375px: 변이 창(네 줄 설명) · 고른 뒤 보상 창
+- [x] 커밋 `prototype(ball-roguelite): 상태 계열 1 — 독(배양 · 번식 · 변이) · 독안개 주머니 · 촉매 · 독 연기`
 
 ### Task 2: 출혈 — 상처 벌리기 · 피 터뜨림 · 피의 잔 · 톱날 원반 · 흡혈 박쥐 · 혈흔 단검 · 터지는 상처 · 피 웅덩이 · 굳지 않는 피
 **Files:** `index.html`(`land` · `breakPeg`/`charge` · `onDeath` · `regen`) · `lab/stages.js`
 **Interfaces:** Produces `RUN.chalice` · `chaliceLv(): number` · `B.bloodQ`
-- [ ] 시험:
+- [x] 시험:
   - 상처 벌리기: 출혈 2, 출혈 4인 적에게 크리 착지 → 8 이상(옮김 전) · 출혈 1을 실은 착지 → 1 + 1 · 1단계는 그대로
   - 피 터뜨림: 출혈 4, 출혈 13 · 체력 1000인 적에 착지 → 출혈 0 · 그 착지 피해 + 150 · 출혈 12면 안 터짐 · 마른 발도 `shot.dmg`에 150
   - 피의 잔: 출혈 6, 13 터뜨림 → `RUN.chalice` 13 · 출혈 6 남음 · 잔 95 → 13 더하면 최대 체력 +5 · `chaliceLv()` 1 → 착지마다 출혈 +1 · 굳지 않는 피: 터뜨린 뒤 출혈 13 그대로
   - 톱날 원반: 페그 10개 맞힌 구슬이 착지 → 출혈 +2 · 흡혈 박쥐: 출혈 적에 착지 → 출혈 −1 · 체력 +1 · 같은 발 다른 구슬 힘 +1, 한 발 5번까지 · 혈흔 단검: 크리 착지 출혈 +2 · 터지는 상처: 출혈 7인 적이 쓰러지면 다른 적마다 7 · 피 웅덩이: 출혈 적에 착지할 때마다 `B.bloodQ` 하나(한 발 10) → `regen` 뒤 피 페그, 맞히면 구슬 힘 +1
   - 마른 발(출혈 6): 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 상태 계열 2 — 출혈(상처 벌리기 · 피 터뜨림 · 피의 잔) · 톱날 원반 · 흡혈 박쥐 · 혈흔 단검 · 터지는 상처 · 피 웅덩이 · 굳지 않는 피`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 상태 계열 2 — 출혈(상처 벌리기 · 피 터뜨림 · 피의 잔) · 톱날 원반 · 흡혈 박쥐 · 혈흔 단검 · 터지는 상처 · 피 웅덩이 · 굳지 않는 피`
 
 ### Task 3: 레이저 — 착지 레이저 · 굴절 · 방사선 · 렌즈 연마 · 노을 구슬 · 집광 렌즈 · 거울 방패 · 표적 조준기 · 분광기
 **Files:** `index.html`(`ORBS.prism` · `redring` ab · `land` · `hurt` 2477줄 · `breakPeg`(마지막 페그 높이 `b.lastPegY`)) · `lab/stages.js`
 **Interfaces:** Produces `laserRate(shot, b): number` · `fireLaser(shot, b, f): number`(준 피해 합) · `RUN.lensBonus` · `e.rad`
-- [ ] 시험:
+- [x] 시험:
   - 착지 레이저: 프리즘(힘 50) 착지 → 줄의 다른 적마다 10(1번 칸 적은 착지 + 10) · 마른 발은 `shot.dmg`에만 · 노을 구슬 0.3 · 지킴이 뒤 적의 몫은 지킴이가 맞음 · 거울 방패면 그대로 · 단계와 상관없이 · 이전 규칙은 레이저 없음
   - 굴절(2): 중독 2 · 출혈 1을 실은 프리즘 → 맞은 적마다 중독 +2 · 출혈 +1 · 방사선(4): 레이저 세 번 → `rad` 3 · 그 적 `hurt(100)` → 109 · 10에서 멈춤
   - 렌즈 연마(6): 레이저로 쓰러뜨림 → `RUN.lensBonus` 0.02 · 비율 1에서 멈춤 · 0.5를 넘으면 마지막 페그 높이 가로줄 8개까지 깨고 그만큼 피해 +
   - 집광 렌즈 +0.1 · 크리 구슬이면 레이저도 크리 배율 · 표적 조준기: 레이저 맞은 적에게 이 발 다음 착지 크리 · 분광기: 중독 · 출혈 걸린 적에게 레이저 +40%
   - 마른 발(레이저 6): 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js && node lab/choose.js`
-- [ ] 커밋 `prototype(ball-roguelite): 상태 계열 3 — 레이저(착지 레이저 · 굴절 · 방사선 · 렌즈 연마) · 노을 구슬 · 집광 렌즈 · 거울 방패 · 표적 조준기 · 분광기`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js && node lab/choose.js`
+- [x] 커밋 `prototype(ball-roguelite): 상태 계열 3 — 레이저(착지 레이저 · 굴절 · 방사선 · 렌즈 연마) · 노을 구슬 · 집광 렌즈 · 거울 방패 · 표적 조준기 · 분광기`
 
 ### Task 4: 폭탄 — 도화선 · 연쇄 · 화약 창고 · 폭죽 구슬 · 도깨비 뇌관
 **Files:** `index.html`(`hitPeg` 폭탄 · `bombLane` · `boardStart` · `land` · `onDeath`) · `lab/stages.js`
 **Interfaces:** Produces `bombChain(shot, b, p, ev): number` · `RUN.bombsLit` · `shot.bombLand`
-- [ ] 시험:
+- [x] 시험:
   - 도화선(2): 판 깔 때 폭탄 페그 +2 · 한 번에 터짐 · 1단계는 두 번
   - 연쇄(4): 폭탄 셋이 반경 24 안에 줄지어 → 하나 맞히면 셋 다 터지고 줄 피해가 1 · 1.2 · 1.4배 · 한 발 20개에서 멈춤 · 터질 때마다 그 발 착지 +3
   - 화약 창고(6): `RUN.bombsLit` 23 → 판 깔 때 대형 폭탄 2 · 대형 폭탄은 구슬 힘 ×5 · 폭탄 피해 ×2 · 마른 발은 `RUN.bombsLit` 그대로
   - 폭죽 구슬: 힘 40 착지 → 줄의 적마다 20(화약고면 40) · 도깨비 뇌관: 최대 체력 200인 적이 쓰러지면 다른 적마다 20 · 기름통 · 터지는 상처와 함께 줄 전체가 쓰러져도 멈춤(`DEATH_CHAIN`)
   - 마른 발(폭탄 6): 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 상태 계열 4 — 폭탄(도화선 · 연쇄 · 화약 창고) · 폭죽 구슬 · 도깨비 뇌관`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 상태 계열 4 — 폭탄(도화선 · 연쇄 · 화약 창고) · 폭죽 구슬 · 도깨비 뇌관`
 
 ### Task 5: 거대·무게 — 눈덩이 · 짓누르기 · 기록 경신
 **Files:** `index.html`(`charge` · `land` · `landMods` · `makeBall`(시작 힘)) · `lab/stages.js`
 **Interfaces:** Produces `isHeavy(shot): boolean` · `b.weight` · `RUN.bestLand` · `RUN.startPow`
-- [ ] 시험:
+- [x] 시험:
   - 눈덩이(2): 닻추가 페그 20개 → 무게 2 · 반지름 ×1.08² · 착지 ×1.2 · 반지름은 1.6배에서 멈춤 · 조약돌은 그대로
   - 짓누르기(4): 착지 25 · 갑옷 5 · 막기인 적 → 25 그대로(19는 깎임) · 체력 10인 적에 착지 25 → 다음 적에게 15
   - 기록 경신(6): `RUN.bestLand` 100, 착지 120 → 기록 120 · `RUN.startPow` 1 → 다음 발 구슬 시작 힘 +1 · 그 착지의 넘친 피해가 셋째 적까지 · 마른 발은 기록 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 상태 계열 5 — 거대·무게(눈덩이 · 짓누르기 · 기록 경신)`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 상태 계열 5 — 거대·무게(눈덩이 · 짓누르기 · 기록 경신)`
 
 ### Task 6: 봇 · 측정 · 검토 · 기록 · PR
 **Files:** `index.html`(`botRun` 변이 고르기) · `lab/stagebot.js`(KIT에 다섯 계열) · waypoint `15-ball-roguelite.md` · `STATUS.md`
-- [ ] `lab/stagebot.js` KIT: 독 `['sting', 'poisonfog'] / ['sporepouch', 'hive', 'fumes', 'catalyst']` · 출혈 `['briar', 'saw'] / ['tridagger', 'spleen', 'bloodpool', 'unclot']` · 레이저 `['prism', 'sunset'] / ['lens', 'mirrorshield', 'scope', 'spectro']` · 폭탄 `['sticky', 'firework'] / ['arsenal', 'powder', 'fuse', 'imp']` · 거대·무게 `['heavy', 'giant'] / ['weight', 'lead', 'bedrock', 'pierce']`
-- [ ] 회귀: `lab/stages.js` · `family` · `choose` · `route` · `formation` 모두 · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 결정성
-- [ ] 측정(기록, 균형은 P8): `stagebot.js` 다섯 계열 × 2 · 4 · 6 × 6런 → 지역별 한 전투 발 수 · 30초 발 · 진형 40런 × mixed · focus · family · `FAM=` 다섯 계열 각 12런. P3 계열과 나란히 표로
-- [ ] 브랜치 전체 검토(새 검토자, 가장 강한 모델) → Critical · Important 고침(시험 RED → GREEN) · Minor 기록
-- [ ] 기록 `15-ball-roguelite.md` §34 · 체크리스트 · STATUS → waypoint → 포인터 → PR(기준 `main`, 트레일러 · AI 서명 없음)
+- [x] `lab/stagebot.js` KIT: 독 `['sting', 'poisonfog'] / ['sporepouch', 'hive', 'fumes', 'catalyst']` · 출혈 `['briar', 'saw'] / ['tridagger', 'spleen', 'bloodpool', 'unclot']` · 레이저 `['prism', 'sunset'] / ['lens', 'mirrorshield', 'scope', 'spectro']` · 폭탄 `['sticky', 'firework'] / ['arsenal', 'powder', 'fuse', 'imp']` · 거대·무게 `['heavy', 'giant'] / ['weight', 'lead', 'bedrock', 'pierce']`
+- [x] 회귀: `lab/stages.js` · `family` · `choose` · `route` · `formation` 모두 · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 결정성
+- [x] 측정(기록, 균형은 P8): `stagebot.js` 다섯 계열 × 2 · 4 · 6 × 6런 → 지역별 한 전투 발 수 · 30초 발 · 진형 40런 × mixed · focus · family · `FAM=` 다섯 계열 각 12런. P3 계열과 나란히 표로
+- [x] 브랜치 전체 검토(새 검토자, 가장 강한 모델) → Critical · Important 고침(시험 RED → GREEN) · Minor 기록
+- [x] 기록 `15-ball-roguelite.md` §34 · 체크리스트 · STATUS → waypoint → 포인터 → PR(기준 `main`, 트레일러 · AI 서명 없음)
 
 ## 다음 계획
 P4가 끝나면 P5(구슬 수 · 표적: 물량 · 메아리 · 크리 · 처형·사냥 · 보물 + 새 아이템 13) 계획을 같은 형식으로 쓴다. P5 · P6이 끝날 때마다 `lab/stagebot.js`로 계열 덱 발 수를 다시 재고, 적 체력 배율(`REGION_HP_R`)은 P8에서 최종으로 맞춘다.
