@@ -900,7 +900,7 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
 - [x] 회귀: `lab/stages.js` · `family` · `choose` · `route` · `formation` 모두 · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 결정성(`base-p6.html` 기준)
 - [x] 측정(기록, 균형은 P8): `stagebot.js` 세 계열 × 2 · 4 · 6 × 12런 → 지역별 한 전투 발 수 · 30초 발 · 진형 무작위 160런 · 몰기 · 계열 40런 · `FAM=` 세 계열 각 12런. P5 표와 나란히
 - [x] 브랜치 전체 검토(새 검토자, 가장 강한 모델) → Critical · Important 고침(시험 RED → GREEN) · Minor 기록
-- [ ] 기록 `15-ball-roguelite.md` §36 · 체크리스트 · STATUS · 「P8에서 볼 것」에 새로 미룬 측정 → waypoint → 포인터 → PR(PR #22 머지 뒤 `main` 기준, 트레일러 · AI 서명 없음)
+- [x] 기록 `15-ball-roguelite.md` §36 · 체크리스트 · STATUS · 「P8에서 볼 것」에 새로 미룬 측정 → waypoint → 포인터 → PR(PR #22 머지 뒤 `main` 기준, 트레일러 · AI 서명 없음) — PR #22가 열려 있어 그 위에 쌓은 PR #23(기준 `ball-roguelite/target-families`)으로 열었다. PR #22 머지 뒤 기준을 `main`으로 바꾼다.
 
 ## P8에서 볼 것 (P3~P6에서 미룬 측정, 2026-11-09 · P6 더함 2026-11-10)
 
