@@ -824,14 +824,14 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
 ### Task 0: 공통 바탕 — 새 아이템 22 자료 · 수치 표 · 단계 글 · 체력 잃기 · 막은 양 · 등장 규칙
 **Files:** `index.html`(`ORBS` · `RELICS` · `RECIPES` · `FAM_ITEMS` · `FAM_STAGE` · `JOT_KEYS` · `heroDefend` · `relicCandsR` · 레이저 분광기 자리 · 체력 깎는 자리) · `lab/stages.js`(P6 절, 102부터) · `lab/family.js`(개수)
 **Interfaces (Produces):** 「정한 것」 1 · 2의 키와 표 · `loseHp(n)` · `lostHp()` · `stsOf(e)` · `wardCap()` · `linkReady()` · `B.blockedTurn` · `RUN.blocked` · `RUN.lostHp` · `JOT_KEYS`에 `web`
-- [ ] 시험: `family.js` 개수 → `summon: 8, guard: 10, blood: 9, swarm: 14` · 새 22개 `rank: true`, 이전 규칙 보상 후보에 없음 · 키 · 이름이 기존과 겹치지 않음 · 열쇠: `spiderbag` · `blooddrop` · `devilfang` · `larvabed` · `bloodoath` · 계열 잇기 · 듀오는 `famsOf`가 빈 배열 · `RECIPES` 사냥벌 + 귀뚜라미 → `queen` · 듀오 `steam`은 화상 2 · 얼음 1이면 후보에 없고 2 · 2면 있음 · `elemring`은 2단계 계열 하나면 없고 둘이면 있음 · 적 턴 공격 7을 받으면 `RUN.lostHp` 7 · 가호 1로 공격 10을 받으면 `B.blockedTurn` 5 · `RUN.blocked` 5 · `stsOf` 중독 + 화상 = 2 · `famStageLines()`가 수호 4단계에서 「방패 들기」 · 「방패 치기」
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && NOBOT=1 node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 생존 계열 0 — 새 아이템 22 자료 · 수치 표 · 단계 글 · 체력 잃기 · 막은 양 · 듀오 · 계열 잇기 등장 규칙`
+- [x] 시험: `family.js` 개수 → `summon: 8, guard: 10, blood: 9, swarm: 14` · 새 22개 `rank: true`, 이전 규칙 보상 후보에 없음 · 키 · 이름이 기존과 겹치지 않음 · 열쇠: `spiderbag` · `blooddrop` · `devilfang` · `larvabed` · `bloodoath` · 계열 잇기 · 듀오는 `famsOf`가 빈 배열 · `RECIPES` 사냥벌 + 귀뚜라미 → `queen` · 듀오 `steam`은 화상 2 · 얼음 1이면 후보에 없고 2 · 2면 있음 · `elemring`은 2단계 계열 하나면 없고 둘이면 있음 · 적 턴 공격 7을 받으면 `RUN.lostHp` 7 · 가호 1로 공격 10을 받으면 `B.blockedTurn` 5 · `RUN.blocked` 5 · `stsOf` 중독 + 화상 = 2 · `famStageLines()`가 수호 4단계에서 「방패 들기」 · 「방패 치기」
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && NOBOT=1 node lab/family.js && node lab/choose.js && node lab/route.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 생존 계열 0 — 새 아이템 22 자료 · 수치 표 · 단계 글 · 체력 잃기 · 막은 양 · 듀오 · 계열 잇기 등장 규칙`
 
 ### Task 1: 소환 — 벌레 떼 · 먹이 · 변태 · 거미 주머니 · 여왕벌 · 유충 침대 · 벌떼 군기 · 곤충 도감
 **Files:** `index.html`(`endShot` · `newShot` · `hitPeg` · `land` · `startFight` · 벌 상한 · 그리기: 거미줄 · 장수말벌) · `lab/stages.js`
 **Interfaces:** Produces `B.flies: number[]` · `RUN.wasps` · `p.web` · `RUN.bugKills` · `bugBite(n, st)`(무리 피해 + 상태이상 + 도감 · 군기)
-- [ ] 시험:
+- [x] 시험:
   - 벌레 떼: 소환 2, 날벌레 4마리 발 → 다음 발 무는 수 4 + 새 것 · 30에서 멈춤 · 소환 0이면 그대로 사라짐 · 새 전투에서 0
   - 먹이: 소환 4, 날벌레 3 · 일반 페그 10 → 발 끝 페그 7 · 먹은 수 1씩 · 그 발 무는 피해 3 × 3, 다음 발 3 × (3 + 1)(물고 나서 먹음) · 페그 0이면 안 먹음 · 구슬이 중독 2를 실었으면 표적 중독 +2(한 번)
   - 변태: 소환 6, 먹은 수 9인 날벌레가 한 번 더 먹으면 `RUN.wasps` 1 · 날벌레에서 빠짐 · 3에서 멈춤 · 장수말벌 2 → 발 끝 뒷줄 20
@@ -839,24 +839,24 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
   - 여왕벌: 벌 12까지 · 벌이 상태이상을 실음 · 사냥벌은 6 그대로
   - 유충 침대 5마리 · 벌떼 군기 ×2 · 곤충 도감: 날벌레로 쓰러뜨리면 `RUN.bugKills` 1 · 10에서 멈춤
   - 마른 발(소환 6 · 거미 주머니): 판 · 런 · 날벌레 그대로
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 브라우저 375px: 거미줄 페그 · 남은 날벌레 수 · 장수말벌 표시
-- [ ] 커밋 `prototype(ball-roguelite): 생존 계열 1 — 소환(벌레 떼 · 먹이 · 변태) · 거미 주머니 · 여왕벌 · 유충 침대 · 벌떼 군기 · 곤충 도감`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 브라우저 375px: 거미줄 페그 · 남은 날벌레 수 · 장수말벌 표시
+- [x] 커밋 `prototype(ball-roguelite): 생존 계열 1 — 소환(벌레 떼 · 먹이 · 변태) · 거미 주머니 · 여왕벌 · 유충 침대 · 벌떼 군기 · 곤충 도감`
 
 ### Task 2: 수호 — 방패 들기 · 방패 치기 · 성흔
 **Files:** `index.html`(`endShot` · `land` · `heroDefend` · `startFight` · `wardCap` 자리) · `lab/stages.js`
 **Interfaces:** Produces `RUN.stigma` · `B.counter`(적 턴 끝에 `B.blockedTurn`을 옮겨 두고 다음 발 첫 착지가 씀)
-- [ ] 시험:
+- [x] 시험:
   - 방패 들기: 수호 2, 진짜 발 끝 가호 +1 · 3에서 멈춤 · 마른 발은 그대로
   - 방패 치기: 수호 4, 가호 2면 착지 ×1.2 · 지난 적 턴 막은 양 6 → 다음 발 첫 착지 +6, 둘째 착지는 그대로, 그다음 발은 0
   - 성흔: 수호 6, 막은 양 누적 49 → 성흔 0 · 50 → 1 · 최대 체력 +3 · 다음 전투 시작 가호 +1 · 가호 상한 5 · 10에서 멈춤 · 전투 끝 가호 2 → 다음 전투(다른 지역이어도) 시작 가호 2 + 성흔 · 수호 4면 다음 전투 0부터
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 생존 계열 2 — 수호(방패 들기 · 방패 치기 · 성흔)`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 생존 계열 2 — 수호(방패 들기 · 방패 치기 · 성흔)`
 
 ### Task 3: 피의 대가 — 바치기 · 광기 · 악마의 거래 · 핏방울 · 악마의 송곳니 · 피의 서약 · 유리 대포
 **Files:** `index.html`(HUD 「바치기」 버튼 · `launch` · `newShot` · `makeBall` · `land` · 쓰러짐 판정 · `lootCards`/`rewardCardsR` 거래 카드 · `applyCard` · `cardHtml` · 봇 `launch` 앞) · `lab/stages.js`
 **Interfaces:** Produces `B.payOn`(다음 발 바치기 켬) · `shot.paid` · `B.dealUsed` · `B.frenzy` · `B.oath` · 카드 `{ t: 'deal', give: 'relic' | 'up', k?, key? }`
-- [ ] 시험:
+- [x] 시험:
   - 바치기: 피 2, 켜고 쏨 → 체력 −2 · 착지 ×1.3 · 체력 2면 켤 수 없음 · 마른 발은 체력 그대로 · 봇은 체력 31/60이면 켬, 30/60이면 안 켬
   - 광기: 피 4, 체력 40/60 → 착지 ×1.2
   - 악마의 거래: 피 6, 쓰러질 피해 → 체력 1 · 그 전투 착지 ×2 · 같은 전투 두 번째는 쓰러짐 · 아홉 수염과 겹치면 거래가 먼저(목숨 그대로) · 보상에 거래 카드 1장 · 고르면 최대 체력 −10 · 최대 체력 20이면 거래 카드 없음
@@ -864,27 +864,27 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
   - 송곳니: `RUN.lostHp` 25 → 시작 힘 +2(Lv1) · +20에서 멈춤
   - 피의 서약: 전투 첫 발 체력 −4 · 착지 ×1.2 · 둘째 발은 안 깎음 · 체력 4면 안 바침
   - 유리 대포: 최대 체력 60 → 30 · 체력 50 → 30 · 착지 ×2
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js && node lab/choose.js`
-- [ ] 브라우저 375px: 바치기 버튼 · 거래 카드 · 버틴 뒤 「광란」 표시
-- [ ] 커밋 `prototype(ball-roguelite): 생존 계열 3 — 피의 대가(바치기 · 광기 · 악마의 거래) · 핏방울 · 악마의 송곳니 · 피의 서약 · 유리 대포`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js && node lab/choose.js`
+- [ ] 브라우저 375px: 바치기 버튼 · 거래 카드 · 버틴 뒤 「광란」 표시 — 바치기 버튼 · 거래 카드는 확인했다. 버틴 뒤는 「광란」 표시 대신 화면 글(「악마의 거래: 버텼다 — 이 전투 착지 ×2」)만 넣었고 브라우저에서는 보지 않았다(오너 플레이에서 확인, §36).
+- [x] 커밋 `prototype(ball-roguelite): 생존 계열 3 — 피의 대가(바치기 · 광기 · 악마의 거래) · 핏방울 · 악마의 송곳니 · 피의 서약 · 유리 대포`
 
 ### Task 4: 계열 잇기 — 원소 고리 · 불붙는 독 · 녹인 방패 · 거둠 바구니 · 여섯 눈 주사위 · 빈 액자
 **Files:** `index.html`(`land` · `enemyTurn` · `newShot` · `endShot` · 확률 자리 열 곳(아홉 가지) · `makeBall`) · `lab/stages.js`
 **Interfaces:** Produces `chance(p)` · `B.harvest`(다음 발 시작 힘 +)
-- [ ] 시험:
+- [x] 시험:
   - 원소 고리: 중독 + 출혈 + 화상 적 → 착지 ×1.45 · 상태이상 없으면 ×1
   - 불붙는 독: 중독 7 → 적 턴에 중독 1 · 화상 +2
   - 녹인 방패: 가호 2로 쏨 → 가호 0 · 착지 ×1.5 · 마른 발은 가호 그대로
   - 거둠 바구니: 씨앗 페그 3 · 열매 2 → 발 끝에 사라짐 · 다음 발 시작 힘 +5 · 20에서 멈춤
   - 여섯 눈 주사위: `chance(0.1)` 0.2 · `chance(0.6)` 1 · 날벌레 둥지: 난수 0.15에서 주사위 없으면 날벌레 0 · 있으면 1 · 회피 0.5 → 1(전투마다 한 번은 반드시 피함)
   - 빈 액자: 조약돌 2칸 → 착지 ×1.4 · 0칸 ×1
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 생존 계열 4 — 계열 잇기(원소 고리 · 불붙는 독 · 녹인 방패 · 거둠 바구니 · 여섯 눈 주사위 · 빈 액자)`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 생존 계열 4 — 계열 잇기(원소 고리 · 불붙는 독 · 녹인 방패 · 거둠 바구니 · 여섯 눈 주사위 · 빈 액자)`
 
 ### Task 5: 듀오 6 · 본뜬 도장
 **Files:** `index.html`(`setDaze` · 레이저 굴절 · `land` · `regrow`/`famRegen` · `heroDefend` · `trans('blade')` 자리 · `relicN` · `famCount0` · `COPY_N` 유물 자리 · `cardHtml` · 승리 화면) · `lab/stages.js`
 **Interfaces:** Produces `relicN(k)` · `stampOf()`(도장이 고른 유물 키 또는 null) · `bladeOn()`
-- [ ] 시험:
+- [x] 시험:
   - 증기 폭발: 화상 3 × 시간 2 적이 기절 → 피해 12 · 화상 0
   - 방사능 독: 중독 3 실은 착지 레이저 → 맞은 적 중독 +6
   - 피바다: 안 빠진 구슬 25 → 착지 출혈 +2
@@ -892,19 +892,19 @@ check('보스: 구슬 하나 → 유물 하나 → 다음 마디', seen.join() =
   - 순교: 가호가 막음 → `RUN.martyrN` 3 · `lostHp()` +3
   - 칼날 어미: 진형 처형 문턱 +0.1 · 크리 배율 +1(이전 규칙 칼날 어미 변신과 같은 값)
   - 본뜬 도장: 독 연기 → 도장 순서면 적 턴 중독 +2 · 독 계열 개수 +1 · 도장이 첫 유물이면 다음에 얻은 유물을 고름 · 고른 유물이 유리 대포면 최대 체력은 한 번만 절반 · 쉼터에서 고른 유물을 버리면 `stampOf()` null · 도장이 도장을 고르지 않음
-- [ ] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && NOBOT=1 node lab/family.js && node lab/formation.js`
-- [ ] 커밋 `prototype(ball-roguelite): 생존 계열 5 — 듀오(증기 폭발 · 방사능 독 · 피바다 · 지뢰밭 · 순교 · 칼날 어미) · 본뜬 도장`
+- [x] 실패 확인 → 구현 → `NOBOT=1 node lab/stages.js && NOBOT=1 node lab/family.js && node lab/formation.js`
+- [x] 커밋 `prototype(ball-roguelite): 생존 계열 5 — 듀오(증기 폭발 · 방사능 독 · 피바다 · 지뢰밭 · 순교 · 칼날 어미) · 본뜬 도장`
 
 ### Task 6: 봇 · 측정 · 검토 · 기록 · PR
-- [ ] `lab/stagebot.js` KIT: 소환 `['hornet', 'spiderbag'] / ['flies', 'larvabed', 'hive', 'bugbanner']` · 수호 `['holywater', 'catclaw'] / ['halo', 'mantle', 'holyflask', 'shell']` · 피의 대가 `['blooddrop', 'devilfang'] / ['bloodoath', 'crown', 'laststand', 'fist']`
-- [ ] 회귀: `lab/stages.js` · `family` · `choose` · `route` · `formation` 모두 · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 결정성(`base-p6.html` 기준)
-- [ ] 측정(기록, 균형은 P8): `stagebot.js` 세 계열 × 2 · 4 · 6 × 12런 → 지역별 한 전투 발 수 · 30초 발 · 진형 무작위 160런 · 몰기 · 계열 40런 · `FAM=` 세 계열 각 12런. P5 표와 나란히
-- [ ] 브랜치 전체 검토(새 검토자, 가장 강한 모델) → Critical · Important 고침(시험 RED → GREEN) · Minor 기록
+- [x] `lab/stagebot.js` KIT: 소환 `['hornet', 'spiderbag'] / ['flies', 'larvabed', 'hive', 'bugbanner']` · 수호 `['holywater', 'catclaw'] / ['halo', 'mantle', 'holyflask', 'shell']` · 피의 대가 `['blooddrop', 'devilfang'] / ['bloodoath', 'crown', 'laststand', 'fist']`
+- [x] 회귀: `lab/stages.js` · `family` · `choose` · `route` · `formation` 모두 · 이전 규칙 지문 `fdf868b7…`(21승) · `selfTest()` 결정성(`base-p6.html` 기준)
+- [x] 측정(기록, 균형은 P8): `stagebot.js` 세 계열 × 2 · 4 · 6 × 12런 → 지역별 한 전투 발 수 · 30초 발 · 진형 무작위 160런 · 몰기 · 계열 40런 · `FAM=` 세 계열 각 12런. P5 표와 나란히
+- [x] 브랜치 전체 검토(새 검토자, 가장 강한 모델) → Critical · Important 고침(시험 RED → GREEN) · Minor 기록
 - [ ] 기록 `15-ball-roguelite.md` §36 · 체크리스트 · STATUS · 「P8에서 볼 것」에 새로 미룬 측정 → waypoint → 포인터 → PR(PR #22 머지 뒤 `main` 기준, 트레일러 · AI 서명 없음)
 
-## P8에서 볼 것 (P3~P5에서 미룬 측정, 2026-11-09)
+## P8에서 볼 것 (P3~P6에서 미룬 측정, 2026-11-09 · P6 더함 2026-11-10)
 
-P3~P5는 측정을 기록만 하고 균형을 P8로 미뤘다. P8 계획을 쓸 때 아래 항목을 빠짐없이 넣는다. 각 줄은 「무엇이 · 얼마나 · 어느 표를 볼지 · 근거 절」 순서다. 수치는 측정한 때의 값이라, P6 · P7을 거친 뒤 다시 잰다.
+P3~P6은 측정을 기록만 하고 균형을 P8로 미뤘다. P8 계획을 쓸 때 아래 항목을 빠짐없이 넣는다. 각 줄은 「무엇이 · 얼마나 · 어느 표를 볼지 · 근거 절」 순서다. 수치는 측정한 때의 값이라, P6 · P7을 거친 뒤 다시 잰다.
 
 - **무작위 봇이 이긴다:** 진형 160런 P4 60승(38%) · P5 63승(39%). P8 목표는 「무작위 거의 0」이다. 적 체력(`REGION_HP_R`, 지금 동굴 ×3 · 성 ×3은 1차 값)과 함께 본다. (§33 · §34 · §35)
   - P5의 40런 14 → 20승은 흔들림이었다. 같은 시드 160런으로 다시 재니 P4 · P5 차이가 3승(2%p)이라, P5 아이템이 무작위 봇을 세게 만든 것은 아니다. 40런 하나로는 6승 차이도 가르지 못하므로, P8은 비교마다 160런으로 잰다. (§35)
@@ -917,8 +917,13 @@ P3~P5는 측정을 기록만 하고 균형을 P8로 미뤘다. P8 계획을 쓸 
 - **한 계열을 끝까지 모으기 어렵다:** 계열마다 12런(`FAM=`)에서 6단계 런이 드물다(레이저 12런 중 7런이 2단계도 못 감, 메아리 · 처형·사냥 · 보물은 6단계 런 0). 보상 끌림 `FAM_PULL`(4개 이상 2.5배 · 2개 이상 1.5배) · 계열 문을 본다. (§34 · §35)
 - **보물은 측정 방법부터 정한다:** 단계별 덱(`lab/stagebot.js`)은 덱을 고정해서 보물의 보상 몫(카드 +1 · 다시 뽑기 · 보물상자)이 쌓이지 않는다(2단계 0승). 보물은 40런 · `FAM=loot` 쪽으로 재거나, stagebot에 보상 몫을 흉내 내는 방법을 더한다. `LOOT_R`. (§35)
 - **판단을 미룬 것:** 연속 크리는 한 발 상한이 없음(`CRIT_R.chain`) · 판 밖으로 빠진 길의 유령도 착지함 · 착지마다 계열 단계를 더 자주 셈(성능). (§35)
+- **P6에서 세 봇이 함께 떨어졌다:** 무작위 160런 66 → 55승 · 몰기 40런 23 → 16 · 계열 40런 25 → 16(6단계 런 10 → 5). 옛 아이템의 전투는 그대로(고정 덱 510전투가 P6 시작과 같음)라 보상 쪽 원인이다. 계열 봇의 자동 계열이 소환으로 쏠리고 소환 카드가 모자라 1개에서 멈춤 · 무작위 봇이 피의 서약 · 핏방울을 집으면 손해 · 몰기 봇은 원인을 못 가름. 계열 잇기 · 듀오 · 새 유물이 보상 유물 칸을 얼마나 차지하는지(`relicCandsR`)부터 센다. (§36)
+- **소환이 가장 느리고 약하다:** 단계별 덱 6단계 6승 · 한 전투 4~5발, `FAM=summon` 12런 1승. `SUMMON_R`(`bite` · `fedPer` · `wasp`) · 벌레가 뒷줄만 무는 것 · 소환 카드 수를 본다. (§36)
+- **수호는 2단계부터 거의 다 이긴다:** 단계별 덱 11 · 12 · 12승(성 한 전투 6 → 3.5발), `FAM=guard` 12런 7승. 생존 계열이 「계열 2~3발」 목표 밖에서 어떤 몫을 할지 정하고 `GUARD_R`(`raise` · `cap6` · 성흔) · 가호를 다음 전투로 넘기는 것을 본다. (§36)
+- **피의 대가는 단계별 덱 6단계 10승인데 `FAM=blood` 12런은 2승:** 계열을 모으는 동안 체력 대가(바치기 봇 문턱 체력 절반 · 피의 서약 자동 바침 · 유리 대포 · 거래 카드)를 버티지 못하는지 본다. `BLOOD_R`. (§36)
+- **P6에서 판단을 미룬 것:** 쉼터에서 도장 대상을 버리면 그 앞 유물로 넘어감 · 지뢰밭이 숲 · 동굴의 평소 다시 돋음에도 걸림 · 거둠 바구니 · 핏방울이 그 발 모든 구슬에 걸림 · 최대 체력 줄이기는 잃은 체력에 안 셈 · 도장을 가지면 `relicN`이 매번 유물을 훑음(봇 런 성능). (§36)
 - **단지 힘 나누기 실험을 켤지:** 순서표의 P8 줄 그대로. (§30)
-- 균형과 별개로 미룬 Minor는 §33(8개) · §34(5개) · §35(9개)에 있다. P8에서 함께 고칠지 따로 고칠지 정한다.
+- 균형과 별개로 미룬 Minor는 §33(8개) · §34(5개) · §35(9개) · §36(4개)에 있다. P8에서 함께 고칠지 따로 고칠지 정한다.
 
 ## 다음 계획
-P6이 끝나면 P7(심연 지역: 네 번째 지역의 적 · 판 · 보스, 사서 · 살덩이 옮김 → 4지역 × 7마디) 계획을 같은 형식으로 쓴다. P7b(방해 적) · P8(균형)은 그 뒤다. P8 계획은 위 「P8에서 볼 것」을 빠짐없이 넣어 쓴다.
+P6은 끝났다(2026-11-10, §36). 다음은 P7(심연 지역: 네 번째 지역의 적 · 판 · 보스, 사서 · 살덩이 옮김 → 4지역 × 7마디) 계획을 같은 형식으로 쓴다. P7b(방해 적) · P7c(희귀도) · P8(균형)은 그 뒤다. P8 계획은 위 「P8에서 볼 것」을 빠짐없이 넣어 쓴다.
