@@ -63,6 +63,7 @@ updated: YYYY-MM-DD
 
 ## §5. 검증 계획
 - [ ] `tsc`/린트 = 0
+- [ ] PR 브랜치에 base merge 커밋 없음: 레포마다 `git log --merges origin/<base>..HEAD` 가 비어 있다(최신화는 rebase)
 - [ ] 단위/통합 테스트: <검증 대상 + 파일>
 - [ ] 수동/시각 검증: <절차 + 통과 기준> (프로젝트 검증 SOP 링크)
 

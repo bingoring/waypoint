@@ -22,6 +22,15 @@ AI가 새 세션을 시작할 때 반드시 아래 순서를 따른다:
 - 중요한 결정이 내려지면 `projects/{name}/DECISIONS.md`에 항목을 추가한다 (아래 "결정 로그")
 - 사람이 채팅으로 게이트에 답하면 AI는 `AI Proposal`을 고쳐 쓰지 않고 검토 게이트 아래 **`승인 결과`** 에 기록한다 (아래 "승인 결과 기록")
 - 버전·가격·스토어 정책 같은 **외부 사실**은 조회일·출처 URL·확인 수준을 함께 적는다 (아래 "외부 사실 표기")
+- **PR · 기능 브랜치를 base(develop · master · main)에 맞출 때는 rebase 만 한다.** base 를 기능 브랜치에 merge 하지 않는다. 충돌 해결 · 서브모듈 포인터 갱신도 rebase 중에 하고 `push --force-with-lease` (아래 "브랜치 규칙")
+
+## 브랜치 규칙
+
+- **PR 브랜치 최신화 = rebase.** `git rebase origin/<base>` → 충돌 해결 → `git log --merges origin/<base>..HEAD` 가 비어 있는지 확인 → `git push --force-with-lease`.
+- **금지:** base 를 기능 브랜치에 merge 하는 모든 경로 — `git merge origin/<base>`, `--rebase` 없는 `git pull`, merge 모드의 `gh pr update-branch` · GitHub "Update branch". 그 merge 커밋은 PR 머지와 함께 base 이력(그리고 base 에서 내려가는 staging · release 브랜치)에 그대로 남아, base 가 자기 자신을 merge 한 기록이 생긴다.
+- **서브모듈 포인터 충돌:** 어느 한쪽 해시를 고르지 않는다. 양쪽을 모두 담은 서브모듈 커밋(서브모듈 PR 이 머지됐으면 서브모듈 base 의 머지 커밋, 아니면 서브모듈 기능 브랜치를 먼저 rebase 한 tip)으로 맞춘다.
+- **예외(merge 가 맞는 곳):** 기능 브랜치를 공용 통합 브랜치(`dev` 등)에 넣을 때, 그리고 PR 의 최종 머지.
+- 구현 체크리스트와 PR 직전 점검에 "PR 브랜치에 base merge 커밋 없음" 을 넣는다(Build Spec 템플릿 §5).
 
 ## 상태 생애주기
 
