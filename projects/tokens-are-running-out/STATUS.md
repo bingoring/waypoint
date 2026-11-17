@@ -8,6 +8,10 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> 📝 **2-2 재구축 분석 제안 (2026-11-17).** Build Spec READY, 승인 대기. 공식 가격표를 확인해 보니 캐시 읽기 단가가 모델마다 달라서(Opus 5.5는 0.05배, Fable은 0.025배), 모델별 가격표로 바꿨다(1-2 계약 정정). 기준 기간의 메뉴 막대 숫자는 17.0% → 23.9%, 줄일 수 있었던 양은 5.5% → 7.8%로 바뀐다.
+
+> ✅ **2-1 머지 (2026-11-17).** PR #1 CI 통과 후 `main`에 머지(`2eed43c`).
+
 > 🏗️ **2-1 구현 완료 → 머지 대기 (2026-11-17, PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1)).** 테스트 57개, 세 기간 기준값 일치, 1.7GB 첫 색인 10.5초·최대 메모리 61MB, 증분 반영 0.43초 이내. 독립 리뷰의 CRITICAL 1·HIGH 1·MEDIUM 6·LOW 5를 모두 채택해 회귀 테스트와 함께 수정.
 
 > ✅ **2-1 승인 (2026-11-17).** 구현 착수 — 브랜치 `feature/2-1-reader-index`.
@@ -36,9 +40,9 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) IMPLEMENTED · PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1) | HUMAN_APPROVED (머지 대기) |
-| 2-2 재구축 판정 · 원인 분류 · 집계 (기준값 대조) | (예정) | PENDING |
-| 2-3 메뉴 막대 앱 화면 · 만료 경고 · 알림 | (예정) | PENDING |
+| 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) IMPLEMENTED · PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1) 머지 `2eed43c` | HUMAN_APPROVED |
+| 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) READY | AI_PROPOSED |
+| 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | (예정) | PENDING |
 | 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | (예정) | PENDING |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
