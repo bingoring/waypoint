@@ -1,7 +1,7 @@
 ---
 phase: 01-inception
 stage: 02-domain-model
-status: AI_PROPOSED
+status: HUMAN_APPROVED
 updated: 2026-11-17
 ---
 
@@ -70,15 +70,16 @@ updated: 2026-11-17
 
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
-- [ ] 원인 분류(Cause)와 비용 배분 규칙이 납득되는가?
-- [ ] "줄일 수 있었던 양"을 짧은 휴식만으로 계산하는 데 동의하는가?
+- [x] 원인 분류(Cause)와 비용 배분 규칙이 납득되는가?
+- [x] "줄일 수 있었던 양"을 짧은 휴식만으로 계산하는 데 동의하는가?
 
-### 승인 결과 (YYYY-MM-DD, 결정자)
+### 승인 결과 (2026-11-17, 사용자)
 
 > AI가 기록한다. 사람의 답이 AI 기본안과 다르면 어느 절을 대체하는지 명시한다(FRAMEWORK "승인 결과 기록").
 
 | # | 답변 |
 |---|------|
+| 1 | 채팅으로 "승인". AI 제안대로 확정한다. |
 
 ## 다음 단계
 

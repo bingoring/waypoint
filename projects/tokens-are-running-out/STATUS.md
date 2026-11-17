@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> ✅ **Inception 승인 (2026-11-17).** 1-1 ~ 1-3을 사용자가 승인했다. 다음: 2-1 제안 — 터미널(CLI) 세션의 캐시 TTL과 `--resume` 동작 확인, 기록 리더와 색인.
+
 > 📝 **Inception 제안 (2026-11-17).** 브레인스토밍에서 정한 내용을 1-1 ~ 1-3으로 옮겼다. 세 스테이지 모두 승인 대기. 승인되면 Construction 첫 단계로 **터미널(CLI) 세션의 캐시 TTL과 `--resume` 동작 확인**을 한다(설계 13장의 주요 위험).
 
 ---
@@ -16,9 +18,9 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | AI_PROPOSED |
-| 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | AI_PROPOSED |
-| 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | AI_PROPOSED |
+| 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | HUMAN_APPROVED |
+| 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | HUMAN_APPROVED |
+| 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | HUMAN_APPROVED |
 
 ## Phase 2 — Construction (How)
 
