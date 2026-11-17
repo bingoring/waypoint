@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> ✅ **2-1 승인 (2026-11-17).** 구현 착수 — 브랜치 `feature/2-1-reader-index`.
+
 > 🔎 **터미널 세션 확인 (2026-11-17).** 터미널 대화형 세션도 메인 세션이 1시간 캐시를 쓰고, `claude -c`는 같은 파일에 이어서 기록한다. CLI 자동 업데이트 직후 캐시 일부를 다시 쓰는 것도 관찰했다. 분류 규칙은 그대로 둔다([DECISIONS](DECISIONS.md)).
 
 > 📝 **2-1 기록 리더와 색인 제안 (2026-11-17).** Build Spec READY, 승인 대기. 같은 호출이 여러 기록 파일에 복사되는 것을 발견해서, 전체 기록 단위로 한 번만 세도록 1-2 계약을 확장했다(기준값은 그대로). 터미널 세션 TTL 확인은 CLI 로그인이 만료되어 뒤로 미뤘다가, 같은 날 사용자가 다시 로그인해서 확인했다.
@@ -32,7 +34,7 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) READY | AI_PROPOSED |
+| 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) READY | HUMAN_APPROVED (구현 중) |
 | 2-2 재구축 판정 · 원인 분류 · 집계 (기준값 대조) | (예정) | PENDING |
 | 2-3 메뉴 막대 앱 화면 · 만료 경고 · 알림 | (예정) | PENDING |
 | 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | (예정) | PENDING |
