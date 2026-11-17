@@ -15,7 +15,7 @@ updated: 2026-11-17
 | R2 | 호출 후보는 `type == "assistant"`, `timestamp` 있음, 비어 있지 않은 `message.id`, 비어 있지 않은 `message.usage` 객체, 비어 있지 않고 `<synthetic>`이 아닌 `message.model`을 모두 만족할 때만 ApiCall이다(구현 후 프로토타입과 맞춤) | `RecordParser` | 조건을 못 맞추면 조용히 버림(실패로 세지 않음) | 1-2 불변식 2, design 5장 |
 | R3 | 후보 줄의 JSON 디코딩이 실패하면 그 줄만 버리고 `parse_failures`를 1 올린다. 모르는 필드와 모르는 type은 무시한다 | `RecordParser` | 크래시 금지 | design 3장 |
 | R4 | 소유 파일: 같은 `message.id`의 occurrence 중에서 키가 가장 작은 파일이 소유한다. 키 = (`kind == main`이고 `line_session_id == files.session_id`이면 0, 아니면 1) → `birthtime` → `path` | `IndexStore` | 해당 없음 | 2-1 계약 확장, prototype `owners` |
-| R5 | 같은 파일 안에서 같은 `message.id`가 다시 나오면 첫 occurrence만 남기고 순번도 새로 주지 않는다 | `Indexer` | 해당 없음 | 1-2 불변식 1 |
+| R5 | 같은 파일 안에서 같은 `message.id`가 다시 나오면 첫 occurrence만 남기고 순번도 새로 주지 않는다 | `Indexer` | 해당 없음 | 1-2 불변식 1. 2-2에서 확장: usage는 마지막 줄 값([rebuild-analysis R16](../rebuild-analysis/business-rules.md)) |
 | R6 | 오프셋은 항상 줄 시작을 가리킨다. 마지막 줄에 줄바꿈이 없으면 그 줄은 소비하지 않고 다음 읽기에서 다시 본다 | `LineReader` | 해당 없음 | 기록이 쓰이는 중일 수 있음 |
 | R7 | 파일의 inode가 바뀌었거나, 크기가 저장된 오프셋보다 작아졌거나, 이미 읽은 앞부분(최대 1KB)의 지문이 달라졌으면, 그 파일의 occurrence와 압축 경계를 모두 지우고 처음부터 다시 읽는다 | `Indexer` | 해당 없음 | 교체·잘림 대응 |
 | R8 | 파일이 사라지면 그 파일의 occurrence, 압축 경계, files 행을 지운다. 그 결과 occurrence가 0개가 된 call은 지우고, 남은 call은 소유 파일을 다시 정한다 | `Indexer`, `IndexStore` | 해당 없음 | Claude Code의 기록 정리 |

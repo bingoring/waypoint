@@ -88,4 +88,5 @@ N/A (standard). 성능 목표는 §5에 포함했다.
 | `IndexMeta.usage_mismatch_count` 저장 | `usageMismatchCount()`가 occurrences에서 그때그때 계산 | 저장값은 재색인 때마다 맞추기 어렵다. 실제 기록에서 0건 |
 | 앱에 "부분 결과 준비" 신호와 변경 알림 | 2-3(화면)으로 옮김 | 신호를 받는 쪽이 앱이므로 화면과 함께 설계한다 |
 | R2: `usage`가 있으면 호출 | 비어 있지 않은 `usage`, 비어 있지 않은 `id`, `model` 필수 | 프로토타입(오라클)과 맞춤. 실제 기록에 해당 사례 0건 |
+| (2-2에서 확장) | 스키마 v3: `occurrences.iterations`, 같은 메시지의 마지막 줄 usage | [rebuild-analysis 편차 로그](../rebuild-analysis/build-spec-index.md) |
 | (명세 없음) | 파일 앞부분 1KB의 지문으로 제자리 덮어쓰기 감지(R7 확장), busy timeout 5초, 손상된 색인은 지우고 다시 만듦, `--db`가 `~/.claude`나 루트 안이면 거부 | 독립 리뷰 LOW·MEDIUM |

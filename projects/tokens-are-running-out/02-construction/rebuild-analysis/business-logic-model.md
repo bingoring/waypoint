@@ -29,17 +29,20 @@ classify(file, events, window):
     if e is compaction: compacted = true; continue
     call = e.call
     if call.owned and window.contains(call.ts):           # R1
-      cost = price(call)                                   # R9 ~ R11
+      rebuild = any(isRebuild(part) for part in call.parts)            # R2: 단계별
+      cost = sum(price(part, part.model ?? call.model) for part in call.parts)   # R9 ~ R11
+      rebuilt = sum(price(part).cacheWrite for part in call.parts if rebuild and isRebuild(part))
+      advisor += parts where kind == advisor                         # R15
       if file.kind == subagent:
         bucket[subagents] += cost.total                    # R7
-        if isRebuild(call): count subagent rebuild
-      else if not isRebuild(call):                         # R2
+        if rebuild: count subagent rebuild
+      else if not rebuild:
         bucket[normalWork] += cost.total
       else:
         cause = causeOf(call, last, lastTTL, compacted)    # R4
-        bucket[normalWork] += cost.other                   # R8
-        bucket[bucketOf(cause)] += cost.cacheWrite
-        if cause == expiredShortBreak: reducible += cost.cacheWrite - cost.writtenAsRead   # R12
+        bucket[normalWork] += cost.total - rebuilt.cacheWrite          # R8
+        bucket[bucketOf(cause)] += rebuilt.cacheWrite
+        if cause == expiredShortBreak: reducible += rebuilt.cacheWrite - rebuilt.writtenAsRead   # R12
         rebuilds.append(RebuildEvent(...))
     last = call                                            # R3: 복사된 호출도 맥락
     lastTTL = call.ttl ?? lastTTL                          # R5
@@ -60,11 +63,12 @@ causeOf(call, last, lastTTL, compacted):
 
 ### 2.3 가격
 ```
-prices(model, promptTokens):
-  keys = table.keys where model == k or model.hasPrefix(k + "-")
-  key = keys.max(by: length) ?? (unpriced[model] += 1; "claude-opus-5-5")
-  p = table[key]
-  return (p.longContext != nil and promptTokens > p.longContext.over) ? p.longContext : p
+prices(model, promptTokens):                   # promptTokens는 단계 하나의 값
+  key = table[model] != nil ? model
+      : (model matches "<key>-YYYYMMDD" and table[key] != nil) ? key
+      : nil                                     # 새 마이너 버전도 nil
+  p = table[key ?? "claude-opus-5-5"]           # nil이면 unpriced에 호출마다 한 번
+  return (p.longContext != nil and promptTokens > p.longContext.over) ? p.longContext : p.base
 ```
 
 ## 3. 상태 전이 (State Transitions)
@@ -86,4 +90,4 @@ prices(model, promptTokens):
 | 대상 | 호출 시점 | 요청/응답 요지 | 실패 처리 |
 |---|---|---|---|
 | 2-1 `Indexer` | 분석마다 | `ownedFiles`, `timeline`, `title` | 색인 오류는 그대로 던짐 |
-| `pricing.json`(번들 리소스) | 앱 시작 시 한 번 | 가격표 로드 | 형식 오류는 개발 오류(테스트로 막음) |
+| `pricing.json`(Swift 상수로 내장) | 보고서를 처음 만들 때 한 번 | 가격표 로드 | 형식 오류는 개발 오류(테스트와 CI로 막음). 색인은 가격표와 무관하게 동작 |
