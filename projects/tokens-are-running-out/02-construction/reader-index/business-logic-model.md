@@ -87,7 +87,7 @@ from calls where ts >= :from and ts < :to                 # 소유 파일과 무
 ## 4. 시퀀스 / 상호작용 (Sequence)
 
 1. 앱 시작 → `IndexStore.open`(스키마 확인) → `FullIndex`가 필요하면 백그라운드 작업으로 실행.
-2. 동시에 `TranscriptWatcher.start(root)`. 전체 색인 중에 온 이벤트는 큐에 쌓았다가 전체 색인이 끝난 뒤 처리.
+2. `TranscriptWatcher.start(root)`를 전체 색인보다 **먼저** 시작한다. 전체 색인 중에 온 이벤트는 actor 뒤에 줄 서서 전체 색인이 끝난 뒤 처리된다(독립 리뷰 반영).
 3. 모든 쓰기는 하나의 직렬 작업자(actor)를 거친다. 읽기(화면 집계)는 WAL 덕분에 쓰기와 동시에 할 수 있다.
 4. CLI `watch`는 같은 흐름을 터미널에서 돌리며 바뀐 파일과 반영 시간을 출력한다(증분 반영 1초 측정용).
 

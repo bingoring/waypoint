@@ -7,6 +7,8 @@ updated: 2026-11-17
 
 # Domain & Entities — 기록 리더와 색인
 
+> **구현 반영(스키마 v2, 2026-11-17):** 독립 리뷰에 따라 파일마다 쓰인 값(ts, model, version, 토큰, TTL)을 `occurrences`에 저장하고, `calls`에는 집계에 쓰는 소유 파일의 값(ts, 토큰 4종)만 둔다. `titles`는 (file_id, seq) 행으로 쌓는다. `files`에 `head_length`, `head_hash`(앞부분 지문)를 더했다. 자세한 차이는 [인덱스 §7 편차 로그](build-spec-index.md).
+>
 > 색인 위치: `~/Library/Application Support/TokensAreRunningOut/index.sqlite`(CLI는 `--db`로 바꿀 수 있음). 원본에서 다시 만들 수 있는 파생 데이터다.
 > enum성 값은 코드의 allowed-set으로 관리하고 DB CHECK를 쓰지 않는다.
 

@@ -12,16 +12,19 @@ updated: 2026-11-17
 | ID | 규칙 (결정적 서술) | 적용 대상 | 위반 시 동작 | 근거/출처 |
 |---|---|---|---|---|
 | R1 | 줄 사전 필터: 바이트에 `"compact_boundary"`가 있으면 압축 후보, `"custom-title"`이 있으면 제목 후보, `"assistant"`와 `"usage"`가 모두 있으면 호출 후보. 나머지 줄은 디코딩하지 않는다 | `RecordParser` | 해당 없음 | prototype `iter_calls`, 성능 |
-| R2 | 호출 후보는 `type == "assistant"`, `timestamp` 있음, `message.id` 있음, `message.usage` 있음, `message.model != "<synthetic>"`을 모두 만족할 때만 ApiCall이다 | `RecordParser` | 조건을 못 맞추면 조용히 버림(실패로 세지 않음) | 1-2 불변식 2, design 5장 |
+| R2 | 호출 후보는 `type == "assistant"`, `timestamp` 있음, 비어 있지 않은 `message.id`, 비어 있지 않은 `message.usage` 객체, 비어 있지 않고 `<synthetic>`이 아닌 `message.model`을 모두 만족할 때만 ApiCall이다(구현 후 프로토타입과 맞춤) | `RecordParser` | 조건을 못 맞추면 조용히 버림(실패로 세지 않음) | 1-2 불변식 2, design 5장 |
 | R3 | 후보 줄의 JSON 디코딩이 실패하면 그 줄만 버리고 `parse_failures`를 1 올린다. 모르는 필드와 모르는 type은 무시한다 | `RecordParser` | 크래시 금지 | design 3장 |
 | R4 | 소유 파일: 같은 `message.id`의 occurrence 중에서 키가 가장 작은 파일이 소유한다. 키 = (`kind == main`이고 `line_session_id == files.session_id`이면 0, 아니면 1) → `birthtime` → `path` | `IndexStore` | 해당 없음 | 2-1 계약 확장, prototype `owners` |
 | R5 | 같은 파일 안에서 같은 `message.id`가 다시 나오면 첫 occurrence만 남기고 순번도 새로 주지 않는다 | `Indexer` | 해당 없음 | 1-2 불변식 1 |
 | R6 | 오프셋은 항상 줄 시작을 가리킨다. 마지막 줄에 줄바꿈이 없으면 그 줄은 소비하지 않고 다음 읽기에서 다시 본다 | `LineReader` | 해당 없음 | 기록이 쓰이는 중일 수 있음 |
-| R7 | 파일의 inode가 바뀌었거나 크기가 저장된 오프셋보다 작아졌으면, 그 파일의 occurrence와 압축 경계를 모두 지우고 처음부터 다시 읽는다 | `Indexer` | 해당 없음 | 교체·잘림 대응 |
+| R7 | 파일의 inode가 바뀌었거나, 크기가 저장된 오프셋보다 작아졌거나, 이미 읽은 앞부분(최대 1KB)의 지문이 달라졌으면, 그 파일의 occurrence와 압축 경계를 모두 지우고 처음부터 다시 읽는다 | `Indexer` | 해당 없음 | 교체·잘림 대응 |
 | R8 | 파일이 사라지면 그 파일의 occurrence, 압축 경계, files 행을 지운다. 그 결과 occurrence가 0개가 된 call은 지우고, 남은 call은 소유 파일을 다시 정한다 | `Indexer`, `IndexStore` | 해당 없음 | Claude Code의 기록 정리 |
-| R9 | 앱과 CLI는 `~/.claude` 아래 어떤 파일도 쓰기 모드로 열지 않는다. 쓰기는 색인 파일에만 한다 | 전체 | 코드 리뷰와 테스트로 막음 | 반목표 |
+| R9 | 앱과 CLI는 `~/.claude` 아래 어떤 파일도 쓰기 모드로 열지 않는다. 쓰기는 색인 파일에만 한다. 색인 경로가 `~/.claude`나 루트 안이면 CLI가 거부한다 | 전체 | CLI 종료 코드 2, CI 소스 검사 | 반목표 |
 | R10 | 네트워크 API(`URLSession`, `Network`)를 쓰지 않는다 | 전체 | CI에서 소스 검사로 막음 | 반목표 |
-| R11 | 제목은 같은 세션에서 나중에 읽은 `custom-title`이 이긴다 | `IndexStore` | 해당 없음 | design 5장 |
+| R11 | 제목은 가장 늦게 만들어진 파일의, 그 파일 안에서 가장 나중의 `custom-title`이 이긴다. 파일이 재색인되거나 지워지면 그 파일의 제목도 지운다 | `IndexStore` | 해당 없음 | design 5장, 독립 리뷰 |
+| R13 | 파일 하나를 읽다가 생긴 오류(권한, 읽는 도중 사라짐)는 그 파일만 건너뛰고 `skippedFiles`로 보고한다. 색인 저장소 오류는 그대로 던진다 | `Indexer` | 다음 스캔이나 이벤트에서 다시 시도 | 독립 리뷰 HIGH |
+| R14 | 읽을 수 없는 폴더 아래의 파일은 사라진 것으로 보지 않는다(기록 유지) | `Indexer`, `TranscriptLocator` | 경고 없이 보존 | 독립 리뷰 MEDIUM |
+| R15 | 다른 연결이 쓰기 잠금을 잡고 있으면 최대 5초 기다린다. 색인 파일이 손상되었으면 지우고 다시 만든다. 조회문은 끝나면 반드시 reset한다 | `SQLiteDatabase`, `Indexer` | 기다린 뒤에도 실패하면 오류 | 독립 리뷰 CRITICAL·MEDIUM |
 | R12 | `stats`는 소유 occurrence의 호출만, `from ≤ ts < to`로 센다 | CLI | 해당 없음 | prototype 기준값 |
 
 ## 2. 검증 규칙 (Validation)

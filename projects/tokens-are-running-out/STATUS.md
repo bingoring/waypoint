@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> 🏗️ **2-1 구현 완료 → 머지 대기 (2026-11-17, PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1)).** 테스트 57개, 세 기간 기준값 일치, 1.7GB 첫 색인 10.5초·최대 메모리 61MB, 증분 반영 0.43초 이내. 독립 리뷰의 CRITICAL 1·HIGH 1·MEDIUM 6·LOW 5를 모두 채택해 회귀 테스트와 함께 수정.
+
 > ✅ **2-1 승인 (2026-11-17).** 구현 착수 — 브랜치 `feature/2-1-reader-index`.
 
 > 🔎 **터미널 세션 확인 (2026-11-17).** 터미널 대화형 세션도 메인 세션이 1시간 캐시를 쓰고, `claude -c`는 같은 파일에 이어서 기록한다. CLI 자동 업데이트 직후 캐시 일부를 다시 쓰는 것도 관찰했다. 분류 규칙은 그대로 둔다([DECISIONS](DECISIONS.md)).
@@ -34,7 +36,7 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) READY | HUMAN_APPROVED (구현 중) |
+| 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) IMPLEMENTED · PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1) | HUMAN_APPROVED (머지 대기) |
 | 2-2 재구축 판정 · 원인 분류 · 집계 (기준값 대조) | (예정) | PENDING |
 | 2-3 메뉴 막대 앱 화면 · 만료 경고 · 알림 | (예정) | PENDING |
 | 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | (예정) | PENDING |
