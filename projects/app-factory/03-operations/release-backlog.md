@@ -12,7 +12,7 @@
 
 ## 공통 — 출시 세션
 
-- [ ] **CI 초록으로** — Flutter 3.50.0 업그레이드 PR (DECISIONS 2026-11-17). 남은 일: 안드로이드 Kotlin 빌드 오류, PR
+- [ ] **CI 초록으로** — Flutter 3.50.0 업그레이드 [PR #24](https://github.com/bingoring/app-factory/pull/24) (DECISIONS 2026-11-17): 분석 0·테스트 14곳 통과·6개 앱 APK 빌드 확인, PR CI 확인 → 머지 → 공 물리·Yawn 세션에 알림
 - [ ] 3-1 스테이지 문서(계정·서명·정책 체크리스트·스토어 등록) 작성
 - [ ] R-1 리뷰에서 3-1로 넘어온 일: Firebase 키 제한, 심볼(Crashlytics) 업로드, 방침 확정, GitHub 액션 SHA 고정
 - [ ] R-1 독립 리뷰 오너 승인 받기
