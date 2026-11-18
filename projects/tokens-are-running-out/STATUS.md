@@ -4,9 +4,13 @@
 **Repository:** [bingoring/tokens-are-running-out](https://github.com/bingoring/tokens-are-running-out)  
 **Design input:** [inputs/design.md](inputs/design.md) (브레인스토밍 산출물, 2026-11-17)  
 **Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
-**Last updated:** 2026-11-17
+**Last updated:** 2026-11-18
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
+
+> 📝 **2-3 메뉴 막대 앱 제안 (2026-11-18).** Build Spec READY(comprehensive), 승인 대기. 실행 세션 파일, 제목 출처, 앱 빌드 방식(SwiftPM + `xcodebuild`), 화면 렌더링 방식을 실제로 확인했다. 사용자 결정 두 가지: advisor 비용은 별도 항목(8번째 버킷)으로, 재구축 임계값도 설정할 수 있게(기본 5만). 화면 시안은 better-interface 방식으로 구현 전에 검토해 HIGH 3건을 명세에 반영했다.
+
+> ✅ **2-2 머지 (2026-11-18).** PR #2 CI 통과 후 `main`에 머지(`6635dcc`).
 
 > 🏗️ **2-2 구현 완료 → 머지 대기 (2026-11-17, PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2)).** 테스트 110개, 세 기간과 합성 픽스처에서 프로토타입과 출력이 글자 단위로 같다. 7일 보고서 0.16초 이내. 실제 기록을 검증하다 비용 계산 결함을 찾아 고쳤다: advisor 단계의 비용이 빠져 있었고, 같은 메시지의 첫 줄 usage가 미완성인 경우가 있었으며, 호출 합계로는 가려지는 재구축이 있었다. 기준 기간 비용은 $616.33 → $807.63이고, 메뉴 막대 숫자는 23.9% → 18.2%다. advisor 비용을 따로 보여 줄지는 사용자 확인 대기([DECISIONS](DECISIONS.md)).
 
@@ -45,8 +49,8 @@
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
 | 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) IMPLEMENTED · PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1) 머지 `2eed43c` | HUMAN_APPROVED |
-| 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) IMPLEMENTED · PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2) 머지 대기 | HUMAN_APPROVED |
-| 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | (예정) | PENDING |
+| 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) IMPLEMENTED · PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2) 머지 `6635dcc` | HUMAN_APPROVED |
+| 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) READY | AI_PROPOSED (승인 대기) |
 | 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | (예정) | PENDING |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
