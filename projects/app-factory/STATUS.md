@@ -4,7 +4,25 @@
 **PRD:** [prd.md](prd.md) (v1.0 확정)
 **Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
 **앱 디자인 프롬프트:** [APP_DESIGN_PROMPT.md](APP_DESIGN_PROMPT.md) (v1, 2-3 로또에 첫 적용 — 결과를 보고 계속 사용 여부 결정)
-**Last updated:** 2026-11-09
+**Last updated:** 2026-11-18
+
+## 세션 역할 · 앱별 상태판 (2026-11-18, DECISIONS 「세션 역할 분리」)
+
+| 세션 | 맡는 일 | 작업 공간 |
+|---|---|---|
+| **출시·운영** (이 문서 관리) | 3-1 이후 출시 전부, CI·Flutter·코어 패키지 호환·앱 생성 도구 | worktree `app-factory-release` |
+| **Yawn 제작** | 2-16 갈래 B 이후 — 인계 [`yawn-swap/handoff-2026-11-18.md`](02-construction/yawn-swap/handoff-2026-11-18.md) | worktree `app-factory-yawn` |
+| **공 물리 제작** | 2-15 | 메인 체크아웃 |
+
+| 앱 | 단계 | 담당 | 다음 |
+|---|---|---|---|
+| 로또 · 연봉 · 소음 | 2-x 승인 → 출시 대기 | 출시 | [출시 할 일](03-operations/release-backlog.md) |
+| 조각보 · 물 마시기 | 보류 | — | — |
+| Yawn! | 제작 중 (2-16) | Yawn 제작 | 갈래 B 남은 기믹 · 오너 플레이 |
+| 공 물리 | 제작 중 (2-15) | 공 물리 제작 | — |
+| 공통 | CI 빨강 → Flutter 3.50.0 업그레이드 진행 | 출시 | 안드로이드 빌드 · PR |
+
+---
 
 > ✅ **1-1 승인 (2026-10-13).** PRD v1.0 확정, P1~P6 채택, Q1~Q8 결정(조직 계정·한영 동시·Android 먼저·AdMob 단독·광고 제거 IAP 포함·Wave 1 순서 확정).
 > ⏳ **오너 작업 (Yawn! 데이터):** Firebase 콘솔에서 Analytics → **BigQuery 연결**(샌드박스 무료 범위) — 출시 뒤 후보 고르기 C 무게·노선 길이 설정을 실제 플레이로 다시 맞추는 데 쓴다.
