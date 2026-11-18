@@ -1,7 +1,7 @@
 ---
 build-spec: menu-bar-app
 stage: 02-construction/03-menu-bar-app
-status: IMPLEMENTED
+status: READY
 depth: comprehensive
 updated: 2026-11-18
 ---

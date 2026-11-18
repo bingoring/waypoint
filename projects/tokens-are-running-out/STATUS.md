@@ -54,7 +54,7 @@
 |---------|------|------|
 | 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) IMPLEMENTED · PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1) 머지 `2eed43c` | HUMAN_APPROVED |
 | 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) IMPLEMENTED · PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2) 머지 `6635dcc` | HUMAN_APPROVED |
-| 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) IMPLEMENTED · PR [#3](https://github.com/bingoring/tokens-are-running-out/pull/3) 머지 대기 | HUMAN_APPROVED |
+| 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) READY · 구현 완료, 사용자 기기 확인 대기(§5) · PR [#3](https://github.com/bingoring/tokens-are-running-out/pull/3) | HUMAN_APPROVED |
 | 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | (예정) | PENDING |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
