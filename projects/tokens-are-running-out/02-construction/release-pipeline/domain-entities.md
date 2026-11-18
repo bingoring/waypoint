@@ -72,7 +72,7 @@ end
 | `NOTARY_KEY_P8_BASE64` | App Store Connect API 팀 키(.p8)의 base64 |
 | `NOTARY_KEY_ID` | API 키 ID |
 | `NOTARY_ISSUER_ID` | API 발급자 ID(UUID) |
-| `TAP_TOKEN` | `bingoring/homebrew-tap`에만 contents 쓰기 권한이 있는 fine-grained 토큰 |
+| `TAP_TOKEN` | `bingoring/homebrew-tap`에만 contents 쓰기 권한이 있는 fine-grained 토큰. 만료 기한이 있으므로, 만료되면 새로 만들어 다시 등록하고 `update-tap.yml`로 밀린 갱신을 처리한다 |
 
 ### `AppIcon`
 - 1024pt 캔버스의 macOS 아이콘 격자: 824pt 둥근 사각형 본체(모서리 반경 약 185pt), 바깥 여백 100pt.

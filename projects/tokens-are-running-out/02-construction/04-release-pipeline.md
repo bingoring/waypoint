@@ -40,6 +40,7 @@ updated: 2026-11-18
 - **빌드와 서명 시험.** `xcodebuild -destination 'generic/platform=macOS'`의 Release 빌드가 유니버설(x86_64, arm64)로 24초에 끝났다. 함께 넣을 동적 프레임워크는 없다. hardened runtime을 붙여 ad-hoc 서명한 앱이 `codesign --verify --strict --deep`을 통과했고 정상 실행되었다(메모리 24MB).
 - **서명 인증서.** 이 기기에는 Apple이 발급한 서명 인증서가 없다(직접 만든 인증서 하나뿐). Developer ID Application 인증서를 새로 만들어야 한다.
 - **아이콘.** Apple 약관상 SF Symbols는 앱 아이콘에 쓸 수 없다. 모래시계를 직접 그린다.
+- **서명 주체.** Developer ID 인증서는 계정 소유자(Account Holder)만 만들 수 있고, 관리자는 클라우드 관리형 인증서만 쓸 수 있다. App Store Connect API 접근 요청도 계정 소유자만 한다([Apple: Developer ID certificates](https://developer.apple.com/help/account/certificates/create-developer-id-certificates), [App Store Connect role permissions](https://developer.apple.com/help/app-store-connect/reference/account-management/role-permissions/), 2026-11-18 조회, 공식 확인). 서명에는 팀의 법적 이름과 팀 ID가 들어가 모든 사본에 남고, 사용자가 `codesign`이나 Gatekeeper 대화상자에서 볼 수 있다.
 
 ### 결정 (사용자가 정함, DECISIONS 2026-11-18)
 - 배포 형식은 **zip**.
@@ -55,8 +56,8 @@ updated: 2026-11-18
 ### 사용자 작업 (작업자가 대신할 수 없음)
 1. **Developer ID Application 인증서:** Xcode ▸ Settings ▸ Accounts ▸ 팀 선택 ▸ Manage Certificates… ▸ + ▸ Developer ID Application. 키체인 접근에서 그 인증서를 개인 키와 함께 .p12로 내보내고 암호를 정한다.
 2. **App Store Connect API 키:** App Store Connect ▸ Users and Access ▸ Integrations ▸ Team Keys ▸ +, 접근 권한 Developer. .p8은 한 번만 내려받을 수 있다. 키 ID와 발급자 ID를 적어 둔다.
-3. **tap 토큰:** tap 저장소를 만든 뒤 GitHub ▸ Settings ▸ Developer settings ▸ Fine-grained tokens. 저장소는 `bingoring/homebrew-tap`만, 권한은 Contents 읽기·쓰기.
-4. **비밀 값 등록:** 저장소 폴더에서 아래를 실행한다. 값은 파일에서 읽거나 입력을 물으므로 화면과 대화에 남지 않는다.
+3. **tap 토큰:** tap 저장소를 만든 뒤 GitHub ▸ Settings ▸ Developer settings ▸ Fine-grained tokens. 저장소는 `bingoring/homebrew-tap`만, 권한은 Contents 읽기·쓰기. 만료 기한이 있으므로 만료되면 새로 만들어 다시 등록한다.
+4. **비밀 값 등록:** 저장소 폴더에서, 이 대화가 아니라 **사용자의 터미널**에서 실행한다(대화창에서 실행한 명령과 출력은 대화 기록에 남는다). 값은 파일에서 읽거나 입력을 물으므로 화면에 남지 않는다. `--body` 옵션은 쓰지 않는다. `<…>` 자리는 실제 파일 경로로 바꾼다.
 
 ```bash
 base64 -i <내보낸 .p12> | gh secret set DEVELOPER_ID_P12_BASE64
@@ -99,6 +100,7 @@ gh secret set TAP_TOKEN
 > 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
 
 - [ ] 2-4 범위와 3-1(정식 첫 공개)의 경계가 맞는가?
+- [ ] 어느 팀(개인 또는 조직) 이름으로 서명할까? 그 팀의 계정 소유자(Account Holder)인가? (서명에 팀의 법적 이름과 팀 ID가 남는다)
 - [ ] 공개 저장소 `bingoring/homebrew-tap`을 만들어도 되는가?
 - [ ] 시험용 사전 릴리스 `v0.1.0-rc.1`을 공개 저장소에 올려도 되는가(prerelease로 표시됨)?
 - [ ] 사용자 작업 1 ~ 4(인증서, API 키, 토큰, 비밀 값 등록)를 해 줄 수 있는가?

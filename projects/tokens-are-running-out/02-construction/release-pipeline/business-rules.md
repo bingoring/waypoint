@@ -20,7 +20,8 @@ updated: 2026-11-18
 | RL-7 | 사전 릴리스 태그는 GitHub prerelease로 만들고 cask를 바꾸지 않는다. 정식 태그만 cask의 `version`과 `sha256`을 바꿔 tap에 push한다 | `release.yml` | | DECISIONS 2026-11-18 |
 | RL-8 | 비밀 값은 출력하지 않는다. 키와 인증서 파일은 `$RUNNER_TEMP`에만 쓰고, 임시 키체인과 함께 마지막 단계(`if: always()`)에서 지운다 | `release.yml` | | 공개 저장소 원칙 |
 | RL-9 | 워크플로 권한은 `contents: write`(릴리스 생성)만 준다. tap 저장소에는 `TAP_TOKEN`으로만 쓴다 | `release.yml` | | 최소 권한 |
-| RL-10 | 같은 태그로 이미 릴리스가 있으면 덮어쓰지 않고 실패한다 | `release.yml` | 실패 | 재현성 |
+| RL-10 | 같은 태그로 이미 릴리스가 있으면 덮어쓰지 않고 실패한다(릴리스 생성 단계에만 적용) | `release.yml` | 실패 | 재현성 |
+| RL-13 | tap 갱신은 따로 다시 실행할 수 있다. `update-tap.yml`(수동 실행, 입력: 태그)이 이미 있는 릴리스의 `.sha256` 첨부 파일에서 버전과 체크섬을 읽어 cask를 갱신한다. `release.yml`도 같은 스크립트를 부른다. 그래서 토큰 만료나 push 거절로 tap 단계만 실패해도 다시 빌드하지 않고 고칠 수 있다 | `update-tap.yml`, `update-cask.sh` | | RL-10과 함께 |
 | RL-11 | 아이콘은 `scripts/make-icon.swift`로 만들고, 그 결과 `Resources/AppIcon.icns`를 커밋한다. SF Symbols를 쓰지 않는다 | 아이콘 | | Apple SF Symbols 약관 |
 | RL-12 | 앱 자체에는 여전히 네트워크 코드가 없다. 네트워크는 CI와 사용자의 Homebrew만 쓴다 | 앱 | CI 검사 | 반목표 3 |
 
@@ -29,7 +30,7 @@ updated: 2026-11-18
 | 입력 | 규칙 | 실패 메시지 |
 |---|---|---|
 | 태그 | `^v\d+\.\d+\.\d+(-rc\.\d+)?$` | "Tag must look like v1.2.3 or v1.2.3-rc.1" |
-| 비밀 값 | 다섯 개(사전 릴리스) 또는 여섯 개(정식, `TAP_TOKEN` 포함)가 모두 있다 | 없는 이름을 출력하고 실패 |
+| 비밀 값 | 다섯 개(사전 릴리스) 또는 여섯 개(정식, `TAP_TOKEN` 포함)가 모두 있다. **빌드 전에** 확인한다 | 없는 이름을 출력하고 실패 |
 | 서명 ID | 가져온 키체인에 "Developer ID Application" 인증서가 정확히 하나 있다 | 실패 |
 
 ## 3. 권한 / 접근 규칙
@@ -49,6 +50,7 @@ updated: 2026-11-18
 |---|---|
 | 공증 거절(Invalid) | 로그를 출력하고 릴리스를 만들지 않음 |
 | 공증이 오래 걸림 | `--timeout 30m`에서 실패. 다시 실행해도 같은 태그로 진행 가능(릴리스가 아직 없으므로) |
-| `TAP_TOKEN` 없음(정식 태그) | 릴리스는 만들고 cask 단계에서 실패해 알림 |
+| `TAP_TOKEN` 없음(정식 태그) | 빌드 전에 실패(§2). 릴리스를 만들지 않음 |
+| `TAP_TOKEN` 만료나 tap push 거절 | 릴리스는 남고 tap 단계만 실패. 토큰을 새로 등록한 뒤 `update-tap.yml`을 그 태그로 다시 실행(RL-13) |
 | 사전 릴리스 | prerelease, cask 그대로 |
 | Intel Mac | 유니버설이라 실행됨(실기 확인은 하지 않음) |

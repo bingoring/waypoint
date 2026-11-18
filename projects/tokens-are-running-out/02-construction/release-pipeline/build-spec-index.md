@@ -27,6 +27,7 @@ updated: 2026-11-18
 | `scripts/release.sh` | 서명·공증·티켓·검증·패키징 | Xcode 도구 | 신규 |
 | `scripts/update-cask.sh`, cask 템플릿 | cask 갱신 | | 신규 |
 | `.github/workflows/release.yml` | 태그 → 릴리스 → tap | 위 스크립트, 비밀 값 | 신규 |
+| `.github/workflows/update-tap.yml` | 이미 있는 릴리스로 tap만 다시 갱신 | `update-cask.sh`, `TAP_TOKEN` | 신규 |
 | `bingoring/homebrew-tap` | 공개 tap 저장소(`Casks/`, README) | | 신규(사용자 확인 후 생성) |
 | README | 설치 방법(Homebrew, 직접 내려받기), 릴리스 방법 | | 기존 수정 |
 
@@ -49,7 +50,7 @@ updated: 2026-11-18
 - [ ] `build-app.sh --release <version>`(유니버설, 버전 키)
 - [ ] `release.sh`(서명·검증·공증·티켓·zip·체크섬). 비밀 값 없이 ad-hoc으로 도는 `--dry-run`
 - [ ] `update-cask.sh`와 cask 템플릿. `brew style`로 문법 확인
-- [ ] `release.yml`(형식 확인, 키체인, 정리 단계 포함)
+- [ ] `release.yml`(형식 확인, 빌드 전 비밀 값 확인, 키체인, 정리 단계 포함)과 `update-tap.yml`
 - [ ] README 설치·릴리스 안내
 - [ ] (사용자) Developer ID Application 인증서, App Store Connect API 키, tap 토큰을 만들고 비밀 값 등록
 - [ ] (사용자 확인 후) `bingoring/homebrew-tap` 생성
@@ -62,6 +63,8 @@ updated: 2026-11-18
 - [ ] 엄격 빌드, 린트, 전체 테스트(앱 코드 변경 없음을 확인)
 - [ ] `release.sh --dry-run`: ad-hoc 서명에 hardened runtime, `codesign --verify --strict --deep` 통과, 유니버설(`lipo -archs`), 버전 키, 아이콘 포함
 - [ ] 생성한 cask가 `brew style`을 통과
+- [ ] x86_64 쪽도 한 번 실행(`arch -x86_64`, Rosetta가 있을 때). 없으면 Intel은 Not verified로 남긴다
+- [ ] 시험용 앱은 사용자가 띄워 둔 앱과 따로 실행하고, 앱 이름이 아니라 PID로 종료한다
 - [ ] `v0.1.0-rc.1` 사전 릴리스: 워크플로 성공, 공증 Accepted, 내려받은 앱이 `spctl`에서 "source=Notarized Developer ID", `stapler validate` 통과, 실행됨. cask는 바뀌지 않음
 - [ ] 워크플로 로그와 저장소에 비밀 값이 나타나지 않음
 - [ ] 정식 `v0.1.0` 릴리스와 `brew install --cask`는 3-1(첫 공개)에서 한다
