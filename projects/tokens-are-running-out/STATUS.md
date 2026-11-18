@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> ✅ **2-4 승인 (2026-11-18).** 구현 착수 — 브랜치 `feature/2-4-release-pipeline`. tap 저장소 생성과 사전 릴리스 `v0.1.0-rc.1` 공개도 승인됨.
+
 > 📝 **2-4 릴리스 파이프라인 제안 (2026-11-18).** Build Spec READY, 승인 대기. Homebrew는 Gatekeeper 통과를 요구하고 cask에 quarantine을 붙이므로 서명·공증이 필수다(공식 문서). 유니버설 빌드와 hardened runtime 서명을 시험했다. 사용자 결정: zip, tap 자동 갱신, 아이콘 지금 제작, App Store Connect API 키. 인증서·API 키·토큰 생성과 비밀 값 등록은 사용자 작업.
 
 > ✅ **2-3 머지 (2026-11-18).** 사용자가 기기 확인 체크리스트(VoiceOver, 키보드, 설정 창, 알림, 로그인 항목, 팝오버를 닫은 뒤 CPU)를 확인한 뒤 PR #3을 `main`에 머지(`7dfda7b`). Build Spec IMPLEMENTED. 다음: 2-4 릴리스 파이프라인(서명 · 공증 · Homebrew tap) 제안.
@@ -59,7 +61,7 @@
 | 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) IMPLEMENTED · PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1) 머지 `2eed43c` | HUMAN_APPROVED |
 | 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) IMPLEMENTED · PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2) 머지 `6635dcc` | HUMAN_APPROVED |
 | 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) IMPLEMENTED · PR [#3](https://github.com/bingoring/tokens-are-running-out/pull/3) 머지 `7dfda7b` | HUMAN_APPROVED |
-| 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | [04-release-pipeline.md](02-construction/04-release-pipeline.md) · [Build Spec](02-construction/release-pipeline/build-spec-index.md) READY | AI_PROPOSED (승인 대기) |
+| 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | [04-release-pipeline.md](02-construction/04-release-pipeline.md) · [Build Spec](02-construction/release-pipeline/build-spec-index.md) READY | HUMAN_APPROVED (구현 중) |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
