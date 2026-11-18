@@ -155,7 +155,8 @@ TokensAreRunningOutApp
 | 첫 색인 | Reading Claude Code history… %@ of %@ | Claude Code 기록을 읽는 중입니다… %@ / %@ |
 | 기록 없음 | No Claude Code history found. Use Claude Code once, and your usage will appear here. | Claude Code 기록을 찾지 못했습니다. Claude Code를 한 번 쓰면 이곳에 사용량이 표시됩니다. |
 | 색인 오류 | Unable to read the usage index. Check that your disk has free space, then try again. | 사용량 색인을 읽지 못했습니다. 디스크에 남은 공간이 있는지 확인한 뒤 다시 시도하세요. |
-| 형식 변화 | Claude Code's history format may have changed: %@ of recent lines couldn't be read, so numbers may be low. Update Tokens Are Running Out to the latest version. | Claude Code 기록 형식이 바뀐 것 같습니다. 최근 줄의 %@를 읽지 못해 숫자가 실제보다 작을 수 있습니다. Tokens Are Running Out을 최신 버전으로 업데이트하세요. |
+| 형식 변화(일부를 못 읽음) | Claude Code's history format may have changed: %@ of Claude's replies from the last 7 days couldn't be read, so numbers may be low. Update Tokens Are Running Out to the latest version. | Claude Code 기록 형식이 바뀐 것 같습니다. 최근 7일 동안 Claude 응답의 %@를 읽지 못해 숫자가 실제보다 작을 수 있습니다. Tokens Are Running Out을 최신 버전으로 업데이트하세요. |
+| 형식 변화(사용량을 못 읽음) | Claude Code's history format may have changed: no usage could be read from the last 7 days. Update Tokens Are Running Out to the latest version. | Claude Code 기록 형식이 바뀐 것 같습니다. 최근 7일 기록에서 사용량을 읽지 못했습니다. Tokens Are Running Out을 최신 버전으로 업데이트하세요. |
 | 버튼 | Try Again · Open Releases Page · Settings… · Quit | 다시 시도 · 릴리스 페이지 열기 · 설정… · 종료 |
 | 알림 제목 | Cache expires in %lld minutes | %lld분 뒤 캐시가 만료됩니다 |
 | 알림 본문 | %@: send a message to keep the cache. Otherwise the next message rebuilds it from %@ tokens (about %@). | %@: 메시지를 보내면 캐시가 유지됩니다. 그렇지 않으면 다음 메시지가 %@ 토큰으로 캐시를 다시 만듭니다(약 %@). |

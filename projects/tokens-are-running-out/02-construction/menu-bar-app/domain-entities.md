@@ -7,7 +7,7 @@ updated: 2026-11-18
 
 # Domain & Entities — 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림
 
-> 2-3의 엔티티는 대부분 계산 결과다. 영속하는 것은 사용자 설정(`UserDefaults`), 예약된 알림(시스템), 색인 스키마 v4의 열 하나뿐이다. 금액 단위는 2-2와 같은 나노달러 정수다.
+> 2-3의 엔티티는 대부분 계산 결과다. 영속하는 것은 사용자 설정(`UserDefaults`), 예약된 알림(시스템), 색인 스키마 v4의 표 하나(`read_stats`)뿐이다. 금액 단위는 2-2와 같은 나노달러 정수다.
 
 ## 1. 엔티티 개요
 
@@ -17,7 +17,7 @@ updated: 2026-11-18
 | `RegistryState` | 실행 세션 파일을 읽은 결과 | 없음 | design 6.5 "상태 확인 불가" |
 | `LastCall` | 세션의 마지막 API 호출과 만료 계산 재료 | 없음(색인에서 계산) | design 6.5 |
 | `ExpiryWarning` | 만료가 다가오는 세션 하나에 대한 경고 | 없음 | design 6.5, 8.1 |
-| `IndexHealth` | 최근 읽은 기록의 파싱 실패 비율 | 색인 `files.read_at`(스키마 v4) | design 8.2 "형식 변화 감지" |
+| `IndexHealth` | 최근 7일 동안 읽은 줄 가운데 호출이 되지 못한 assistant 줄의 비율 | 색인 `read_stats`(스키마 v4) | design 8.2 "형식 변화 감지" |
 | `IndexProgress` | 첫 색인 진행률 | 없음 | design 8.2 "첫 색인 중", 2-1 편차(부분 결과 신호) |
 | `AppSettings` | 사용자 설정 | `UserDefaults` | design 8.1 설정 창, DECISIONS 2026-11-18 |
 | `ScheduledExpiryNotification` | 예약된 만료 알림 하나 | `UNUserNotificationCenter`(시스템) | design 6.5 알림 |
@@ -35,7 +35,7 @@ updated: 2026-11-18
 | `status` | `busy` / `idle` / `other` | ✅ | `status` | 모르는 값은 `other` |
 | `statusSince` | Double? | | `statusUpdatedAt`(밀리초) | 초 단위로 바꿔 저장 |
 | `cwd` | String? | | `cwd` | 제목도 이름도 없을 때 폴더 이름을 쓴다 |
-| `processStart` | Double? | | `procStart`(ISO 8601) | PID 재사용 확인용. 형식이 다르면 nil |
+| `processStart` | Double? | | `procStart`(`ps lstart` 형식의 로컬 시각, 예: `Tue Nov 17 21:03:11 2026`, `en_US_POSIX`의 `EEE MMM d HH:mm:ss yyyy`로 해석. 2026-11-18 확인) | PID 재사용 확인용. 해석하지 못하면 nil이고, 그때는 `kill`만으로 판단한다 |
 
 - 위 키 말고는 읽지 않는다. 같은 폴더의 `*.key` 파일은 **열지 않는다**(BR-R3).
 
@@ -69,10 +69,18 @@ updated: 2026-11-18
 ### `IndexHealth`
 | 필드 | 타입 | 설명 |
 |---|---|---|
-| `candidateLines` | Int | 최근 7일 안에 새 줄을 읽은 파일들의 후보 줄 수 |
-| `parseFailures` | Int | 같은 파일들의 파싱 실패 수 |
-| `formatChanged` | Bool | BR-H1 |
-| `failureShare` | Double | 표시용 비율 |
+| `assistantLines` | Int | 최근 7일 동안 읽은 줄 가운데 최상위 `type`이 `assistant`인 줄과, `"assistant"`가 들어 있지만 JSON이 깨진 줄의 수 |
+| `assistantWithoutCall` | Int | 그중 API 호출이 되지 못한 줄(2-1 R2 불충족 + 깨진 줄). 평소에는 `<synthetic>` 메시지뿐이다(2026-11-18 측정: 89,765줄 중 68줄, 0.076%) |
+| `mainLines`, `mainCalls` | Int | 최근 7일 동안 메인 기록 파일에서 새로 읽은 줄 수와 새로 생긴 호출 수 |
+| `kind` | `none` / `unreadableLines(share)` / `noCalls` | BR-H1 |
+
+### `read_stats` (색인 스키마 v4)
+| 열 | 타입 | 설명 |
+|---|---|---|
+| `file_id`, `day` | INTEGER | 기본 키. `day`는 UTC 기준 `floor(읽은 시각 / 86400)` |
+| `lines`, `assistant_lines`, `assistant_without_call`, `calls` | INTEGER | 그날 그 파일에서 새로 읽은 값의 합 |
+
+- 30일보다 오래된 행은 전체 색인 때 지운다. 파일이 다시 읽히면(잘림·교체) 그 파일의 행도 지운다.
 
 ### `IndexProgress`
 | 필드 | 타입 | 설명 |

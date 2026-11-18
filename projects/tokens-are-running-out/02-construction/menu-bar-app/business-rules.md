@@ -44,20 +44,21 @@ updated: 2026-11-18
 |---|---|---|---|---|
 | BR-B1 | advisor 단계의 비용은 메인·서브에이전트 모두 `advisor` 버킷에 넣는다. 메인 재구축 호출의 `normalWork`는 (호출 비용 − 재구축한 단계의 쓰기 비용 − advisor 비용), 서브에이전트 호출의 `subagents`는 (호출 비용 − advisor 비용) | `UsageAnalyzer` | | DECISIONS 2026-11-18(사용자 결정) |
 | BR-B2 | CLI와 프로토타입의 버킷 순서: normal work, rebuild after short break, rebuild after long break, session start & compaction, subagents, advisor, model change & update, unknown. 2-2의 "advisor (in buckets)" 줄은 `advisor calls       N, input=…, output=…`로 바꾼다(N > 0일 때만) | `ReportText`, `drain.py` | | 같음 |
-| BR-B3 | 재구축 임계값은 매개변수다(기본 50,000). 분석기, `running-out report --rebuild-threshold`, `drain.py --rebuild-threshold`가 같은 값을 받는다 | `RebuildClassifier`, `UsageAnalyzer` | | DECISIONS 2026-11-18(사용자 결정) |
+| BR-B3 | 재구축 임계값은 매개변수다(기본 50,000). 분석기, `running-out report --rebuild-threshold`, `drain.py --rebuild-threshold`가 같은 값을 받는다 | `RebuildClassifier`, `UsageAnalyzer` | | DECISIONS 2026-11-18(AI 제안, 승인 게이트에서 확인) |
 | BR-B4 | `RebuildEvent`에 `previousContextTokens`(직전 호출의 BR-E2 값)를 더한다. 긴 휴식 행에 보인다 | `UsageAnalyzer` | | design 8.1 |
 
 ### 색인 (2-1 확장)
 | ID | 규칙 | 적용 대상 | 위반 시 동작 | 근거/출처 |
 |---|---|---|---|---|
-| BR-I1 | 스키마 v4: `files.read_at`(새 바이트를 마지막으로 읽은 시각, 초). 처음 열 때 색인을 다시 만든다 | `Indexer` | | BR-H1 |
+| BR-I1 | 스키마 v4: `read_stats` 표(domain-entities). 파일을 읽을 때마다 그날의 행에 더한다. 처음 열 때 색인을 다시 만든다 | `Indexer` | | BR-H1 |
+| BR-I4 | 2-1 R1 확장: `"assistant"`가 들어 있는 줄은 `"usage"`가 없어도 해석한다. 최상위 `type`이 `assistant`인데 2-1 R2를 만족하지 못하면 `.assistantWithoutCall`(새 결과)로 돌려준다. 호출 판정은 바뀌지 않는다 | `RecordParser` | | BR-H1 |
 | BR-I2 | `indexAll(progress:)`: 읽을 바이트 합(`bytesTotal`)과 읽은 바이트(`bytesRead`)를 최대 0.1초 간격으로 알린다 | `Indexer` | | design 8.2, 2-1 편차 |
 | BR-I3 | `lastCall(ofSession:)`: `kind == main`이고 `session_id`가 같은 파일(여럿이면 가장 늦게 만든 파일)의 마지막 호출 | `Indexer` | 없으면 nil | BR-E1 |
 
 ### 형식 변화 (Health)
 | ID | 규칙 | 적용 대상 | 위반 시 동작 | 근거/출처 |
 |---|---|---|---|---|
-| BR-H1 | 최근 7일 안에 새 줄을 읽은 파일에서 파싱 실패가 20줄 이상이고, 후보 줄의 1%를 넘으면 `formatChanged` | `Indexer.health(since:)` | 배너 표시 | design 8.2, 10장 |
+| BR-H1 | 최근 7일의 `read_stats`로 판단한다. ① `assistantLines ≥ 50`이고 `assistantWithoutCall / assistantLines > 5%`이면 `unreadableLines`. ② ①이 아니고 `mainLines ≥ 200`인데 `mainCalls == 0`이면 `noCalls`(최상위 `type` 자체가 바뀐 경우). 그 밖은 `none` | `Indexer.health(since:)` | 배너 표시 | design 8.2, 10장, 2026-11-18 측정 |
 
 ### 화면 계산 (UI)
 | ID | 규칙 | 적용 대상 | 위반 시 동작 | 근거/출처 |
@@ -111,7 +112,10 @@ updated: 2026-11-18
 | 기록 없음 | `~/.claude/projects`가 없음 | "기록 없음" 상태 |
 | 첫 색인 | 색인이 비어 있음 | 진행 막대, 끝나면 보고서 |
 | 색인 오류 | 데이터베이스를 열거나 쓸 수 없음(디스크 가득, 권한) | 오류 상태와 "다시 시도" |
-| 형식 변화 | BR-H1 | 배너와 "릴리스 페이지 열기" |
+| 형식 변화: `usage` 이름이 바뀜 | assistant 줄에 `usage`가 없음 | `unreadableLines` 배너(BR-H1 ①) |
+| 형식 변화: `message.id`가 없어짐 | assistant 줄이 R2 불충족 | `unreadableLines` 배너 |
+| 형식 변화: 최상위 `type`이 바뀜 | 메인 파일에 줄은 늘지만 호출 0건 | `noCalls` 배너(BR-H1 ②) |
+| 평소의 `<synthetic>` 메시지 | 0.1% 미만 | 배너 없음 |
 | 재구축 없음 | 목록이 비어 있음 | 빈 상태 문구(모든 원인 보기가 꺼져 있으면 켜는 방법 안내) |
 | 비용 0인 기간 | 호출 0건 | 원인 행 대신 "이 기간에는 사용 기록이 없습니다" |
 | 긴 제목 | 한 줄을 넘음 | 한 줄로 자르고 도움말과 근거 화면에서 전체 표시 |

@@ -48,17 +48,17 @@ updated: 2026-11-18
 
 ## §3. 미해결 질문 (Open Questions)
 
-없음. 사용자에게 물어 정한 두 가지(advisor 별도 항목, 재구축 임계값 설정)와 작성자 판단은 [DECISIONS](../../DECISIONS.md) 2026-11-18에 기록했다.
+없음. advisor 별도 항목은 사용자가 정했다. 재구축 임계값 설정은 사용자의 의견(다른 사용자의 기록은 다를 수 있다)을 받아 AI가 제안했고, 승인 게이트에서 확인한다. 작성자 판단과 함께 [DECISIONS](../../DECISIONS.md) 2026-11-18에 기록했다.
 
 ## §4. 구현 체크리스트
 
 - [ ] 2-2 확장: advisor 버킷, 임계값 매개변수(`--rebuild-threshold`), `previousContextTokens` — 앱·프로토타입·픽스처 기대 출력 함께
-- [ ] 색인 스키마 v4(`read_at`), `health(since:)`, `lastCall(ofSession:)`, `indexAll(progress:)`
-- [ ] `SessionRegistry`(`<숫자>.json`만, 생존·PID 재사용 확인, `.unavailable`)
+- [ ] 색인 스키마 v4(`read_stats`), `RecordParser`의 `.assistantWithoutCall`(BR-I4), `health(since:)`, `lastCall(ofSession:)`, `indexAll(progress:)`
+- [ ] `SessionRegistry`(`<숫자>.json`만, 생존·PID 재사용 확인(`procStart`는 `ps lstart` 형식), `.unavailable`)
 - [ ] `ExpiryCalculator`(BR-E1 ~ BR-E6)
 - [ ] `AppModel`(W1 ~ W6, 보고서 캐시, 분 단위 갱신 조건)
 - [ ] 알림 맞추기(`NotificationScheduling` 프로토콜과 가짜 구현으로 테스트)
-- [ ] 화면: 메뉴 막대, 팝오버의 모든 상태, 근거 팝오버, 설정 창
+- [ ] 화면: 메뉴 막대, 팝오버의 모든 상태, 근거 팝오버, 설정 창(`LSUIElement` 앱에서 `SettingsLink`로 열 때 창이 앞으로 오는지 확인하고, 아니면 앱을 활성화한 뒤 연다)
 - [ ] String Catalog(en·ko) — frontend-components §7의 모든 문구
 - [ ] `scripts/build-app.sh`, `Info.plist`, ad-hoc 서명
 - [ ] `ui-snapshots`로 상태별 PNG(밝은·어두운 × en·ko)를 만들고 better-interface로 검토, HIGH 0건
@@ -69,10 +69,10 @@ updated: 2026-11-18
 
 ## §5. 검증 계획
 - [ ] 엄격 빌드(경고=오류), `swift format lint --strict`, 전체 테스트 통과
-- [ ] 단위 테스트: business-rules §5의 경계마다 하나 이상(경고·알림·실행 세션·형식 변화·원인 행·임계값)
+- [ ] 단위 테스트: business-rules §5의 경계마다 하나 이상(경고·알림·실행 세션·형식 변화·원인 행·임계값). 형식 변화는 `usage` 이름 변경, `message.id` 누락, 최상위 `type` 변경 픽스처가 모두 배너를 띄우고, `<synthetic>` 메시지만 있는 픽스처는 띄우지 않아야 한다
 - [ ] 기준값: 기본 임계값에서 세 기간과 합성 픽스처의 `running-out report`가 `drain.py`와 글자 단위로 같다(advisor 버킷 반영 후 새 값). 다른 임계값 하나(예: 30,000)에서도 같다
 - [ ] 화면: `ui-snapshots` PNG를 better-interface로 검토해 HIGH 0건. 결과를 스테이지 문서에 기록
-- [ ] 실제 앱 확인(사용자 기기): 메뉴 막대 표시, VoiceOver 이름, 키보드만으로 모든 조작, 알림 권한 요청과 수신, 로그인 항목. 내가 확인할 수 없는 항목은 **Not verified**로 남기고 사용자에게 확인을 부탁한다
+- [ ] 실제 앱 확인(사용자 기기): 메뉴 막대 표시, VoiceOver 이름, 키보드만으로 모든 조작, 설정 창이 앞으로 오는지, 알림 권한 요청과 실제 수신(구현 시험에서는 설정 조회만 확인했다), 로그인 항목. 내가 확인할 수 없는 항목은 **Not verified**로 남기고 사용자에게 확인을 부탁한다
 - [ ] 보안: 네트워크 API 0건, `~/.claude` 쓰기 0건, `*.key` 파일을 여는 코드 0건(테스트)
 - [ ] PR 브랜치에 base merge 커밋 없음
 

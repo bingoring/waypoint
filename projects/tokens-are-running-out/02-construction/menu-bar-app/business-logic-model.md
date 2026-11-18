@@ -11,7 +11,7 @@ updated: 2026-11-18
 
 | 타깃 | 종류 | 내용 | 의존 |
 |---|---|---|---|
-| `RunningOutCore` | 라이브러리(기존) | 2-1·2-2에 더해 `SessionRegistry`, `ExpiryCalculator`, `Indexer.health`·`lastCall`·진행률, advisor 버킷, 임계값 매개변수 | Foundation, SQLite3 |
+| `RunningOutCore` | 라이브러리(기존) | 2-1·2-2에 더해 `SessionRegistry`, `ExpiryCalculator`, `Indexer.health`·`lastCall`·진행률·`read_stats`, `RecordParser`의 `.assistantWithoutCall`, advisor 버킷, 임계값 매개변수 | Foundation, SQLite3 |
 | `RunningOutUI` | 라이브러리(신규) | SwiftUI 화면, `AppModel`(`@MainActor @Observable`), 표시용 계산(`PopoverPresentation`), String Catalog(`Localizable.xcstrings`, en·ko). 시스템 서비스는 프로토콜(`NotificationScheduling`, `LoginItemControlling`, `URLOpening`)로만 쓴다 | `RunningOutCore`, SwiftUI |
 | `TokensAreRunningOut` | 실행 파일(신규) | `@main` App: `MenuBarExtra(.window)`, `Settings` 장면, 프로토콜의 실제 구현(`UNUserNotificationCenter`, `SMAppService`, `NSWorkspace`) | `RunningOutUI` |
 | `ui-snapshots` | 개발용 실행 파일(신규, `Tools/ui-snapshots`) | 합성 데이터로 화면 상태를 PNG로 그림(밝은·어두운 모드, en·ko). 배포하지 않음 | `RunningOutUI` |
@@ -92,8 +92,11 @@ warnings(registry, now, settings, prices):
 ### 3.2 형식 변화
 ```
 health(since: now - 7d):
-  SELECT SUM(candidate_lines), SUM(parse_failures) FROM files WHERE read_at >= ?
-  formatChanged = failures >= 20 && failures > candidates * 0.01               # BR-H1
+  a, w = SELECT SUM(assistant_lines), SUM(assistant_without_call) FROM read_stats WHERE day >= ?
+  m, c = SELECT SUM(lines), SUM(calls) FROM read_stats JOIN files ... WHERE kind = 'main' AND day >= ?
+  if a >= 50 && w > a * 0.05: unreadableLines(w / a)                          # BR-H1 ①
+  elif m >= 200 && c == 0: noCalls                                            # BR-H1 ②
+  else: none
 ```
 
 ### 3.3 메뉴 막대 표시
