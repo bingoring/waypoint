@@ -122,9 +122,9 @@ gh secret set TAP_TOKEN
 | 릴리스 빌드 | `build-app.sh --release 0.1.0-rc.1`: `x86_64 arm64`, `CFBundleShortVersionString` 0.1.0, `CFBundleVersion` 커밋 수, 아이콘 포함. 값이 없거나 형식이 틀린 버전은 거부 |
 | 서명(dry-run) | ad-hoc 서명에 hardened runtime(`flags=0x10002(adhoc,runtime)`), `codesign --verify --strict --deep` 통과. 앱 버전과 다른 `--version`, 인자 누락은 거부 |
 | 실행 | hardened runtime 빌드를 따로 실행해 6초 뒤 살아 있음을 확인(메모리 약 93MB, CPU 0.0%)하고 PID로 종료 |
-| cask | `brew style` 통과(임시 로컬 tap에서 검사한 뒤 제거). `depends_on macos: ">= :sonoma"`는 거부되어 `:sonoma`로 바꿈 |
+| cask | `brew style` 통과(임시 로컬 tap에서 검사한 뒤 제거). `depends_on macos: ">= :sonoma"`는 거부되어 `:sonoma`로 바꿈. `brew info`가 이를 "macOS >= 14"로 읽음을 확인. Homebrew 7은 신뢰하지 않은 tap의 cask를 읽지 않지만, `brew install --cask bingoring/tap/…`처럼 tap 이름을 붙이면 그 cask를 자동으로 신뢰한다(`--dry-run`으로 확인, 신뢰 목록은 임시 폴더에 둠) |
 | tap push | 로컬 사본(bare 저장소)으로 시험: 첫 실행은 커밋·push, 같은 버전은 아무것도 하지 않고 성공, 토큰이 없으면 실패, 사전 릴리스 버전과 잘못된 체크섬은 거부. 토큰은 클론의 `.git/config`에 남지 않음 |
-| 워크플로 | 모든 `run` 블록의 셸 문법 확인. 태그와 입력 값은 `env`로만 넘김 |
+| 워크플로 | 모든 `run` 블록의 셸 문법 확인. 태그와 입력 값은 `env`로만 넘김. PR CI에 `build-app.sh --release 0.0.0`과 `release.sh --dry-run` 단계를 더해 러너에서도 유니버설 빌드와 hardened runtime 서명을 확인한다 |
 | 아이콘 | 같은 스크립트로 다시 만들면 바이트까지 같음. 모든 크기에서 캔버스 가장자리 알파 0. 그래픽 대비(렌더링 픽셀 측정): 흰 캡 9.50 ~ 12.23:1, 모래 5.48 ~ 7.06:1(기준 3:1) |
 
 ### 아이콘 검토 (better-ui · better-colors)
@@ -153,6 +153,7 @@ Finder가 쓰는 `NSWorkspace` 아이콘을 크기별로 렌더링해 확인했�
 - **Intel(x86_64) 실행:** 이 기기에 Rosetta가 없다. 바이너리에 x86_64 조각이 있는 것만 확인했다.
 - **실제 서명·공증·릴리스와 로그의 비밀 값:** 비밀 값 등록 뒤 `v0.1.0-rc.1`로 확인한다.
 - **`brew audit`:** Homebrew가 이 기기의 Xcode 26.4.1을 오래된 버전으로 보고 실행을 거부했다.
+- **tap 인증:** 토큰을 HTTP 헤더로 넘기는 경로는 아직 한 번도 실행되지 않았다. 로컬 시험은 `file://` 원격이라 헤더를 쓰지 않으므로, 커밋·push 순서와 "토큰이 설정에 남지 않음"만 증명한다. 사전 릴리스는 tap 단계를 건너뛰므로 첫 실행은 정식 `v0.1.0`(3-1)이다.
 
 ### 남은 일
 1. 사용자: 위 "사용자 작업" 1 ~ 4(인증서, API 키, tap 토큰, 비밀 값 6개 등록).
