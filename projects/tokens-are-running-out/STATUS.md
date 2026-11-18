@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> 🏗️ **2-3 구현 완료 → 머지 대기 (2026-11-18, PR [#3](https://github.com/bingoring/tokens-are-running-out/pull/3)).** 메뉴 막대 앱(개발 빌드)이 동작한다: 곧 만료되는 세션 경고와 알림, 원인 분해(advisor 포함), 비용이 컸던 캐시 재구축과 근거, 설정 창, 영어·한국어. 테스트 170개, 기본값과 3만에서 세 기간 모두 프로토타입과 같음. 구현 후 화면 검토에서 HIGH 3건(넘침, 잘림, 밝은 모드 대비)을 고쳤고, 독립 리뷰의 MEDIUM 7건을 모두 반영했다. 메모리 최대 63MB. VoiceOver, 키보드, 알림 수신, 로그인 항목은 사용자 확인 대기.
+
 > ✅ **2-3 승인 (2026-11-18).** 재구축 임계값 설정 제안도 함께 확정. 구현 착수 — 브랜치 `feature/2-3-menu-bar-app`.
 
 > 📝 **2-3 메뉴 막대 앱 제안 (2026-11-18).** Build Spec READY(comprehensive), 승인 대기. 실행 세션 파일, 제목 출처, 앱 빌드 방식(SwiftPM + `xcodebuild`), 화면 렌더링 방식을 실제로 확인했다. advisor 비용은 별도 항목(8번째 버킷)으로 보여 준다(사용자 결정). 재구축 임계값도 설정할 수 있게 하는 것은 사용자 의견을 받은 AI 제안이고, 승인 게이트에서 확인한다(기본 5만). 형식 변화는 "호출이 되지 못한 assistant 줄의 비율"로 감지한다. 화면 시안은 better-interface 방식으로 구현 전에 검토해 HIGH 3건을 명세에 반영했다.
@@ -52,7 +54,7 @@
 |---------|------|------|
 | 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) IMPLEMENTED · PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1) 머지 `2eed43c` | HUMAN_APPROVED |
 | 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) IMPLEMENTED · PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2) 머지 `6635dcc` | HUMAN_APPROVED |
-| 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) READY | HUMAN_APPROVED (구현 중) |
+| 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) IMPLEMENTED · PR [#3](https://github.com/bingoring/tokens-are-running-out/pull/3) 머지 대기 | HUMAN_APPROVED |
 | 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | (예정) | PENDING |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
