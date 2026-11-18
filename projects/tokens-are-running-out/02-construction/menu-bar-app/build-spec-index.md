@@ -1,7 +1,7 @@
 ---
 build-spec: menu-bar-app
 stage: 02-construction/03-menu-bar-app
-status: READY
+status: IMPLEMENTED
 depth: comprehensive
 updated: 2026-11-18
 ---
@@ -72,7 +72,7 @@ updated: 2026-11-18
 - [x] 단위 테스트: business-rules §5의 경계마다 하나 이상(경고·알림·실행 세션·형식 변화·원인 행·임계값). 형식 변화는 `usage` 이름 변경, `message.id` 누락, 최상위 `type` 변경 픽스처가 모두 배너를 띄우고, `<synthetic>` 메시지만 있는 픽스처는 띄우지 않아야 한다
 - [x] 기준값: 기본 임계값에서 세 기간과 합성 픽스처의 `running-out report`가 `drain.py`와 글자 단위로 같다(advisor 버킷 반영 후 새 값). 다른 임계값 하나(예: 30,000)에서도 같다
 - [x] 화면: `ui-snapshots` PNG를 better-interface로 검토해 HIGH 0건. 결과를 스테이지 문서에 기록
-- [ ] 실제 앱 확인(사용자 기기): 메뉴 막대 표시, VoiceOver 이름, 키보드만으로 모든 조작, 설정 창이 앞으로 오는지, 알림 권한 요청과 실제 수신, 로그인 항목, 팝오버를 닫으면 분 단위 갱신이 멈추는지. **Not verified** — PR에서 사용자에게 확인을 부탁한다(구현 측 확인: 앱 실행·색인·종료, 메모리·CPU 측정)
+- [x] 실제 앱 확인(사용자 기기): 메뉴 막대 표시, VoiceOver 이름, 키보드만으로 모든 조작, 설정 창이 앞으로 오는지, 알림 권한 요청과 실제 수신, 로그인 항목, 팝오버를 닫으면 분 단위 갱신이 멈추는지. 사용자가 PR #3 체크리스트를 기기에서 확인하고 채팅으로 "확인했어"라고 답했다(2026-11-18). 구현 측 확인은 앱 실행·색인·종료, 메모리·CPU 측정
 - [x] 보안: 네트워크 API 0건, `~/.claude` 쓰기 0건, `*.key` 파일을 여는 코드 0건(테스트)
 - [x] PR 브랜치에 base merge 커밋 없음
 
