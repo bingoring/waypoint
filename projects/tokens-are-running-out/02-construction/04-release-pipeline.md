@@ -54,7 +54,7 @@ updated: 2026-11-18
 - 서명·공증 단계는 `scripts/release.sh`에 모아 로컬에서도 같은 순서로 돌릴 수 있게 하고, 워크플로는 그것을 부르기만 한다.
 
 ### 사용자 작업 (작업자가 대신할 수 없음)
-1. **Developer ID Application 인증서:** Xcode ▸ Settings ▸ Apple Accounts(Xcode 25 이전에는 Accounts) ▸ 팀 선택 ▸ Manage Certificates… ▸ + ▸ Developer ID Application. 키체인 접근에서 그 인증서를 개인 키와 함께 .p12로 내보내고 암호를 정한다.
+1. **Developer ID Application 인증서:** Xcode ▸ Settings ▸ Apple Accounts(예전 Xcode에서는 Accounts) ▸ 팀 선택 ▸ Manage Certificates… ▸ + ▸ Developer ID Application. 키체인 접근에서 그 인증서를 개인 키와 함께 .p12로 내보내고 암호를 정한다.
 2. **App Store Connect API 키:** App Store Connect ▸ Users and Access ▸ Integrations ▸ Team Keys ▸ +, 접근 권한 Developer. .p8은 한 번만 내려받을 수 있다. 키 ID와 발급자 ID를 적어 둔다.
 3. **tap 토큰:** tap 저장소를 만든 뒤 GitHub ▸ Settings ▸ Developer settings ▸ Fine-grained tokens. 저장소는 `bingoring/homebrew-tap`만, 권한은 Contents 읽기·쓰기. 만료 기한이 있으므로 만료되면 새로 만들어 다시 등록한다.
 4. **비밀 값 등록:** 저장소 폴더에서, 이 대화가 아니라 **사용자의 터미널**에서 실행한다(대화창에서 실행한 명령과 출력은 대화 기록에 남는다). 값은 파일에서 읽거나 입력을 물으므로 화면에 남지 않는다. `--body` 옵션은 쓰지 않는다. `<…>` 자리는 실제 파일 경로로 바꾼다.
