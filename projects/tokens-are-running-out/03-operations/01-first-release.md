@@ -194,3 +194,46 @@ updated: 2026-11-20
 | 정리 | 임시 tap 제거, 받은 파일 캐시 삭제, `tap-new`가 켠 개발자 모드 끔, 임시 신뢰 설정 삭제. tap 목록은 시험 전과 같다 |
 
 - **Not verified:** `brew audit`(Command Line Tools 업데이트 뒤 공개된 tap에서 다시 시도할 수 있다), 실행 중인 앱이 있을 때의 `uninstall quit:`.
+
+### `v0.1.0` 공개 (2026-11-20, 게이트 7)
+
+**태그 전 확인:** 모두 통과했다.
+- PR #6 머지 커밋 `657aa4f`의 `main` CI가 통과했다.
+- rc.4와 비교해 릴리스 경로 파일 변경이 없다(바뀐 것은 README, 그림 두 장, 이슈 템플릿, 문서 포인터).
+- Environment 비밀 값 6개, 저장소 수준 0개, 보호 규칙이 활성이다.
+- tap의 `Casks/`가 비어 있고, `v0.1.0` 태그와 릴리스가 없었다.
+
+**릴리스 실행:** `657aa4f`에 annotated 태그를 올렸다. 실행이 승인 대기로 멈췄고, 사용자가 승인했다.
+- 처음 실행된 `main` 조상 확인을 포함해, 서명·공증·릴리스 생성까지 모든 단계가 성공했다.
+- 마지막 tap 단계만 실패했다(아래 사고).
+
+**릴리스 검증:** 공개된 자산을 새 폴더로 내려받아 다시 검사했다.
+- 체크섬이 일치한다.
+- `codesign --verify --strict --deep`, `stapler validate`, `spctl` "Notarized Developer ID", `syspolicy_check distribution`, `check-binary.sh`를 모두 통과했다.
+- 버전은 0.1.0(빌드 100), 아키텍처는 `x86_64 arm64`이다.
+
+**사고: tap 단계 403**
+- 로그: `Permission to bingoring/homebrew-tap.git denied to bingoring`
+- 원인: 토큰은 유효했지만(사용자로 인증됨), 사용자가 다시 만든 fine-grained 토큰에 저장소 권한이 하나도 추가되어 있지 않았다. 공개 저장소라서 clone은 됐고, push에서 막혔다.
+- 대응: 계획한 대로 잡을 다시 실행하거나 태그를 다시 올리지 않았다. 사용자가 토큰 편집 화면에서 Contents를 추가해 Read and write로 바꿨고, 토큰 값은 그대로다.
+- 복구: `main`에서 "Update Homebrew tap"을 `v0.1.0`으로 실행했다. 승인 뒤 성공했고, tap에 커밋 `c26525c`("tokens-are-running-out 0.1.0")가 생겼다. cask의 버전은 0.1.0이고, 체크섬은 릴리스의 `.sha256`과 같다.
+- 이로써 Environment의 `TAP_TOKEN`과 복구 워크플로의 `main` 실행이 처음으로 증명되었다. 릴리스 잡 안의 tap 단계(`--only-newer`로 push)는 아직 성공한 적이 없고, 다음 정식 릴리스에서 처음 성공을 확인한다.
+
+**이 기기 설치(게이트 8, 9)**
+- `brew install --cask bingoring/tap/tokens-are-running-out`이 한 번에 설치되었다.
+- 설치된 앱: quarantine 속성 있음, `spctl` "Notarized Developer ID", 서명 검증 통과, 버전 0.1.0
+- `brew uninstall --zap`: 앱, 색인 폴더, 설정 파일을 지웠다. Homebrew는 파일을 휴지통으로 옮긴다고 출력했다. 설정 도메인도 비었고, Caskroom 항목도 남지 않았다. 그 뒤 다시 설치해 그대로 두었다.
+- 처음 열 때의 확인 대화상자와 화면 확인은 사용자 확인 항목이다.
+
+**릴리스 노트(게이트 4, 10):** 자동 생성된 노트 위에 짧은 소개를 붙였다. 붙인 내용은 무엇을 하는지, 무엇을 하지 않는지, 설치 방법, 미확인 환경 안내다. SHA-256 줄과 자산은 그대로다.
+
+**3-2 기준선 (2026-11-20T06:29Z):**
+- 별 0, 포크 0, watcher 0
+- `v0.1.0` zip 다운로드 2, `.sha256` 2
+- 이 수치에는 검증용 내려받기(AI의 `gh` 1회, tap 워크플로 1회)가 들어 있다. 이 기기의 Homebrew 설치 1회는 집계가 늦어 나중에 더해질 수 있다. 소개 글을 올리기 직전의 값을 3-2의 0점으로 삼는다.
+
+- **Not verified:**
+  - Intel, macOS 14 ~ 26
+  - `brew audit`: Command Line Tools가 오래되어 실행되지 않는다
+  - 실행 중인 앱이 있을 때의 `uninstall quit:`
+  - 릴리스 잡 안의 tap 단계 성공
