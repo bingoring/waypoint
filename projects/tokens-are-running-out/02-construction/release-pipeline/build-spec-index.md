@@ -1,9 +1,9 @@
 ---
 build-spec: release-pipeline
 stage: 02-construction/04-release-pipeline
-status: READY
+status: IMPLEMENTED
 depth: standard
-updated: 2026-11-18
+updated: 2026-11-20
 ---
 
 # Build Spec — 릴리스 파이프라인 (서명 · 공증 · Homebrew tap)

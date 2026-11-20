@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> ✅ **2-4 사용자 확인 (2026-11-20).** 사용자가 `v0.1.0-rc.3`을 브라우저로 내려받아 경고 없이 열리는 것을 확인했다. Build Spec IMPLEMENTED. 남은 것: PR #4 머지. 다음: R-1 독립 코드 리뷰, 3-1 첫 공개(`v0.1.0`, Homebrew).
+
 > 🏗️ **2-4 사전 릴리스 시험 통과 → 사용자 확인·머지 대기 (2026-11-20, PR [#4](https://github.com/bingoring/tokens-are-running-out/pull/4)).** 사용자가 인증서·API 키·tap 토큰을 만들고 비밀 값 6개를 등록했다. `v0.1.0-rc.3`에서 서명, 공증 Accepted, 티켓, GitHub 사전 릴리스까지 성공했고, 내려받은 앱이 "source=Notarized Developer ID"로 판정되어 실행됐다. 로그에 비밀 값 노출 없음. rc.1(키 ID·발급자 ID가 바뀌어 등록됨)과 rc.2(새 Developer ID의 첫 공증이 30분을 넘김)의 실패에서 형식 검사와 공증 결과 읽기를 고쳤다. 남은 것: 사용자가 브라우저로 내려받아 열어 보기, 머지.
 
 > 🏗️ **2-4 구현 → 비밀 값 등록 대기 (2026-11-18).** 아이콘, 유니버설 릴리스 빌드, 서명·공증 스크립트, 릴리스·tap 워크플로, cask, README를 구현했다. dry-run(ad-hoc + hardened runtime), `brew style`, 로컬 사본으로 tap push를 확인했다. macOS 27 Finder가 초타원 바탕의 아이콘을 회색 틀에 넣는 것을 렌더링으로 찾아 시스템 모양으로 바꿨다. 독립 리뷰의 지적 3건(토큰 전달, 산출물 폴더, 인자 확인)을 반영했다. Intel 실행은 Rosetta가 없어 Not verified. 다음: 사용자가 비밀 값을 등록하면 `v0.1.0-rc.1`로 끝까지 시험.
@@ -65,7 +67,7 @@
 | 2-1 기록 리더와 색인 | [01-reader-and-index.md](02-construction/01-reader-and-index.md) · [Build Spec](02-construction/reader-index/build-spec-index.md) IMPLEMENTED · PR [#1](https://github.com/bingoring/tokens-are-running-out/pull/1) 머지 `2eed43c` | HUMAN_APPROVED |
 | 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) IMPLEMENTED · PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2) 머지 `6635dcc` | HUMAN_APPROVED |
 | 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) IMPLEMENTED · PR [#3](https://github.com/bingoring/tokens-are-running-out/pull/3) 머지 `7dfda7b` | HUMAN_APPROVED |
-| 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | [04-release-pipeline.md](02-construction/04-release-pipeline.md) · [Build Spec](02-construction/release-pipeline/build-spec-index.md) READY | HUMAN_APPROVED (`v0.1.0-rc.3` 시험 통과, 사용자 확인·머지 대기) |
+| 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | [04-release-pipeline.md](02-construction/04-release-pipeline.md) · [Build Spec](02-construction/release-pipeline/build-spec-index.md) IMPLEMENTED · PR [#4](https://github.com/bingoring/tokens-are-running-out/pull/4) 머지 대기 | HUMAN_APPROVED |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
