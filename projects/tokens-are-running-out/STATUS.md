@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> 📝 **3-1 첫 공개 제안 (2026-11-20).** 정식 `v0.1.0`의 공개 순서와 실패 대응, 공개 전 정리(README 스크린숏, 이슈 템플릿, 미확인 환경 안내, 토픽), cask 사전 시험, 이 기기에서의 Homebrew 설치 확인, 소개 글 초안(Show HN, GeekNews)을 제안했다. 공식 `homebrew/cask`는 인지도 기준(자체 제출 stars 225 등)과 30일 조건에 못 미쳐 자체 tap을 유지한다. AI_PROPOSED, 승인 대기.
+
 > ✅ **R-1 머지 (2026-11-20).** PR #5를 `main`에 머지했다(`b8b05f6`). Construction → Operations 게이트를 통과했다. 다음: 3-1 첫 공개(`v0.1.0`, Homebrew 설치 확인). 정식 태그 전용 단계와 Environment의 `TAP_TOKEN`은 그때 처음 실행된다.
 
 > ✅ **R-1 후속: 릴리스 경로 재시험 (2026-11-20).** 릴리스 비밀 값을 Environment `release`로 옮기고(저장소 수준 0개) `v*` 태그 보호를 걸었다. `v0.1.0-rc.4`는 승인 대기로 멈췄다가, 사용자가 승인한 뒤 모든 검사와 서명·공증을 통과했다. 내려받은 앱은 `spctl`에서 "Notarized Developer ID"로 받아들여졌다. 남은 것: PR #5 머지. 다음: 3-1 첫 공개(`v0.1.0`, Homebrew 설치 확인).
@@ -91,7 +93,7 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 3-1 첫 공개 (GitHub Releases · Homebrew tap) | (예정) | PENDING |
+| 3-1 첫 공개 (GitHub Releases · Homebrew tap) | [01-first-release.md](03-operations/01-first-release.md) · [소개 글 초안](03-operations/first-release/launch-posts.md) | AI_PROPOSED |
 | 3-2 반응 확인 (수요 가설 검증) | (예정) | PENDING |
 
 ---
