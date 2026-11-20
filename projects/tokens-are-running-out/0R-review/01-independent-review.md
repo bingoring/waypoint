@@ -186,3 +186,26 @@ INV4는 Claude Code가 실제로 쓰는 형식의 입력에 적용한다. 다음
 ## 다음 단계
 
 승인 후 → `STATUS.md`의 R-1을 `HUMAN_APPROVED`로 → PR 머지 → (승인 시) `v0.1.0-rc.4`로 릴리스 경로 재시험 → 3-1 첫 공개(`v0.1.0`, Homebrew 설치 확인) 제안.
+
+## 승인 후 진행 (2026-11-20)
+
+### 저장소 설정 (게이트 4)
+| 항목 | 결과 |
+|---|---|
+| 워크플로 | 릴리스 잡과 "Update Homebrew tap" 잡이 `environment: release`를 선언한다. README의 릴리스 안내와 알림 문구(게이트 6)도 같은 커밋에 넣었다 |
+| Environment `release` | 필수 승인자는 사용자이고, 자기 승인을 허용한다. 허용 대상은 `v*` 태그와 `main` 브랜치다. 사용자의 승인을 받아 AI가 `gh api`로 만들었다 |
+| 태그 보호 | ruleset "Release tags": `refs/tags/v*`의 만들기·바꾸기·지우기를 막고, 저장소 관리자만 우회한다 |
+| 비밀 값 | 사용자가 6개를 Environment에 다시 등록하고 저장소 수준 비밀 값을 지웠다. AI는 이름과 등록 시각만 확인했다(저장소 수준 0개, Environment 6개) |
+
+### 사전 릴리스 `v0.1.0-rc.4` (게이트 3)
+PR #5의 끝 커밋에 태그를 올렸다. 이 커밋의 CI는 통과했고, 태그 뒤로 워크플로는 바뀌지 않았다.
+
+| 항목 | 결과 |
+|---|---|
+| 승인 대기 | 실행이 `waiting` 상태로 멈췄고, 대기 중인 배포는 Environment `release`, 승인자는 사용자였다. 사용자가 승인한 뒤에야 시작했다 |
+| 실행 | 모든 단계 성공. 태그 검사, 비밀 값 형식 검사, 엄격 빌드, 테스트, 반목표 검사, 유니버설 빌드, 바이너리 검사를 거친 뒤 서명·공증·티켓 붙이기·릴리스를 했다. 정식 태그 전용 단계(`main` 조상 확인, cask 갱신)는 건너뛰었다. 잡 약 3분, 서명·공증 단계 20초 |
+| 릴리스 | prerelease 표시, zip과 SHA-256 두 자산 |
+| 내려받아 검증 | 체크섬 일치. `codesign --verify --strict --deep` 통과, hardened runtime, 보안 타임스탬프. `spctl` "accepted, source=Notarized Developer ID". `stapler validate` 통과. `syspolicy_check distribution` 통과. 버전 0.1.0(빌드 92), `x86_64 arm64`, 엔타이틀먼트 없음, `check-binary.sh` 통과 |
+| tap | `bingoring/homebrew-tap`에 새 커밋 없음(사전 릴리스는 cask를 바꾸지 않는다) |
+
+- **Not verified:** tap 토큰 경로는 첫 정식 릴리스 `v0.1.0`에서 처음 실행된다. Intel 실행은 이 기기에 Rosetta가 없어 확인하지 못했다.
