@@ -113,7 +113,7 @@ gh secret set TAP_TOKEN
 |---|------|
 | 1 | 채팅으로 "승인". AI 제안대로 확정한다: 범위, 공개 tap 저장소 `bingoring/homebrew-tap` 생성, 시험용 사전 릴리스 `v0.1.0-rc.1` 공개, 사용자 작업 1 ~ 4. 서명 주체는 사용자가 인증서를 만드는 팀(사용자가 계정 소유자인 팀)이며, 서명에 그 팀의 이름과 팀 ID가 남는다는 점을 알렸다. |
 
-## 구현 결과 (2026-11-18, 비밀 값 등록 대기)
+## 구현 결과 (2026-11-18 ~ 20, PR [#4](https://github.com/bingoring/tokens-are-running-out/pull/4))
 
 ### 검증
 | 항목 | 결과 |
@@ -149,16 +149,40 @@ Finder가 쓰는 `NSWorkspace` 아이콘을 크기별로 렌더링해 확인했�
 | 약 15 | 타임스탬프 서버가 잠시 실패하면 재시도가 없다 | **반영하지 않음.** 릴리스가 생기기 전 단계라 워크플로를 다시 실행하면 된다 |
 | 문서 | `update-cask.sh` 이름, `--verbose=2`·`-dvvv` 표기, 서명 ID를 이름 대신 SHA-1로 지정 | **채택.** Build Spec 편차 로그에 기록 |
 
+### 사전 릴리스로 끝까지 시험 (2026-11-19 ~ 20)
+사용자가 Developer ID Application 인증서, App Store Connect 팀 키(Developer), tap 토큰을 만들고 비밀 값 6개를 등록했다. 작업자는 값을 보지 않고 이름과 등록 시각만 확인했다.
+
+| 태그 | 결과 | 원인과 조치 |
+|---|---|---|
+| `v0.1.0-rc.1` | 실패(릴리스 없음) | Developer ID 서명은 성공. 공증 제출에서 `notarytool`이 발급자 ID가 UUID가 아니라고 거부했다. 키 ID와 발급자 ID가 서로 바뀌어 등록되어 있었다. 두 값의 형식을 빌드 전에 확인하는 단계를 더했다(`0800075`) |
+| `v0.1.0-rc.2` | 실패(릴리스 없음) | 처음 실행은 새 형식 검사가 키 ID를 잡아냈다. 사용자가 다시 등록한 뒤 재실행하니 업로드와 인증은 성공했지만, Apple이 30분 안에 검사를 끝내지 않아 시간 초과됐다. 이때 결과 JSON이 표준 오류로 나와 스크립트가 제출 ID를 놓쳤다. 고쳤다(`2a888c5`). 그 제출은 나중에 사용자가 `notarytool info`로 확인했을 때 Accepted였다. 새 Developer ID의 첫 공증이 오래 걸린 것으로 본다 |
+| `v0.1.0-rc.3` | **성공**(약 2분) | 공증 Accepted, 티켓 부착, 워크플로 안의 Gatekeeper 판정 통과, GitHub 사전 릴리스 생성 |
+
+`v0.1.0-rc.3`의 첨부 파일을 내려받아 확인한 결과:
+
+| 항목 | 결과 |
+|---|---|
+| 릴리스 | prerelease, 첨부 파일 2개(zip 1.76MB, `.sha256`), 본문 첫 줄에 SHA-256 |
+| 체크섬 | `shasum -a 256 -c` 통과. 본문, `.sha256`, 실제 파일이 같다(INV1) |
+| 번들 | `x86_64 arm64`, 버전 0.1.0, 빌드 65 |
+| 서명 | `codesign --verify --strict --deep` 통과. Authority는 Developer ID Application → Developer ID Certification Authority → Apple Root CA. hardened runtime, 보안 타임스탬프, `Notarization Ticket=stapled` |
+| 티켓 | `stapler validate` 통과 |
+| Gatekeeper | `spctl --assess --type execute`: accepted, **source=Notarized Developer ID**(INV2). `syspolicy_check distribution`: "ready for distribution" |
+| 실행 | 따로 실행해 6초 뒤 살아 있음(메모리 약 108MB, CPU 0.0%), PID로 종료. 시험용 사본은 LaunchServices 등록을 해제하고 지웠다 |
+| 로그 | 비밀 값이 든 줄은 모두 `***`. 개인 키나 인증서 PEM 표지 0건, 200자 넘는 base64 0건. `AUTHORIZATION` 줄은 `actions/checkout`의 기본 토큰이고 가려져 있다 |
+| tap | `Casks/`에 `.gitkeep`만 있다(사전 릴리스는 cask를 바꾸지 않음, RL-7) |
+
+- 릴리스 없이 태그만 남은 `v0.1.0-rc.1`과 `v0.1.0-rc.2`는 그대로 둔다. 태그를 옮기거나 지우지 않는다.
+
 ### Not verified
 - **Intel(x86_64) 실행:** 이 기기에 Rosetta가 없다. 바이너리에 x86_64 조각이 있는 것만 확인했다.
-- **실제 서명·공증·릴리스와 로그의 비밀 값:** 비밀 값 등록 뒤 `v0.1.0-rc.1`로 확인한다.
+- **브라우저로 내려받아 여는 흐름:** quarantine 속성이 붙은 상태에서 Finder로 여는 과정은 확인 대화상자가 사용자 화면에 뜨므로 작업자가 하지 않았다. 사용자 확인 항목으로 둔다.
 - **`brew audit`:** Homebrew가 이 기기의 Xcode 26.4.1을 오래된 버전으로 보고 실행을 거부했다.
 - **tap 인증:** 토큰을 HTTP 헤더로 넘기는 경로는 아직 한 번도 실행되지 않았다. 로컬 시험은 `file://` 원격이라 헤더를 쓰지 않으므로, 커밋·push 순서와 "토큰이 설정에 남지 않음"만 증명한다. 사전 릴리스는 tap 단계를 건너뛰므로 첫 실행은 정식 `v0.1.0`(3-1)이다.
 
 ### 남은 일
-1. 사용자: 위 "사용자 작업" 1 ~ 4(인증서, API 키, tap 토큰, 비밀 값 6개 등록).
-2. 작업자: PR 브랜치의 커밋에 `v0.1.0-rc.1` 태그를 붙여 push하고, 워크플로와 첨부 zip(`spctl`, `stapler validate`, 실행)을 확인한다.
-3. 그 결과를 기록하고 Build Spec을 IMPLEMENTED로 바꾼 뒤 머지한다.
+1. 사용자: `v0.1.0-rc.3` 릴리스 페이지에서 zip을 브라우저로 내려받아 압축을 풀고 열어 본다. "인터넷에서 내려받은 앱" 확인 대화상자 외의 경고 없이 실행되면 통과다.
+2. 그 확인 뒤 Build Spec을 IMPLEMENTED로 바꾸고 PR을 머지한다.
 
 ## 다음 단계
 

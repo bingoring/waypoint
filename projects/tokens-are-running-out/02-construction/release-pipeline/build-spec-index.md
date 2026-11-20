@@ -52,9 +52,9 @@ updated: 2026-11-18
 - [x] `update-cask.sh`와 cask 템플릿. `brew style`로 문법 확인(이름은 `update-tap.sh`, §7)
 - [x] `release.yml`(형식 확인, 빌드 전 비밀 값 확인, 키체인, 정리 단계 포함)과 `update-tap.yml`
 - [x] README 설치·릴리스 안내
-- [ ] (사용자) Developer ID Application 인증서, App Store Connect API 키, tap 토큰을 만들고 비밀 값 등록
+- [x] (사용자) Developer ID Application 인증서, App Store Connect API 키, tap 토큰을 만들고 비밀 값 등록
 - [x] (사용자 확인 후) `bingoring/homebrew-tap` 생성
-- [ ] 사전 릴리스 `v0.1.0-rc.1`로 끝까지 시험: 공증 Accepted, 첨부 zip을 받아 `spctl`·`stapler validate`·실행
+- [x] 사전 릴리스 `v0.1.0-rc.1`로 끝까지 시험: 공증 Accepted, 첨부 zip을 받아 `spctl`·`stapler validate`·실행 → `v0.1.0-rc.3`에서 통과(rc.1·rc.2는 비밀 값과 첫 공증 대기로 실패, §7)
 - [x] 독립 리뷰와 반영
 - [x] PR 브랜치에 base merge 커밋 없음
 
@@ -65,8 +65,8 @@ updated: 2026-11-18
 - [x] 생성한 cask가 `brew style`을 통과
 - [x] x86_64 쪽도 한 번 실행(`arch -x86_64`, Rosetta가 있을 때). 없으면 Intel은 Not verified로 남긴다 → Rosetta가 없어 **Not verified**
 - [x] 시험용 앱은 사용자가 띄워 둔 앱과 따로 실행하고, 앱 이름이 아니라 PID로 종료한다
-- [ ] `v0.1.0-rc.1` 사전 릴리스: 워크플로 성공, 공증 Accepted, 내려받은 앱이 `spctl`에서 "source=Notarized Developer ID", `stapler validate` 통과, 실행됨. cask는 바뀌지 않음
-- [ ] 워크플로 로그와 저장소에 비밀 값이 나타나지 않음
+- [x] `v0.1.0-rc.1` 사전 릴리스: 워크플로 성공, 공증 Accepted, 내려받은 앱이 `spctl`에서 "source=Notarized Developer ID", `stapler validate` 통과, 실행됨. cask는 바뀌지 않음 → `v0.1.0-rc.3`
+- [x] 워크플로 로그와 저장소에 비밀 값이 나타나지 않음
 - [ ] 정식 `v0.1.0` 릴리스와 `brew install --cask`는 3-1(첫 공개)에서 한다
 
 ## §6. NFR
@@ -84,6 +84,8 @@ N/A(standard). 릴리스 한 번이 30분 안에 끝나면 된다(공증 대기 
 | business-logic-model §2.6 `--sign "Developer ID Application: …"`, `--verbose=2`, `-dvvv` | `--sign <SHA-1>`(키체인에 하나뿐임을 확인한 ID), `codesign --verify --strict --deep`, `-dvv`로 runtime 플래그 확인 | 이름 문자열보다 해시가 정확하다. 확인에 쓰는 출력은 같다 |
 | business-logic-model §2.8 `TAP_TOKEN`으로 tap 저장소를 받음 | 토큰을 URL이 아니라 환경 변수(`GIT_CONFIG_*`)의 HTTP 헤더로 전달하고, Actions에서는 인코딩한 값도 마스킹 | 독립 리뷰: 프로세스 인자와 클론의 `.git/config`에 토큰이 남지 않게 |
 | (명시 없음) 산출물 위치 | `.build/dist/` | `.build/release`는 SwiftPM이 만드는 링크라서 겹치면 링크를 덮어쓴다(독립 리뷰, 실제로 확인) |
+| §2 검증 규칙 "비밀 값이 모두 있다" | 이름뿐 아니라 `NOTARY_KEY_ID`(10자리)와 `NOTARY_ISSUER_ID`(UUID)의 형식도 빌드 전에 확인(값은 출력하지 않음) | rc.1에서 두 값이 바뀌어 등록된 것을 공증 단계에서야 알았다 |
+| RL-5 `notarytool` 결과로 판정 | 표준 출력과 표준 오류를 함께 읽어 JSON 줄에서 상태와 제출 ID를 꺼내고, 시간 초과면 제출 ID와 확인 명령을, 거절이면 `notarytool log`를 출력 | rc.2에서 시간 초과 결과가 표준 오류로 나와 제출 ID를 놓쳤다 |
 | RL-13 `.sha256`에서 읽음 | `update-tap.yml`은 zip도 함께 받아 `shasum -c`로 맞는지 확인한 뒤 갱신 | 체크섬 파일만 믿지 않는다 |
 | RL-6 `spctl` 통과 | 판정 결과는 실패할 때만 출력 | 성공한 로그를 짧게 둔다(서명자 이름은 비밀 값이 아니다) |
 | business-logic-model §3 "둥근 사각형" | SwiftUI `RoundedRectangle(cornerRadius: 185.4, style: .continuous)`(Apple 아이콘 격자). 처음 만든 초타원(n=5)은 버렸다 | macOS 27에서 초타원 바탕은 Finder가 회색 틀 안에 줄여 넣었다. 시스템 모양과 같은 둥근 사각형은 그대로 표시됐다(그림자 유무와 무관, 실측) |
