@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> 🔍 **R-1 독립 코드 리뷰 제안 (2026-11-20).** 작성 세션과 분리된 다른 모델의 리뷰어 3명이 2-1 ~ 2-4 전체를 검토했다(CRITICAL·HIGH 0, MEDIUM 10). 수정 중 삭제 경로를 한 번 더 리뷰해 HIGH 2건(남의 DB 테이블 삭제, 링크로 root 안에 색인 생성)을 더 찾아 고쳤다. 테스트 170 → 213개, 실제 기록 네 기간 × 임계값 두 개가 프로토타입과 글자 단위로 같다. 반목표 검사는 스크립트와 바이너리 심볼 검사로 바꿨고, 릴리스는 서명 전에 CI와 같은 검사를 거친다. 바뀐 릴리스 경로는 `v0.1.0-rc.4`로 다시 시험해야 한다. AI_PROPOSED, 승인 대기.
+
 > ✅ **2-4 머지 (2026-11-20).** PR #4를 `main`에 머지(`629b33f`). 태그를 올리면 서명·공증된 유니버설 앱이 GitHub Release에 올라가고, 정식 태그면 Homebrew tap이 갱신된다. 다음: R-1 독립 코드 리뷰(Construction → Operations 게이트), 이어서 3-1 첫 공개(`v0.1.0`, Homebrew 설치 확인).
 
 > ✅ **2-4 사용자 확인 (2026-11-20).** 사용자가 `v0.1.0-rc.3`을 브라우저로 내려받아 경고 없이 열리는 것을 확인했다. Build Spec IMPLEMENTED. 남은 것: PR #4 머지. 다음: R-1 독립 코드 리뷰, 3-1 첫 공개(`v0.1.0`, Homebrew).
@@ -77,7 +79,7 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| R-1 Independent Code Review | (예정) | PENDING |
+| R-1 Independent Code Review | [01-independent-review.md](0R-review/01-independent-review.md) | AI_PROPOSED |
 
 ## Phase 3 — Operations (Ship)
 
