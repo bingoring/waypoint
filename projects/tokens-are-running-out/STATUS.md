@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> ✅ **R-1 머지 (2026-11-20).** PR #5를 `main`에 머지했다(`b8b05f6`). Construction → Operations 게이트를 통과했다. 다음: 3-1 첫 공개(`v0.1.0`, Homebrew 설치 확인). 정식 태그 전용 단계와 Environment의 `TAP_TOKEN`은 그때 처음 실행된다.
+
 > ✅ **R-1 후속: 릴리스 경로 재시험 (2026-11-20).** 릴리스 비밀 값을 Environment `release`로 옮기고(저장소 수준 0개) `v*` 태그 보호를 걸었다. `v0.1.0-rc.4`는 승인 대기로 멈췄다가, 사용자가 승인한 뒤 모든 검사와 서명·공증을 통과했다. 내려받은 앱은 `spctl`에서 "Notarized Developer ID"로 받아들여졌다. 남은 것: PR #5 머지. 다음: 3-1 첫 공개(`v0.1.0`, Homebrew 설치 확인).
 
 > ✅ **R-1 승인 (2026-11-20).** 사용자가 권장안대로 승인했다. 리뷰 판정과 수정을 확정하고, 릴리스 비밀 값은 GitHub Environment `release`(실행마다 사용자 승인, `v*` 태그와 `main`만 사용)로 옮기고 `v*` 태그를 보호한다. 러너는 `macos-latest`를 유지하고, README에 알림에 세션 제목이 보인다고 적었다. 남은 것: 사용자의 Environment·태그 규칙 설정과 비밀 값 재등록 → `v0.1.0-rc.4` 재시험 → PR #5 머지 → 3-1 첫 공개(`v0.1.0`).
@@ -83,7 +85,7 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| R-1 Independent Code Review | [01-independent-review.md](0R-review/01-independent-review.md) · PR [#5](https://github.com/bingoring/tokens-are-running-out/pull/5) | HUMAN_APPROVED |
+| R-1 Independent Code Review | [01-independent-review.md](0R-review/01-independent-review.md) · PR [#5](https://github.com/bingoring/tokens-are-running-out/pull/5) 머지 `b8b05f6` | HUMAN_APPROVED |
 
 ## Phase 3 — Operations (Ship)
 

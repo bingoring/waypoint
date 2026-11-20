@@ -208,4 +208,8 @@ PR #5의 끝 커밋에 태그를 올렸다. 이 커밋의 CI는 통과했고, �
 | 내려받아 검증 | 체크섬 일치. `codesign --verify --strict --deep` 통과, hardened runtime, 보안 타임스탬프. `spctl` "accepted, source=Notarized Developer ID". `stapler validate` 통과. `syspolicy_check distribution` 통과. 버전 0.1.0(빌드 92), `x86_64 arm64`, 엔타이틀먼트 없음, `check-binary.sh` 통과 |
 | tap | `bingoring/homebrew-tap`에 새 커밋 없음(사전 릴리스는 cask를 바꾸지 않는다) |
 
-- **Not verified:** tap 토큰 경로는 첫 정식 릴리스 `v0.1.0`에서 처음 실행된다. Intel 실행은 이 기기에 Rosetta가 없어 확인하지 못했다.
+- **Not verified:** 다음은 첫 정식 릴리스 `v0.1.0`에서 처음 실행된다: 정식 태그 전용 단계(`main` 조상 확인, `--only-newer` cask 갱신), Environment로 옮긴 `TAP_TOKEN`, Environment를 붙인 "Update Homebrew tap"의 `main` 실행(tap 단계가 실패했을 때의 복구 경로). Intel 실행은 이 기기에 Rosetta가 없어 확인하지 못했다.
+
+### 머지
+
+사용자가 PR [#5](https://github.com/bingoring/tokens-are-running-out/pull/5)를 `main`에 머지했다(`b8b05f6`, 2026-11-20). PR의 마지막 커밋 `b92cc25`의 CI는 통과했다.
