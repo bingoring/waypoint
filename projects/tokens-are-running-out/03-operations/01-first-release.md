@@ -171,3 +171,26 @@ updated: 2026-11-20
 ## 다음 단계
 
 승인 후 → `STATUS.md`의 3-1을 `HUMAN_APPROVED`로 → 공개 전 정리 PR → cask 사전 시험 → 태그 전 확인 → `v0.1.0` → 검증과 설치 확인 → 릴리스 노트 → 기준선 기록 → 사용자가 소개 글 게시 → 3-2 제안
+
+## 진행 결과
+
+### 공개 전 정리 (2026-11-20, PR [#6](https://github.com/bingoring/tokens-are-running-out/pull/6))
+- 저장소 토픽 5개를 붙였다(게이트 5).
+- README에 스냅숏 도구로 만든 팝오버 화면(밝은·어두운 모드)과 미확인 환경 안내를 넣었다(게이트 2, 4).
+- 버그 보고 템플릿을 넣었다(게이트 3). 대화 내용, 세션 제목, 프로젝트 경로를 붙이지 말라고 먼저 안내한다.
+- 릴리스 경로 파일은 바뀌지 않았다. `check-anti-goals.py`는 추적 파일 86개에서 위반 0건이다.
+
+### cask 사전 시험 (2026-11-20, 게이트 6)
+사용자가 실행 중이던 rc.3 사본을 끈 뒤에 했다. `update-tap.sh --write-only`로 쓴 cask의 버전만 `0.1.0-rc.4`로 바꿔, 신뢰 설정을 임시 폴더로 격리한 임시 로컬 tap에 넣었다.
+
+| 항목 | 결과 |
+|---|---|
+| `brew style` | 위반 없음 |
+| `brew audit` | 실행되지 않음. Homebrew가 이 기기의 Command Line Tools(16.2)를 오래된 버전으로 보고 거부했다. 업데이트에는 관리자 권한이 필요하다 |
+| 설치 | 전체 이름으로 한 번에 설치됨(그 항목만 신뢰). rc.4 자산을 내려받아 체크섬을 확인하고 `/Applications`로 옮겼다 |
+| 설치된 앱 | quarantine 속성 있음, `spctl` "accepted, source=Notarized Developer ID", `codesign --verify --strict --deep` 통과, 버전 0.1.0, 번들 ID `io.github.bingoring.TokensAreRunningOut` |
+| cask 정보 | 요구 사항 "macOS >= 14", 설치 항목은 앱 하나 |
+| 제거 | `brew uninstall --cask`가 앱과 Caskroom 항목을 지웠다. `--zap`이 아니므로 색인 폴더는 남았다. 앱을 열지 않아서 `uninstall quit:`은 끌 앱이 없었다 |
+| 정리 | 임시 tap 제거, 받은 파일 캐시 삭제, `tap-new`가 켠 개발자 모드 끔, 임시 신뢰 설정 삭제. tap 목록은 시험 전과 같다 |
+
+- **Not verified:** `brew audit`(Command Line Tools 업데이트 뒤 공개된 tap에서 다시 시도할 수 있다), 실행 중인 앱이 있을 때의 `uninstall quit:`.
