@@ -4,9 +4,11 @@
 **Repository:** [bingoring/tokens-are-running-out](https://github.com/bingoring/tokens-are-running-out)  
 **Design input:** [inputs/design.md](inputs/design.md) (브레인스토밍 산출물, 2026-11-17)  
 **Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
-**Last updated:** 2026-11-18
+**Last updated:** 2026-11-20
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
+
+> ✅ **R-1 승인 (2026-11-20).** 사용자가 권장안대로 승인했다. 리뷰 판정과 수정을 확정하고, 릴리스 비밀 값은 GitHub Environment `release`(실행마다 사용자 승인, `v*` 태그와 `main`만 사용)로 옮기고 `v*` 태그를 보호한다. 러너는 `macos-latest`를 유지하고, README에 알림에 세션 제목이 보인다고 적었다. 남은 것: 사용자의 Environment·태그 규칙 설정과 비밀 값 재등록 → `v0.1.0-rc.4` 재시험 → PR #5 머지 → 3-1 첫 공개(`v0.1.0`).
 
 > 🔍 **R-1 독립 코드 리뷰 제안 (2026-11-20).** 작성 세션과 분리된 다른 모델의 리뷰어 3명이 2-1 ~ 2-4 전체를 검토했다(CRITICAL·HIGH 0, MEDIUM 10). 수정 중 삭제 경로를 한 번 더 리뷰해 HIGH 2건(남의 DB 테이블 삭제, 링크로 root 안에 색인 생성)을 더 찾아 고쳤다. 테스트 170 → 213개, 실제 기록 네 기간 × 임계값 두 개가 프로토타입과 글자 단위로 같다. 반목표 검사는 스크립트와 바이너리 심볼 검사로 바꿨고, 릴리스는 서명 전에 CI와 같은 검사를 거친다. 바뀐 릴리스 경로는 `v0.1.0-rc.4`로 다시 시험해야 한다. AI_PROPOSED, 승인 대기.
 
@@ -79,7 +81,7 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| R-1 Independent Code Review | [01-independent-review.md](0R-review/01-independent-review.md) | AI_PROPOSED |
+| R-1 Independent Code Review | [01-independent-review.md](0R-review/01-independent-review.md) · PR [#5](https://github.com/bingoring/tokens-are-running-out/pull/5) | HUMAN_APPROVED |
 
 ## Phase 3 — Operations (Ship)
 
