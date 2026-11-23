@@ -4,9 +4,11 @@
 **Repository:** [bingoring/tokens-are-running-out](https://github.com/bingoring/tokens-are-running-out)  
 **Design input:** [inputs/design.md](inputs/design.md) (브레인스토밍 산출물, 2026-11-17)  
 **Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
-**Last updated:** 2026-11-20
+**Last updated:** 2026-11-23
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
+
+> 📝 **2-5 큰 세션 정리 안내 제안 (2026-11-23).** 실제 기록으로 분석을 다시 확인했다. 분석은 정확했지만, 캐시 만료는 비용의 8분의 1이고 가장 큰 "일반 작업"의 68%가 큰 컨텍스트를 호출마다 다시 읽는 비용이었다. 사용자와 정한 방향은 두 가지다. 큰 세션에 붙여 넣을 `/compact` 프롬프트를 복사해 주고, 떠나기 전 정리를 안내한다. 프롬프트는 세션 복제본으로 시험해 블라인드 평가 1위였던 A2를 쓴다. Build Spec READY, AI_PROPOSED, 승인 대기. 3-1 소개 글 게시는 이 게이트에서 시점을 정한다.
 
 > 🚀 **`v0.1.1` 공개 (2026-11-20).** 첫 실행에서 "로그인할 때 열기"를 켤 수 없는 결함을 찾았다. 처음 설치하면 상태가 `.notFound`로 나오는데, 앱이 이를 "사용 불가"로 다룬 것이 원인이었다. 회귀 테스트와 함께 고쳐 `v0.1.1`로 내보냈다. 릴리스 잡 안의 tap 단계가 처음으로 성공해, 정식 릴리스 경로가 끝까지 통과했다. `brew upgrade`로 받은 앱에서 켜기가 동작했다(상태 1). 남은 것: 사용자의 소개 글 게시 → 3-2 제안.
 
@@ -86,6 +88,7 @@
 | 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) IMPLEMENTED · PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2) 머지 `6635dcc` | HUMAN_APPROVED |
 | 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) IMPLEMENTED · PR [#3](https://github.com/bingoring/tokens-are-running-out/pull/3) 머지 `7dfda7b` | HUMAN_APPROVED |
 | 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | [04-release-pipeline.md](02-construction/04-release-pipeline.md) · [Build Spec](02-construction/release-pipeline/build-spec-index.md) IMPLEMENTED · PR [#4](https://github.com/bingoring/tokens-are-running-out/pull/4) 머지 `629b33f` | HUMAN_APPROVED |
+| 2-5 큰 세션 정리 안내 (compact 프롬프트 · 시점 안내) | [05-compact-guidance.md](02-construction/05-compact-guidance.md) · [Build Spec](02-construction/compact-guidance/build-spec-index.md) READY | AI_PROPOSED |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
