@@ -198,3 +198,5 @@ Settings…                                                         Quit
 ## 다음 단계
 
 PR 머지 → `STATUS.md` 갱신 → 2-4 제안(Developer ID 서명, 공증, GitHub Releases, Homebrew tap)
+
+> 2-5 계약 확장(2026-11-23): 마지막 호출 뒤에 compact가 있는 세션은 만료 경고에서 빠진다 → [05-compact-guidance.md](05-compact-guidance.md), [BR-C18](compact-guidance/business-rules.md).
