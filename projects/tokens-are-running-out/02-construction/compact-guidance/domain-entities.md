@@ -41,14 +41,14 @@ func largeSessions(registry: RegistryState, now: Double, thresholdTokens: Int) a
 | 추가 | 뜻 |
 |---|---|
 | `public internal(set) var largeSessions: [LargeSession] = []` | 경고와 같은 시점에 갱신 |
-| `public func copyCompactPrompt()` | `CompactPrompt.text`를 클립보드에 쓴다 |
+| `public func copyCompactPrompt() -> Bool` | `CompactPrompt.text`를 클립보드에 쓰고, 성공 여부를 돌려준다. 실패하면 화면은 "복사됨"을 보이지 않는다 |
 | 생성자 인자 `pasteboard: PasteboardWriting` | 기본값은 `SystemPasteboard()` |
 
 ## `PasteboardWriting` (RunningOutUI, 신규)
 
 ```swift
-@MainActor public protocol PasteboardWriting: AnyObject { func write(_ text: String) }
-public final class SystemPasteboard: PasteboardWriting  // NSPasteboard.general: clearContents, setString(.string)
+@MainActor public protocol PasteboardWriting: AnyObject { func write(_ text: String) -> Bool }
+public final class SystemPasteboard: PasteboardWriting  // NSPasteboard.general: clearContents, then setString(.string)'s result
 ```
 
 ## `CompactPrompt`
