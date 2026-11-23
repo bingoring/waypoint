@@ -57,27 +57,27 @@ updated: 2026-11-23
 - 없음. 기준값, 위치, 프롬프트, 버전은 2-5 검토 게이트에서 승인되었다(2026-11-23).
 
 ## §4. 구현 체크리스트
-- [ ] **붙여 넣기 확인(먼저):** 시험용 복제 세션을 대화형으로 열어, 복사한 A2를 붙여 넣고 Return을 눌러 `/compact <지시>`로 실행되는지 본다. 안 되면 BR-C20의 한 줄 형식으로 바꾼다
-- [ ] `LastCall.compactedAfter`와 `ExpiryCalculator`의 제외 규칙, 테스트(compact 뒤 경고 없음, 다음 호출 뒤 다시 판단)
-- [ ] `LargeSession`, `LargeSessionFinder`와 단위 테스트(기준 경계, 작업 중인 세션 포함, 중복 세션, 레지스트리 없음, 가격 없는 모델, 정렬)
-- [ ] `IndexService.largeSessions`와 `IndexServing` 확장, 시험용 가짜 구현 갱신
-- [ ] `PasteboardWriting`, `SystemPasteboard`, `AppModel.largeSessions`·`copyCompactPrompt()`와 테스트(갱신 시점, 복사 내용)
-- [ ] `CompactPrompt`와 문구: 한국어가 시험한 A2와 글자 단위로 같은지 확인하는 테스트
-- [ ] `LargeSessionsSection`, `LargeSessionRow`, `CopyCompactPromptButton`
-- [ ] `ExpiryWarningRow`의 안내 줄 확장
-- [ ] `Localizable.xcstrings` 영어·한국어
-- [ ] 미리보기 데이터와 스냅숏(큰 세션 있음, 큰 세션이 만료 직전, 큰 세션 6개 이상, 한·영, 밝은·어두운 모드)
-- [ ] better-interface 검토와 반영
-- [ ] README의 "What it does"에 한 줄 추가
+- [ ] **붙여 넣기 확인(먼저):** 시험용 복제 세션을 대화형으로 열어, 복사한 A2를 붙여 넣고 Return을 눌러 `/compact <지시>`로 실행되는지 본다. 안 되면 BR-C20의 한 줄 형식으로 바꾼다 → **미완료(사용자 확인 대기, 머지 전 필수)**
+- [x] `LastCall.compactedAfter`와 `ExpiryCalculator`의 제외 규칙, 테스트(compact 뒤 경고 없음, 다음 호출 뒤 다시 판단)
+- [x] `LargeSession`, `LargeSessionFinder`와 단위 테스트(기준 경계, 작업 중인 세션 포함, 중복 세션, 레지스트리 없음, 가격 없는 모델, 정렬)
+- [x] `IndexService.largeSessions`와 `IndexServing` 확장, 시험용 가짜 구현 갱신
+- [x] `PasteboardWriting`, `SystemPasteboard`, `AppModel.largeSessions`·`copyCompactPrompt()`와 테스트(갱신 시점, 복사 내용)
+- [x] `CompactPrompt`와 문구: 한국어가 시험한 A2와 글자 단위로 같은지 확인하는 테스트
+- [x] `LargeSessionsSection`, `LargeSessionRow`, `CopyCompactPromptButton`
+- [x] `ExpiryWarningRow`의 안내 줄 확장
+- [x] `Localizable.xcstrings` 영어·한국어
+- [x] 미리보기 데이터와 스냅숏(큰 세션 있음, 큰 세션이 만료 직전, 큰 세션 6개 이상, 한·영, 밝은·어두운 모드)
+- [x] better-interface 검토와 반영
+- [x] README의 "What it does"에 한 줄 추가
 
 ## §5. 검증 계획
-- [ ] `swift build --build-tests -Xswiftc -warnings-as-errors` 경고 0건, `swift test`, `swift format lint --strict`
-- [ ] `scripts/check-anti-goals.py`(네트워크 없음, 쓰기는 색인뿐), 릴리스 빌드의 `check-binary.sh`
-- [ ] PR 브랜치에 base merge 커밋 없음
-- [ ] 단위 테스트: `LargeSessionFinderTests`, `CompactPromptTests`, `AppModel` 갱신·복사 테스트
-- [ ] 스냅숏 검토: 문구 잘림 없음, 360pt 폭, 큰 글씨에서도 버튼이 보임
-- [ ] 실제 앱(사용자 기기): 큰 세션이 보이는지, 복사한 프롬프트를 붙여 넣으면 compact가 실행되는지, VoiceOver 이름과 알림
-- [ ] 독립 리뷰(작성 맥락이 없는 리뷰어)
+- [x] `swift build --build-tests -Xswiftc -warnings-as-errors` 경고 0건, `swift test`, `swift format lint --strict`
+- [x] `scripts/check-anti-goals.py`(네트워크 없음, 쓰기는 색인뿐), 릴리스 빌드의 `check-binary.sh`
+- [x] PR 브랜치에 base merge 커밋 없음
+- [x] 단위 테스트: `LargeSessionFinderTests`, `CompactPromptTests`, `AppModel` 갱신·복사 테스트
+- [x] 스냅숏 검토: 문구 잘림 없음, 360pt 폭, 큰 글씨에서도 버튼이 보임
+- [ ] 실제 앱(사용자 기기, `v0.2.0` 설치 뒤): 큰 세션이 보이는지, 복사한 프롬프트를 붙여 넣으면 compact가 실행되는지, VoiceOver 이름과 알림
+- [x] 독립 리뷰(작성 맥락이 없는 리뷰어)
 
 ## §6. NFR · 성능
 N/A(standard). 참고: 레지스트리의 세션 수만큼 `lastCall`을 한 번씩 더 조회한다. 만료 경고가 이미 같은 조회를 하므로, 결과를 나눠 쓰지 않아도 실행 중인 세션 수(보통 10개 미만)만큼의 색인 조회가 늘 뿐이다.
@@ -85,4 +85,11 @@ N/A(standard). 참고: 레지스트리의 세션 수만큼 `lastCall`을 한 번
 ## §7. 편차 로그
 | SoT | 실제 구현 | 사유 |
 |---|---|---|
-|  |  |  |
+| frontend-components ①: 수치 줄과 바닥 문구를 `.secondary`로 | 기본 글자색 | 화면 검토에서 밝은 모드 대비가 3.10:1로 측정되어 4.5:1에 못 미쳤다. 기본색으로 12.49:1(어두운 모드 11.55:1). 기존 화면도 글자는 모두 기본색이다 |
+| frontend-components ②: 줄의 접근성을 `.contain`으로 바꾸고 요약 레이블 | 기존 줄은 그대로 묶고, 안내 문장과 버튼만 묶음 밖에 둔다 | 기존 VoiceOver 읽기를 유지하면서 버튼이 따로 초점을 받는다. 읽는 순서는 기기 확인에서 본다 |
+| frontend-components ①: 상태 확인 불가 아이콘의 툴팁을 만료 경고와 같이 | 새 문구 "…이 세션은 이미 끝났을 수도 있습니다" | 만료 경고의 "이미 작업 중일 수도"는 큰 세션에 맞지 않는다 |
+| §4 첫 항목: 붙여 넣기 확인을 구현 전에 | 구현 뒤, 머지 전에 한다 | 사용자의 확인을 기다리는 동안, 줄 형식과 무관한 작업을 먼저 했다. 안 되면 BR-C20의 한 줄 형식으로 바꾼다 |
+| 구현 계획 작업 5의 수동 실행 확인 | `v0.2.0` 설치 뒤 사용자 기기에서 | Homebrew 설치본이 실행 중이라, 같은 번들 ID의 사본을 띄우면 3-1에서 찾은 "사본 두 개" 문제를 다시 만든다 |
+| README 스크린숏: 2-5 범위 밖 | 큰 세션이 보이는 상태(`popover-large-expiring`)로 교체 | 새 기능을 소개 글과 README에서 보이기 위해. 값은 모두 스냅숏 도구의 가상 값 |
+| 범위 밖 | `scripts/check-strings.py`가 Xcode 27의 빌드 폴더 이름(`RunningOutUI-t.build`)도 찾는다 | 옛 이름만 찾아 오래된 Debug 빌드를 읽고 있었다 |
+| 2-3 frontend-components §1 "최대 화면 높이의 80%"(강제하는 코드 없었음) | 내용은 스크롤 영역에 넣고, 팝오버 높이를 화면 높이의 80%로 제한한다. 설정·종료 버튼은 고정. 스냅숏은 제한 없이 그리고 `popover-capped`(700pt)를 더했다 | 브랜치 리뷰에서 지적: 이번 기능으로 팝오버가 1,125pt까지 길어져 14인치 화면에서 버튼이 밀릴 수 있었다 |
