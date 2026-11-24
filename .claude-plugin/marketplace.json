@@ -1,0 +1,13 @@
+{
+  "name": "waypoint",
+  "owner": {
+    "name": "bingoring"
+  },
+  "plugins": [
+    {
+      "name": "waypoint",
+      "source": "./plugin",
+      "description": "AI 제안 → 사람 승인 게이트 기반의 Markdown 개발 라이프사이클 프레임워크"
+    }
+  ]
+}
