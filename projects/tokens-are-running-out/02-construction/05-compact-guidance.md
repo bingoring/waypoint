@@ -2,7 +2,7 @@
 phase: 02-construction
 stage: 05-compact-guidance
 status: HUMAN_APPROVED
-updated: 2026-11-23
+updated: 2026-11-24
 ---
 
 # [Stage 2-5] 큰 세션 정리 안내 (compact 프롬프트 · 시점 안내)
@@ -191,3 +191,9 @@ updated: 2026-11-23
 - **공개 자산:** 체크섬, cask의 sha256 일치, 서명(Developer ID, hardened runtime), 공증과 staple, Gatekeeper(`Notarized Developer ID`), `syspolicy_check distribution`, 두 아키텍처의 `check-binary`가 모두 통과했다.
 - **설치:** 이 기기는 `brew upgrade`로 0.2.0에서 0.2.1이 되었다. Homebrew가 앱을 종료한 뒤 `/Applications`에서 다시 열었고, quarantine 플래그는 승인된 상태(`01c1`)이며 Gatekeeper도 통과했다. 검증하려고 풀어 둔 같은 번들 ID의 사본 다섯 개는 LaunchServices 등록을 해제하고 지웠다.
 - **남은 것:** 사용자가 팝오버 내용이 다시 보이는지 확인한다. 그 뒤 2-5 기기 확인(큰 세션 영역, 2초 동안의 "복사됨", 터미널 세션에 붙여 넣어 compact, VoiceOver와 키보드)을 마치면 Build Spec을 IMPLEMENTED로 바꾼다.
+
+### 기기 확인 (2026-11-24)
+- **회귀:** `v0.2.1` 설치 뒤 팝오버 내용이 다시 보이는 것을 사용자가 확인했다.
+- **2-5 기능:** 실행 중인 세션 중 20만 토큰을 넘는 세션이 둘 있는 상태에서 사용자가 확인했다. 큰 세션 영역, 복사 버튼과 2초 동안의 "복사됨", 복사된 한 줄 프롬프트, VoiceOver의 이름과 복사 알림, 키보드 이동이 모두 정상이었다.
+- **확인하지 않은 것:** 데스크톱 앱 세션에 붙여 넣었을 때 `/compact`로 실행되는지, compact 뒤 그 세션이 목록에서 빠지는 동작(단위 테스트로만 확인). 실제 작업 세션을 정리하게 되므로 선택 항목으로 두었다.
+- **결과:** Build Spec을 IMPLEMENTED로 바꿨다. 2-5를 마친다.

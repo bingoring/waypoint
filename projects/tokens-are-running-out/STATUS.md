@@ -8,6 +8,8 @@
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
 
+> ✅ **2-5 기기 확인 완료 (2026-11-24).** `v0.2.1`에서 팝오버 내용이 다시 보이고, 큰 세션 영역, 복사와 "복사됨", VoiceOver, 키보드 이동이 정상인 것을 사용자가 확인했다. Build Spec IMPLEMENTED. 데스크톱 앱에서의 붙여 넣기와 compact 뒤 목록 제외는 기기에서 확인하지 않았다. 다음: 3-1 소개 글 게시(사용자) → 3-2 제안.
+
 > 🚀 **`v0.2.1` 공개 (2026-11-24).** 팝오버 회귀를 고친 `v0.2.1`을 공개했다. 릴리스 잡과 tap 갱신이 성공했고, 공개 자산의 서명·공증·Gatekeeper와 바이너리 검사가 통과했다. 이 기기는 `brew upgrade`로 0.2.1이 되었다. 남은 것: 사용자의 팝오버 확인 → 2-5 기기 확인 → Build Spec IMPLEMENTED → 3-1 소개 글 게시(사용자) → 3-2 제안.
 
 > 🚑 **`v0.2.0` 공개와 회귀 → `v0.2.1` (2026-11-23).** `v0.2.0`을 공개했지만, 팝오버 내용이 사라지고 버튼만 보이는 회귀가 있었다. 높이 제한을 위해 넣은 스크롤 영역이 메뉴 막대 창의 작은 높이 제안을 그대로 받았다. 재현 테스트와 함께 고쳐 `v0.2.1`로 내보낸다.
@@ -98,7 +100,7 @@
 | 2-2 재구축 판정 · 원인 분류 · 비용 분해 | [02-rebuild-analysis.md](02-construction/02-rebuild-analysis.md) · [Build Spec](02-construction/rebuild-analysis/build-spec-index.md) IMPLEMENTED · PR [#2](https://github.com/bingoring/tokens-are-running-out/pull/2) 머지 `6635dcc` | HUMAN_APPROVED |
 | 2-3 메뉴 막대 앱 화면 · 만료 경고 · 실행 중인 세션 · 알림 | [03-menu-bar-app.md](02-construction/03-menu-bar-app.md) · [Build Spec](02-construction/menu-bar-app/build-spec-index.md) IMPLEMENTED · PR [#3](https://github.com/bingoring/tokens-are-running-out/pull/3) 머지 `7dfda7b` | HUMAN_APPROVED |
 | 2-4 릴리스 파이프라인 (서명 · 공증 · Homebrew tap) | [04-release-pipeline.md](02-construction/04-release-pipeline.md) · [Build Spec](02-construction/release-pipeline/build-spec-index.md) IMPLEMENTED · PR [#4](https://github.com/bingoring/tokens-are-running-out/pull/4) 머지 `629b33f` | HUMAN_APPROVED |
-| 2-5 큰 세션 정리 안내 (compact 프롬프트 · 시점 안내) | [05-compact-guidance.md](02-construction/05-compact-guidance.md) · [Build Spec](02-construction/compact-guidance/build-spec-index.md) READY | HUMAN_APPROVED |
+| 2-5 큰 세션 정리 안내 (compact 프롬프트 · 시점 안내) | [05-compact-guidance.md](02-construction/05-compact-guidance.md) · [Build Spec](02-construction/compact-guidance/build-spec-index.md) IMPLEMENTED · PR [#10](https://github.com/bingoring/tokens-are-running-out/pull/10) 머지 `58836ba` · 회귀 수정 PR [#11](https://github.com/bingoring/tokens-are-running-out/pull/11) 머지 `d232c66` | HUMAN_APPROVED |
 
 ## Phase R — Independent Code Review 🔍 (Construction → Operations 게이트)
 
