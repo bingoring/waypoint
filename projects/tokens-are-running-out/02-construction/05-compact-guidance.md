@@ -185,3 +185,9 @@ updated: 2026-11-23
 - **회귀:** 사용자가 팝오버를 열자 내용이 사라지고 설정·종료 버튼만 보였다. 브랜치 리뷰 반영(팝오버 최대 높이)에서 내용을 `ScrollView`에 넣었는데, 메뉴 막대 창이 내용보다 작은 높이를 제안하면 스크롤 영역이 그 높이까지 줄어든다. 테스트와 스냅숏은 제약 없는 크기(`fittingSize`)로만 재서 이 경우를 놓쳤다.
 - **수정(`v0.2.1`):** 스크롤 영역의 높이를 내용 높이로 정하고, 최대 높이에서만 멈추게 했다(`fixedSize`와 `frame(maxHeight:)`). 작은 높이를 제안받는 경우를 재현하는 테스트(`smallProposalDoesNotCollapse`)를 먼저 써서, 고치기 전 코드에서 실패하는 것을 확인했다.
 - **확인의 한계:** 이 기기에서는 프로그램이 메뉴 막대 항목을 누를 권한이 없어, 실제 창은 `v0.2.1` 설치 뒤 사용자 화면으로 확인한다.
+
+### `v0.2.1` 공개 (2026-11-24)
+- **릴리스:** PR #11을 머지하고(`d232c66`), `main` CI 통과와 태그 전 확인(릴리스 경로 무변경, tap 0.2.0, Environment 비밀 값) 뒤 태그를 올렸다. 사용자가 승인한 뒤 릴리스 잡과 tap 갱신(0.2.1)이 모두 성공했다. 태그, 릴리스 실행, 저장해 둔 커밋이 같은 커밋을 가리킨다.
+- **공개 자산:** 체크섬, cask의 sha256 일치, 서명(Developer ID, hardened runtime), 공증과 staple, Gatekeeper(`Notarized Developer ID`), `syspolicy_check distribution`, 두 아키텍처의 `check-binary`가 모두 통과했다.
+- **설치:** 이 기기는 `brew upgrade`로 0.2.0에서 0.2.1이 되었다. Homebrew가 앱을 종료한 뒤 `/Applications`에서 다시 열었고, quarantine 플래그는 승인된 상태(`01c1`)이며 Gatekeeper도 통과했다. 검증하려고 풀어 둔 같은 번들 ID의 사본 다섯 개는 LaunchServices 등록을 해제하고 지웠다.
+- **남은 것:** 사용자가 팝오버 내용이 다시 보이는지 확인한다. 그 뒤 2-5 기기 확인(큰 세션 영역, 2초 동안의 "복사됨", 터미널 세션에 붙여 넣어 compact, VoiceOver와 키보드)을 마치면 Build Spec을 IMPLEMENTED로 바꾼다.

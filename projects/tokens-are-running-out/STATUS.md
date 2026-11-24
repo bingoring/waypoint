@@ -4,9 +4,11 @@
 **Repository:** [bingoring/tokens-are-running-out](https://github.com/bingoring/tokens-are-running-out)  
 **Design input:** [inputs/design.md](inputs/design.md) (브레인스토밍 산출물, 2026-11-17)  
 **Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
-**Last updated:** 2026-11-23
+**Last updated:** 2026-11-24
 
 > 🔒 **공개 저장소:** 개발자 기기의 실제 Claude Code 기록, 세션 제목, 대화 내용은 커밋하지 않는다. 문서에는 집계 수치만 쓰고, 예시는 가상의 값으로 쓴다([DECISIONS](DECISIONS.md) 2026-11-17).
+
+> 🚀 **`v0.2.1` 공개 (2026-11-24).** 팝오버 회귀를 고친 `v0.2.1`을 공개했다. 릴리스 잡과 tap 갱신이 성공했고, 공개 자산의 서명·공증·Gatekeeper와 바이너리 검사가 통과했다. 이 기기는 `brew upgrade`로 0.2.1이 되었다. 남은 것: 사용자의 팝오버 확인 → 2-5 기기 확인 → Build Spec IMPLEMENTED → 3-1 소개 글 게시(사용자) → 3-2 제안.
 
 > 🚑 **`v0.2.0` 공개와 회귀 → `v0.2.1` (2026-11-23).** `v0.2.0`을 공개했지만, 팝오버 내용이 사라지고 버튼만 보이는 회귀가 있었다. 높이 제한을 위해 넣은 스크롤 영역이 메뉴 막대 창의 작은 높이 제안을 그대로 받았다. 재현 테스트와 함께 고쳐 `v0.2.1`로 내보낸다.
 
