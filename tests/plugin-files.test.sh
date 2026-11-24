@@ -33,8 +33,10 @@ else
 fi
 
 # no-old-paths: core-rules 와 스킬에 옛 경로가 없다(안내문 줄은 제외).
+# init 스킬은 옛 방식 레포를 알아보려고 docs/dlc 를 일부러 언급하므로 제외한다.
 for f in "$P/core-rules.md" "$P"/skills/*/SKILL.md; do
   [ -f "$f" ] || continue
+  [ "$f" = "$P/skills/init/SKILL.md" ] && continue
   hits=$(grep -vF -e "$GUARD" "$f" | grep -nE '_templates/|docs/dlc')
   [ -z "$hits" ] || fail no-old-paths "$f: $hits"
 done
@@ -97,6 +99,35 @@ if [ -f "$I" ]; then
 else
   fail init-skill "$I 없음"
 fi
+
+# has <검사 이름> <파일> <문자열>: 파일에 문자열이 있어야 한다.
+has() { grep -qF -e "$3" "$2" 2>/dev/null || fail "$1" "$2 에 '$3' 없음"; }
+
+# git-doc-flow: git 스킬에 설계 9절의 문서 커밋 절차가 있다(메인 체크아웃 확인 → pull --rebase → 고치고 커밋·push, 읽기도 메인 체크아웃).
+G="$P/skills/git/SKILL.md"
+has git-doc-flow "$G" '### 문서 커밋 흐름(STATUS·DECISIONS·핸드오프)'
+has git-doc-flow "$G" 'branch --show-current'
+has git-doc-flow "$G" 'pull --rebase'
+has git-doc-flow "$G" '읽을 때도 메인 체크아웃'
+has git-doc-flow "$P/core-rules.md" '메인 체크아웃의 `docs/waypoint/DECISIONS.md`'
+has git-doc-flow "$P/skills/decisions/SKILL.md" '메인 체크아웃의 `docs/waypoint/DECISIONS.md`'
+
+# git-buildspec-handoff: 2-15에서 빠졌던 Build Spec 체크포인트 문장과 핸드오프 위치가 있다.
+has git-buildspec-handoff "$G" 'Build Spec은 코드와 같은 체크포인트에서 함께 커밋'
+has git-buildspec-handoff "$G" '`docs/waypoint/inputs/`'
+
+# start-calls-skills: start 스킬이 AI Proposal 전에 부를 스킬을 안내한다.
+S0="$P/skills/start/SKILL.md"
+has start-calls-skills "$S0" '`waypoint:stage`'
+has start-calls-skills "$S0" '`waypoint:build-spec`'
+has start-calls-skills "$S0" '`waypoint:review-gate`'
+
+# init-precheck: init 스킬이 옛 방식 레포와 이미 연결된 레포에서 멈춘다.
+has init-precheck "$I" '.gitmodules'
+has init-precheck "$I" '이미 있으면 멈추고'
+
+# block-outside-repo: CLAUDE.md 블록이 「레포 밖에서 시작한 세션」 가능성을 함께 안내한다.
+has block-outside-repo "$B" '레포 밖에서 시작'
 
 if [ "$fails" -gt 0 ]; then
   echo "$fails failed"

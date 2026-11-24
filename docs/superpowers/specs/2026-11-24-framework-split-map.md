@@ -30,6 +30,10 @@ FRAMEWORK 줄 번호는 커밋 ba64aee 기준이다(이전 안내 줄을 넣기 
 - `core-rules.md`의 제목과 한 줄 안내
 - `core-rules.md` 각 규칙 끝의 「(자세히: `waypoint:<스킬>`)」
 - `stage`, `review-gate`, `build-spec`, `decisions` 끝의 템플릿 사용 안내(Read로 읽고 Write로 복사). `stage`에는 스테이지·게이트 템플릿 경로도 넣었다. FRAMEWORK에는 없었지만, 플러그인으로 옮기면 템플릿이 플러그인 캐시 안에 있어서 경로를 알려 주지 않으면 찾을 수 없다.
+- `start` 끝의 한 단락: 「4단계(`AI Proposal` 작성) 전에 `waypoint:stage`를 호출한다 …」. 예전에는 세션마다 FRAMEWORK 전체를 읽어서 Build Spec·리뷰 게이트 규칙이 늘 컨텍스트에 있었다. 스킬로 나눈 뒤에는 어느 스킬을 부를지 알려 주지 않으면 이 규칙들이 조용히 빠질 수 있어서 넣었다(설계 5.2절).
+- `git`의 「### 문서 커밋 흐름(STATUS·DECISIONS·핸드오프)」 하위 절 전체: 설계 9절이 `skills/git`에 넣으라고 한 자세한 절차(메인 체크아웃 확인 → `pull --rebase` → 고치고 커밋·push, 읽을 때도 메인 체크아웃).
+- `decisions`의 「항목은 메인 체크아웃의 `docs/waypoint/DECISIONS.md`에 추가한다 …」: 설계 9절.
+- `git`과 `core-rules.md`의 문서 커밋 흐름 문장에 든 「핸드오프(`docs/waypoint/inputs/`)」: 2-15 참고.
 
 ## 2. 고친 문장
 
@@ -37,40 +41,42 @@ FRAMEWORK 줄 번호는 커밋 ba64aee 기준이다(이전 안내 줄을 넣기 
 - **경로:** 참조나 경로만 새 구조에 맞게 고쳤다. 뜻은 같다.
 - **사실 바뀜:** 이전 때문에 원문이 사실이 아니게 되어 새 흐름에 맞게 고쳐 썼다. 새 흐름은 설계 문서 9절이다.
 
+FRAMEWORK 줄 번호는 이전 안내 줄을 넣은 뒤 기준이다(ba64aee 기준 번호 + 2). 「원문」과 「새 문장」은 파일에서 그대로 옮겼고, 검사기가 둘 다 대조한다.
+
 ### 2-1 (start)
 - 원문: `projects/{project-name}/STATUS.md`를 읽는다
 - 새 문장: 메인 체크아웃의 `docs/waypoint/STATUS.md`를 읽는다
-- 종류: 경로
+- 종류: 사실 바뀜 + 경로. 경로를 바꾸면서 「메인 체크아웃의」를 붙였다(설계 9절: STATUS는 메인 체크아웃의 것을 읽는다).
 
 ### 2-2 (core-rules)
 - 원문: 코드를 산출하는 Construction phase 이후, Operations 진입 전 **독립 코드 리뷰 게이트**(`🔍`)를 통과해야 한다 (아래 "리뷰 게이트")
-- 새 문장: … 통과해야 한다 (자세히: `waypoint:review-gate`)
-- 종류: 경로
+- 새 문장: 코드를 산출하는 Construction phase 이후, Operations 진입 전 **독립 코드 리뷰 게이트**(`🔍`)를 통과해야 한다 (자세히: `waypoint:review-gate`)
+- 종류: 경로. 「(아래 "…")」 참조를 스킬 이름으로 바꿨다.
 
 ### 2-3 (core-rules)
 - 원문: 중요한 결정이 내려지면 `projects/{name}/DECISIONS.md`에 항목을 추가한다 (아래 "결정 로그")
-- 새 문장: 중요한 결정이 내려지면 `docs/waypoint/DECISIONS.md`에 항목을 추가한다 (자세히: `waypoint:decisions`)
-- 종류: 경로
+- 새 문장: 중요한 결정이 내려지면 메인 체크아웃의 `docs/waypoint/DECISIONS.md`에 항목을 추가한다 (자세히: `waypoint:decisions`)
+- 종류: 사실 바뀜 + 경로. `projects/{name}/` → `docs/waypoint/`, 그리고 「메인 체크아웃의」를 붙였다(설계 9절).
 
 ### 2-4 (core-rules)
 - 원문: 사람이 채팅으로 게이트에 답하면 AI는 `AI Proposal`을 고쳐 쓰지 않고 검토 게이트 아래 **`승인 결과`** 에 기록한다 (아래 "승인 결과 기록")
-- 새 문장: … 에 기록한다 (자세히: `waypoint:stage`)
+- 새 문장: 사람이 채팅으로 게이트에 답하면 AI는 `AI Proposal`을 고쳐 쓰지 않고 검토 게이트 아래 **`승인 결과`** 에 기록한다 (자세히: `waypoint:stage`)
 - 종류: 경로
 
 ### 2-5 (core-rules)
 - 원문: 버전·가격·스토어 정책 같은 **외부 사실**은 조회일·출처 URL·확인 수준을 함께 적는다 (아래 "외부 사실 표기")
-- 새 문장: … 함께 적는다 (자세히: `waypoint:stage`)
+- 새 문장: 버전·가격·스토어 정책 같은 **외부 사실**은 조회일·출처 URL·확인 수준을 함께 적는다 (자세히: `waypoint:stage`)
 - 종류: 경로
 
 ### 2-6 (core-rules)
 - 원문: **PR · 기능 브랜치를 base(develop · master · main)에 맞출 때는 rebase 만 한다.** base 를 기능 브랜치에 merge 하지 않는다. 충돌 해결 · 서브모듈 포인터 갱신도 rebase 중에 하고 `push --force-with-lease` (아래 "브랜치 규칙")
-- 새 문장: … base 를 기능 브랜치에 merge 하지 않는다. 충돌 해결도 rebase 중에 하고 `push --force-with-lease` (자세히: `waypoint:git`)
-- 종류: 사실 바뀜(이전 뒤 waypoint 프로젝트에는 서브모듈 포인터가 없다) + 경로
+- 새 문장: **PR · 기능 브랜치를 base(develop · master · main)에 맞출 때는 rebase 만 한다.** base 를 기능 브랜치에 merge 하지 않는다. 충돌 해결도 rebase 중에 하고 `push --force-with-lease` (자세히: `waypoint:git`)
+- 종류: 사실 바뀜 + 경로. 이전 뒤 waypoint 프로젝트 레포에는 서브모듈 포인터가 없으므로 「· 서브모듈 포인터 갱신」을 뺐다. 다른 서브모듈을 쓰는 레포를 위한 일반 규칙은 git 스킬에 범위를 좁혀 남겼다(2-7).
 
 ### 2-7 (git)
-- 원문: **서브모듈 포인터 충돌:** 어느 한쪽 해시를 고르지 않는다. … 으로 맞춘다.
-- 새 문장: 서브모듈을 쓰는 레포에서: **서브모듈 포인터 충돌:** … (원문은 그대로 두고 앞에 적용 범위만 붙였다)
-- 종류: 사실 바뀜(검사기는 원문이 그대로 들어 있어 통과하지만, 뜻이 좁아졌으므로 기록한다)
+- 원문: **서브모듈 포인터 충돌:** 어느 한쪽 해시를 고르지 않는다. 양쪽을 모두 담은 서브모듈 커밋(서브모듈 PR 이 머지됐으면 서브모듈 base 의 머지 커밋, 아니면 서브모듈 기능 브랜치를 먼저 rebase 한 tip)으로 맞춘다.
+- 새 문장: 서브모듈을 쓰는 레포에서: **서브모듈 포인터 충돌:** 어느 한쪽 해시를 고르지 않는다. 양쪽을 모두 담은 서브모듈 커밋(서브모듈 PR 이 머지됐으면 서브모듈 base 의 머지 커밋, 아니면 서브모듈 기능 브랜치를 먼저 rebase 한 tip)으로 맞춘다.
+- 종류: 사실 바뀜. 원문은 그대로 두고 앞에 적용 범위(「서브모듈을 쓰는 레포에서:」)만 붙였다. 검사기는 원문이 들어 있어 통과하지만 뜻이 좁아졌으므로 기록한다.
 
 ### 2-8 (review-gate)
 - 원문: 리뷰어에게 `_templates/reviewer-brief-template.md`(적대적 리뷰 지시 템플릿)를 채워 전달한다.
@@ -79,7 +85,7 @@ FRAMEWORK 줄 번호는 커밋 ba64aee 기준이다(이전 안내 줄을 넣기 
 
 ### 2-9 (review-gate)
 - 원문: 템플릿: 스테이지 문서 `_templates/review-stage-template.md`, 리뷰어 지시 `_templates/reviewer-brief-template.md`.
-- 새 문장: `_templates/` → `${CLAUDE_PLUGIN_ROOT}/templates/` (두 곳)
+- 새 문장: 템플릿: 스테이지 문서 `${CLAUDE_PLUGIN_ROOT}/templates/review-stage-template.md`, 리뷰어 지시 `${CLAUDE_PLUGIN_ROOT}/templates/reviewer-brief-template.md`.
 - 종류: 경로
 
 ### 2-10 (build-spec, 표 다섯 줄)
@@ -88,12 +94,16 @@ FRAMEWORK 줄 번호는 커밋 ba64aee 기준이다(이전 안내 줄을 넣기 
 - 원문: | **business-logic-model** | 워크플로·알고리즘·상태 전이·시퀀스·통합 지점 | `_templates/build-spec/business-logic-model.md` |
 - 원문: | **frontend-components** (조건부) | 컴포넌트 트리·props·상태·상호작용·API·화면 상태 | `_templates/build-spec/frontend-components.md` |
 - 원문: | *인덱스* | 개요·범위·분해·아티팩트 매니페스트·미해결질문·체크리스트·검증·NFR·편차 | `_templates/build-spec/build-spec-index.md` |
-- 새 문장: 각 줄의 `_templates/` → `${CLAUDE_PLUGIN_ROOT}/templates/`
+- 새 문장: | **domain-entities** | 엔티티·타입·데이터 shape·관계·상태·영속성·allowed-set | `${CLAUDE_PLUGIN_ROOT}/templates/build-spec/domain-entities.md` |
+- 새 문장: | **business-rules** | 불변식·검증·제약·권한 규칙·엣지케이스 매핑 | `${CLAUDE_PLUGIN_ROOT}/templates/build-spec/business-rules.md` |
+- 새 문장: | **business-logic-model** | 워크플로·알고리즘·상태 전이·시퀀스·통합 지점 | `${CLAUDE_PLUGIN_ROOT}/templates/build-spec/business-logic-model.md` |
+- 새 문장: | **frontend-components** (조건부) | 컴포넌트 트리·props·상태·상호작용·API·화면 상태 | `${CLAUDE_PLUGIN_ROOT}/templates/build-spec/frontend-components.md` |
+- 새 문장: | *인덱스* | 개요·범위·분해·아티팩트 매니페스트·미해결질문·체크리스트·검증·NFR·편차 | `${CLAUDE_PLUGIN_ROOT}/templates/build-spec/build-spec-index.md` |
 - 종류: 경로
 
 ### 2-11 (build-spec)
 - 원문: **크면 분리(기본 권장)**: `projects/{name}/{phase}/<topic>/`에 **아티팩트별 파일**(인덱스 + 4). 콘텐츠 시리즈는
-- 새 문장: `projects/{name}/{phase}/<topic>/` → `docs/waypoint/{phase}/<topic>/`
+- 새 문장: **크면 분리(기본 권장)**: `docs/waypoint/{phase}/<topic>/`에 **아티팩트별 파일**(인덱스 + 4). 콘텐츠 시리즈는
 - 종류: 경로
 
 ### 2-12 (build-spec)
@@ -104,18 +114,20 @@ FRAMEWORK 줄 번호는 커밋 ba64aee 기준이다(이전 안내 줄을 넣기 
 ### 2-13 (decisions)
 - 원문: 각 프로젝트는 `projects/{name}/DECISIONS.md`(**append-only, ADR 스타일**)를 둔다.
 - 새 문장: 각 프로젝트는 `docs/waypoint/DECISIONS.md`(**append-only, ADR 스타일**)를 둔다.
-- 종류: 경로
+- 종류: 경로. 바로 다음 줄에 「항목은 메인 체크아웃의 …에 추가한다」를 새로 넣었다(1절).
 
 ### 2-14 (decisions)
 - 원문: 템플릿: `_templates/decisions-template.md`.
 - 새 문장: 템플릿: `${CLAUDE_PLUGIN_ROOT}/templates/decisions-template.md`.
 - 종류: 경로
 
-### 2-15 (git, 두 줄을 한 문장으로)
+### 2-15 (git과 core-rules, 두 줄을 두 문장으로)
 - 원문: **모노레포 순서**: 문서·핸드오프 변경은 `docs/dlc`(waypoint 서브모듈)에서 **먼저 커밋+push** → 그 다음 메인 repo에서
 - 원문: 코드 변경 + **서브모듈 포인터 갱신**을 커밋+push. DECISIONS/STATUS/Build Spec은 코드와 같은 체크포인트에서 함께 커밋.
-- 새 문장: **문서 커밋 흐름**: STATUS.md와 DECISIONS.md는 메인 체크아웃(세션 시작 때 주입된 `<waypoint>` 블록에 적힌 경로)에서 기본 브랜치로 바로 커밋하고 push한다. 스테이지 문서·Build Spec·리뷰 문서는 작업 브랜치에 실어 PR과 함께 머지한다.
-- 종류: 사실 바뀜. 같은 문장을 `core-rules.md`에도 「(자세히: `waypoint:git`)」 꼬리와 함께 두었다.
+- 새 문장: **문서 커밋 흐름**: STATUS.md와 DECISIONS.md, 핸드오프(`docs/waypoint/inputs/`)는 메인 체크아웃(세션 시작 때 주입된 `<waypoint>` 블록에 적힌 경로)에서 기본 브랜치로 바로 커밋하고 push한다. 스테이지 문서·Build Spec·리뷰 문서는 작업 브랜치에 실어 PR과 함께 머지한다.
+- 새 문장: **문서 커밋 흐름**: STATUS.md와 DECISIONS.md, 핸드오프(`docs/waypoint/inputs/`)는 메인 체크아웃(세션 시작 때 주입된 `<waypoint>` 블록에 적힌 경로)에서 기본 브랜치로 바로 커밋하고 push한다. 스테이지 문서·Build Spec·리뷰 문서는 작업 브랜치에 실어 PR과 함께 머지한다.
+- 새 문장: Build Spec은 코드와 같은 체크포인트에서 함께 커밋한다.
+- 종류: 사실 바뀜. 서브모듈 순서를 설계 9절의 문서 커밋 흐름으로 바꿨다. 같은 문장을 `core-rules.md`에도 「(자세히: `waypoint:git`)」 꼬리와 함께 두었다(그래서 새 문장을 두 번 적었다). 원문의 「Build Spec은 코드와 같은 체크포인트에서 함께 커밋」은 이전과 상관없으므로 별도 문장으로 되살렸다. 원문의 「핸드오프」는 STATUS·DECISIONS와 함께 기본 브랜치로 바로 가는 공유 문서로 분류했다(실행자 판단: 여러 작업이 함께 보는 입력이라 원문의 「먼저 커밋+push」와 같은 취지).
 
 ## 3. 두 곳에 둔 문장
 

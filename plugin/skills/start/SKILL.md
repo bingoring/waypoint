@@ -14,3 +14,5 @@ AI가 새 세션을 시작할 때 반드시 아래 순서를 따른다:
 3. 해당 스테이지 문서를 열고 `Inputs` 섹션에 명시된 파일을 모두 읽는다
 4. `AI Proposal` 섹션을 작성하고 status를 `AI_PROPOSED`로 변경한다
 5. 사람에게 리뷰를 요청하고 대기한다
+
+4단계(`AI Proposal` 작성) 전에 `waypoint:stage`를 호출한다. 로직·화면·알고리즘·콘텐츠를 산출하는 스테이지면 `waypoint:build-spec`을, Construction에서 Operations로 넘어가는 리뷰 게이트면 `waypoint:review-gate`를 먼저 호출한다. 결정이 내려지면 `waypoint:decisions`를, 커밋할 때는 `waypoint:git`을 따른다.

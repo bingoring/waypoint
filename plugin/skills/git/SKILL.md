@@ -22,4 +22,16 @@ description: waypoint 프로젝트에서 커밋·push할 때, PR 브랜치를 ba
 - **메시지 = conventional-commit** 한 줄(`fix(scope): …` / `feat(scope): …` / `docs(scope): …`), 지금까지의 로그 스타일 유지.
   본문은 필요할 때만 간결히.
 - **Co-Authored-By 등 공동작업 트레일러 금지**(솔로 작업 외형). AI 서명/`Generated with` 류도 넣지 않는다.
-- **문서 커밋 흐름**: STATUS.md와 DECISIONS.md는 메인 체크아웃(세션 시작 때 주입된 `<waypoint>` 블록에 적힌 경로)에서 기본 브랜치로 바로 커밋하고 push한다. 스테이지 문서·Build Spec·리뷰 문서는 작업 브랜치에 실어 PR과 함께 머지한다.
+- **문서 커밋 흐름**: STATUS.md와 DECISIONS.md, 핸드오프(`docs/waypoint/inputs/`)는 메인 체크아웃(세션 시작 때 주입된 `<waypoint>` 블록에 적힌 경로)에서 기본 브랜치로 바로 커밋하고 push한다. 스테이지 문서·Build Spec·리뷰 문서는 작업 브랜치에 실어 PR과 함께 머지한다.
+- Build Spec은 코드와 같은 체크포인트에서 함께 커밋한다.
+
+### 문서 커밋 흐름(STATUS·DECISIONS·핸드오프)
+
+STATUS.md, DECISIONS.md, 핸드오프(`docs/waypoint/inputs/`)는 여러 작업이 함께 보는 공유 문서다. 기능 브랜치나 worktree에서 일하더라도 아래 순서로 메인 체크아웃의 기본 브랜치에 바로 반영한다. `<메인>`은 세션 시작 때 주입된 `<waypoint>` 블록의 「메인 체크아웃」 경로다.
+
+0. `git -C <메인> branch --show-current`가 기본 브랜치(main 또는 master)이고 `git -C <메인> status --porcelain`의 출력이 비어 있는지 확인한다. 둘 중 하나라도 아니면 고치지 말고 멈춰서 오너에게 알린다.
+1. `git -C <메인> pull --rebase`로 최신화한다.
+2. `<메인>/docs/waypoint/` 아래의 파일을 고친다. 작업 브랜치에 있는 사본은 고치지 않는다.
+3. 고친 파일만 `git -C <메인> add`하고 커밋한 뒤 `git -C <메인> push`한다. push가 거절되면 `git -C <메인> pull --rebase`를 한 뒤 다시 push한다. `--rebase` 없는 pull은 쓰지 않는다.
+
+이 파일들은 읽을 때도 메인 체크아웃의 것을 읽는다. 작업 브랜치에 있는 사본은 브랜치를 만든 시점의 상태라서 낡았을 수 있다.

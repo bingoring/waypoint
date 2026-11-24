@@ -7,6 +7,7 @@ description: 새 프로젝트 레포를 waypoint에 연결할 때 사용한다. 
 
 새 프로젝트 레포의 루트(메인 체크아웃)에서 아래 순서로 진행한다. 템플릿은 모두 `${CLAUDE_PLUGIN_ROOT}/templates/`에 있다. 템플릿 파일은 Read 도구로 읽어 Write 도구로 프로젝트에 복사한다. Bash 명령 안에서는 `${CLAUDE_PLUGIN_ROOT}`를 쓰지 않는다(환경변수로 노출되지 않는다).
 
+0. **이미 waypoint를 쓰는 레포인지 확인한다.** `.gitmodules`에 waypoint 서브모듈(`docs/dlc` 또는 `waypoint` 경로)이 있거나 `docs/waypoint/`가 이미 있으면 멈추고 오너에게 알린다. 기존 프로젝트를 옮기는 일은 이 스킬이 아니라 waypoint 레포의 이전 절차(`docs/superpowers/plans/2026-11-24-plugin-split.md`의 절차 M)로 한다.
 1. **문서 골격을 만든다.** `docs/waypoint/01-inception`, `docs/waypoint/02-construction`, `docs/waypoint/03-operations` 디렉터리를 만든다.
 2. **STATUS와 DECISIONS를 만든다.**
    - `${CLAUDE_PLUGIN_ROOT}/templates/STATUS.template.md` → `docs/waypoint/STATUS.md`. `{Project Name}`과 날짜를 채운다.
