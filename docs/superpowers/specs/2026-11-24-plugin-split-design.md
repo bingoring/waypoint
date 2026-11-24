@@ -92,28 +92,32 @@ A를 고른 이유: 문서 분리만 놓고 보면 B로도 충분하다. 하지�
 ```
 waypoint/
 ├── .claude-plugin/
-│   ├── marketplace.json      # 마켓플레이스 "waypoint", 플러그인 하나(source: "./")
-│   └── plugin.json           # name "waypoint", version 생략(커밋을 따라감)
-├── core-rules.md             # 항상 지켜야 하는 규칙. SessionStart 훅이 주입
-├── skills/
-│   ├── start/SKILL.md        # 세션 시작 프로토콜
-│   ├── stage/SKILL.md        # 스테이지 생애주기·승인 결과·비가역 게이트·문서 깊이·외부 사실 표기
-│   ├── build-spec/SKILL.md   # 구현 스펙
-│   ├── review-gate/SKILL.md  # 독립 코드 리뷰 게이트
-│   ├── decisions/SKILL.md    # 결정 로그
-│   ├── git/SKILL.md          # 브랜치 규칙·커밋 규칙
-│   └── init/SKILL.md         # 새 프로젝트를 waypoint에 연결
-├── templates/                # 지금의 _templates/ 전부 + STATUS.template.md
-├── hooks/hooks.json          # SessionStart → scripts/session-context.sh
-├── scripts/session-context.sh
-├── githooks/commit-msg       # 지금의 .githooks/commit-msg (init이 각 레포로 복사)
+│   └── marketplace.json      # 마켓플레이스 "waypoint", 플러그인 하나(source: "./plugin")
+├── plugin/                   # 플러그인 본체. 설치하면 이 디렉터리만 캐시로 복사된다
+│   ├── .claude-plugin/plugin.json   # name "waypoint", version 생략(커밋을 따라감)
+│   ├── core-rules.md         # 항상 지켜야 하는 규칙. SessionStart 훅이 주입
+│   ├── skills/
+│   │   ├── start/SKILL.md        # 세션 시작 프로토콜
+│   │   ├── stage/SKILL.md        # 스테이지 생애주기·승인 결과·비가역 게이트·문서 깊이·외부 사실 표기
+│   │   ├── build-spec/SKILL.md   # 구현 스펙
+│   │   ├── review-gate/SKILL.md  # 독립 코드 리뷰 게이트
+│   │   ├── decisions/SKILL.md    # 결정 로그
+│   │   ├── git/SKILL.md          # 브랜치 규칙·커밋 규칙
+│   │   └── init/SKILL.md         # 새 프로젝트를 waypoint에 연결
+│   ├── templates/            # 지금의 _templates/ 전부 + STATUS.template.md
+│   ├── hooks/hooks.json      # SessionStart → scripts/session-context.sh
+│   ├── scripts/session-context.sh
+│   └── githooks/commit-msg   # 지금의 .githooks/commit-msg (init이 각 레포로 복사)
+├── tests/                    # 플러그인 스크립트와 분할 검사의 테스트(설치 대상 아님)
 ├── FRAMEWORK.md              # 사람용 개요와 스킬 색인. 규칙 본문은 두지 않는다
 ├── README.md                 # 설치·사용법
 ├── CLAUDE.md                 # 이 레포(플러그인 자체)를 고치는 세션용 규칙
-└── docs/superpowers/specs/   # 이 설계 문서 같은 waypoint 자체의 설계
+└── docs/superpowers/         # 이 설계 문서 같은 waypoint 자체의 설계와 계획
 ```
 
 `projects/`는 이전이 모두 끝나면 지운다. 이전 중의 처리는 5.5절에 적었다.
+
+> **계획 단계 변경(2026-11-24):** 처음 설계에서는 플러그인을 레포 루트에 두었다. 이것을 `plugin/` 하위 디렉터리로 바꿨다. 플러그인을 설치하면 플러그인 디렉터리 전체가 `~/.claude/plugins/cache/`로 복사되는데, 루트를 플러그인으로 두면 `projects/`(약 150MB)와 테스트·문서까지 복사되기 때문이다. 이 문서의 다른 절에 나오는 `core-rules.md`, `skills/`, `templates/`, `hooks/`, `scripts/`, `githooks/`는 모두 `plugin/` 아래의 경로로 읽는다.
 
 ### 5.2 규칙의 배치
 
