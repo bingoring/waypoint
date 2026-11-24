@@ -49,6 +49,55 @@ else
   fail framework-split "$MAP 없음"
 fi
 
+# templates-copied: _templates/ 의 모든 파일이 plugin/templates/ 에 같은 상대 경로로 있고, STATUS 템플릿도 있다.
+for f in $(cd _templates && find . -type f | sed 's#^\./##'); do
+  [ -f "$P/templates/$f" ] || fail templates-copied "$P/templates/$f 없음"
+done
+[ -f "$P/templates/STATUS.template.md" ] || fail templates-copied "$P/templates/STATUS.template.md 없음"
+
+# templates-no-old-ref: 플러그인 템플릿이 옛 경로나 FRAMEWORK를 가리키지 않는다.
+if [ -d "$P/templates" ]; then
+  hits=$(grep -rnE '_templates|FRAMEWORK' "$P/templates")
+  [ -z "$hits" ] || fail templates-no-old-ref "$hits"
+fi
+
+# block-and-settings: CLAUDE.md 블록과 프로젝트 설정 템플릿.
+B="$P/templates/claude-md-block.md"
+if [ -f "$B" ]; then
+  grep -qF '## Waypoint' "$B" || fail block-and-settings "블록에 '## Waypoint' 없음"
+  grep -qF 'docs/waypoint/STATUS.md' "$B" || fail block-and-settings "블록에 STATUS 경로 없음"
+else
+  fail block-and-settings "$B 없음"
+fi
+python3 -m json.tool "$P/templates/project-settings.json" > /dev/null 2>&1 \
+  || fail block-and-settings "project-settings.json 이 없거나 JSON이 아님"
+grep -qF '"waypoint@waypoint": true' "$P/templates/project-settings.json" 2>/dev/null \
+  || fail block-and-settings "enabledPlugins 항목 없음"
+
+# commit-msg: 공동작업 트레일러가 든 메시지는 거부하고, 일반 메시지는 받는다.
+H="$P/githooks/commit-msg"
+if [ -x "$H" ]; then
+  M=$(mktemp)
+  printf 'feat: x\n\nCo-Authored-By: A <a@b>\n' > "$M"
+  sh "$H" "$M" 2>/dev/null && fail commit-msg-rejects "Co-Authored-By 메시지를 받아들임"
+  printf 'feat: x\n\n\360\237\244\226 Generated with [Claude Code](https://claude.com/claude-code)\n' > "$M"
+  sh "$H" "$M" 2>/dev/null && fail commit-msg-rejects-2 "Generated with 메시지를 받아들임"
+  printf 'feat: x\n' > "$M"
+  sh "$H" "$M" 2>/dev/null || fail commit-msg-accepts "일반 메시지를 거부함"
+  rm -f "$M"
+else
+  fail commit-msg-rejects "$H 없음 또는 실행 권한 없음"
+fi
+
+# init-skill: init 스킬이 있고 블록과 설정 템플릿을 쓴다.
+I="$P/skills/init/SKILL.md"
+if [ -f "$I" ]; then
+  grep -qF 'claude-md-block.md' "$I" || fail init-skill "claude-md-block.md 언급 없음"
+  grep -qF 'project-settings.json' "$I" || fail init-skill "project-settings.json 언급 없음"
+else
+  fail init-skill "$I 없음"
+fi
+
 if [ "$fails" -gt 0 ]; then
   echo "$fails failed"
   exit 1
