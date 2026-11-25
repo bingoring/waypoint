@@ -1,5 +1,7 @@
 # Waypoint Framework Rules
 
+> **플러그인으로 이전 중(2026-11-24).** 규칙 원본은 `plugin/core-rules.md`와 `plugin/skills/`다. 아직 이전하지 않은 프로젝트는 이 파일을 계속 따른다.
+
 > 이 문서는 AI가 Waypoint 프레임워크 안에서 동작할 때 반드시 따라야 하는 계약서다.
 
 ## 세션 시작 프로토콜
