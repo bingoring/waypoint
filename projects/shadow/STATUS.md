@@ -1,8 +1,9 @@
 # Shadow Engineer — Waypoint Status
 
 **Framework:** [Waypoint](https://github.com/bingoring/waypoint)  
-**PRD:** [prd.md](../../prd.md) | [prd-tech.md](../../prd-tech.md)  
-**Last updated:** 2026-06-02
+**PRD:** [prd.md](prd.md) | [prd-tech.md](prd-tech.md)  
+**Decisions (audit):** [DECISIONS.md](DECISIONS.md)  
+**Last updated:** 2026-07-10
 
 ---
 
@@ -10,7 +11,7 @@
 
 | 스테이지 | 문서 | 상태 |
 |---------|------|------|
-| 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | PENDING |
+| 1-1 Context Synthesis | [01-context-synthesis.md](01-inception/01-context-synthesis.md) | AI_PROPOSED |
 | 1-2 Domain Model | [02-domain-model.md](01-inception/02-domain-model.md) | PENDING |
 | 1-3 Architecture Decision ⚠️ | [03-architecture-decision.md](01-inception/03-architecture-decision.md) | PENDING |
 
