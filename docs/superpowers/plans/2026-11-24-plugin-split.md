@@ -560,6 +560,15 @@ Expected: `메인 체크아웃: /Users/ywyeom/private/shadow`
 
 매개변수: `NAME`(waypoint `projects/` 아래 이름), `REPO`(로컬 경로), `SUB`(submodule 경로), `BASE`(기본 브랜치), `GH`(GitHub `owner/repo`). 사전 준비로 `git-filter-repo`가 없으면 `brew install git-filter-repo`를 실행한다.
 
+`plugin/...` 경로는 waypoint 메인 체크아웃(`/Users/ywyeom/private/waypoint/plugin/...`)의 파일을 가리킨다.
+
+> **shadow 파일럿에서 보완한 점(2026-11-25):**
+> - M0: 실행 중인 다른 세션은 `lsof -a -d cwd -c claude -Fn | grep '^n'`으로 확인할 수 있다. `$REPO`나 그 worktree가 나오면 오너에게 멈춰 달라고 요청한다.
+> - M3: 서브모듈이 하나뿐이면 `.gitmodules`가 빈 파일로 남는다. 같은 커밋에서 `git rm .gitmodules`로 지운다.
+> - M6: CLAUDE.md가 없던 레포는 `# <NAME>` 제목 한 줄 뒤에 블록을 넣는다.
+> - M10: `git rm -rq projects/$NAME`은 디렉터리까지 지우므로 `mkdir -p projects/$NAME` 뒤에 MOVED.md를 만든다.
+> - 마무리 확인: 설치된 플러그인으로 `$REPO`에서 `claude -p "…<waypoint> 블록의 '메인 체크아웃' 줄을 출력하라"`를 실행해 `메인 체크아웃: $REPO`가 나오는지 본다.
+
 - [ ] **M0 게이트 확인**
 
 ```bash
