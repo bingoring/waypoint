@@ -109,6 +109,18 @@ else
   fail hook-block-match "$PC(실행 권한) 또는 $SC 없음"
 fi
 
+# board-sync-files: 4단계의 board-sync.sh와 pre-push. 검사 블록이 status-check.sh와 같고, 둘째 줄이 버전 줄이고, 실행 권한이 있다.
+BSY="$P/scripts/board-sync.sh"
+PP="$P/githooks/pre-push"
+for f in "$BSY" "$PP"; do
+  [ -x "$f" ] || { fail board-sync-files "$f 없음 또는 실행 권한 없음"; continue; }
+  case $(sed -n 2p "$f") in
+    '# waypoint-hook-version: '[0-9]*) ;;
+    *) fail board-sync-files "$f 둘째 줄이 버전 줄이 아님" ;;
+  esac
+done
+[ -f "$BSY" ] && [ "$(block "$BSY")" = "$(block "$SC")" ] || fail board-sync-files "$BSY 의 검사 블록이 $SC 와 다름"
+
 # init-skill: init 스킬이 있고 블록과 설정 템플릿을 쓴다.
 I="$P/skills/init/SKILL.md"
 if [ -f "$I" ]; then

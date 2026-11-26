@@ -221,6 +221,45 @@ run_sync --commit "$first"
 [ -z "$(board_card 2-2)" ] || fail commit-arg "주지 않은 커밋의 줄을 반영함"
 [ -n "$(board_card 2-1)" ] || fail commit-arg "준 커밋의 줄을 반영하지 않음"
 
+# ---- Task 5: 잠금과 재실행 ----
+LK="$R/.git/waypoint/board-sync.lock"
+mklock() { mkdir -p "$LK"; echo "$1" > "$LK/pid"; echo "$2" > "$LK/started"; }
+
+# lock-busy: 살아 있는 동기화가 잠금을 쥐고 있으면 재실행 표시만 남기고 끝난다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+sleep 30 & live=$!
+mklock "$live" "$(date +%s)"
+run_sync
+[ -s "$FAKE_GH_LOG" ] && fail lock-busy "gh를 부름"
+[ -e "$R/.git/waypoint/board-sync.rerun" ] || fail lock-busy "재실행 표시가 없음"
+[ -d "$LK" ] || fail lock-busy "남의 잠금을 지움"
+
+# lock-old: 살아 있는 PID인데 10분이 넘은 잠금은 실패로 기록한다.
+rm -rf "$LK" "$R/.git/waypoint/board-sync.rerun"
+mklock "$live" "$(( $(date +%s) - 700 ))"
+run_sync
+case $(status_line) in "fail "*" lock: "*) ;; *) fail lock-old "상태: $(status_line)" ;; esac
+kill "$live" 2> /dev/null; wait "$live" 2> /dev/null
+
+# lock-stale: 죽은 PID의 잠금은 지우고 실행한다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+sh -c 'exit 0' & dead=$!; wait "$dead"
+mklock "$dead" "$(date +%s)"
+run_sync
+case $(status_line) in ok*) ;; *) fail lock-stale "상태: $(status_line) / $(cat "$T/out")" ;; esac
+[ -d "$LK" ] && fail lock-stale "끝난 뒤 잠금이 남음"
+
+# rerun: 실행 중에 재실행 표시가 생기면, 끝난 뒤 기본 브랜치 끝 커밋으로 한 번 더 실행한다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+first=$(g rev-parse HEAD)
+printf '%s\n' '| 2-2 | 다음 | IN_PROGRESS | | 계획: x | | [#3](https://github.com/test/repo/pull/3) |' >> "$R/docs/waypoint/STATUS.md"
+g commit -qam two
+mkdir -p "$R/.git/waypoint"; : > "$R/.git/waypoint/board-sync.rerun"
+run_sync --commit "$first"
+[ -n "$(board_card 2-2)" ] || fail rerun "다시 실행하지 않음(2-2 카드 없음)"
+[ -e "$R/.git/waypoint/board-sync.rerun" ] && fail rerun "재실행 표시가 남음"
+[ "$(grep -c '시작 commit=' "$R/.git/waypoint/board-sync.log")" = 2 ] || fail rerun "실행 횟수: $(grep -c '시작 commit=' "$R/.git/waypoint/board-sync.log")"
+
 if [ "$fails" -gt 0 ]; then
   echo "$fails failed"
   exit 1

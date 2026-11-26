@@ -394,54 +394,107 @@ wp_sync_project() {
   return 0
 }
 
+# wp_lock: 잠금을 잡으면 0. 다른 동기화가 실행 중이면 재실행 표시를 남기고 2. 잠금이 10분 넘게 풀리지 않으면 실패로 기록하고 1.
+wp_lock() {
+  _lk="$WP_DIR/board-sync.lock"
+  if mkdir "$_lk" 2> /dev/null; then
+    echo $$ > "$_lk/pid"; date +%s > "$_lk/started"
+    return 0
+  fi
+  _pid=; _st=0
+  [ -r "$_lk/pid" ] && read -r _pid < "$_lk/pid"
+  [ -r "$_lk/started" ] && read -r _st < "$_lk/started"
+  if [ -n "$_pid" ] && kill -0 "$_pid" 2> /dev/null; then
+    _age=$(( $(date +%s) - ${_st:-0} ))
+    if [ "$_age" -gt 600 ]; then
+      wp_fail lock "잠금이 오래 풀리지 않음(PID $_pid, ${_age}초). 그 프로세스를 확인한 뒤 $_lk를 지우고 다시 실행한다"
+      return 1
+    fi
+    : > "$WP_DIR/board-sync.rerun"
+    wp_log "다른 동기화가 실행 중(PID $_pid). 끝난 뒤 다시 실행하도록 표시함"
+    return 2
+  fi
+  rm -rf "$_lk"
+  wp_log "오래된 잠금을 지움(PID ${_pid:-없음})"
+  if mkdir "$_lk" 2> /dev/null; then
+    echo $$ > "$_lk/pid"; date +%s > "$_lk/started"
+    return 0
+  fi
+  : > "$WP_DIR/board-sync.rerun"
+  return 2
+}
+
+# wp_run <커밋>: 그 커밋의 STATUS와 「보드:」 줄로 한 번 동기화한다.
+wp_run() {
+  _commit=$1
+  WP_TMP=$(mktemp -d) || return 1
+  git show "$_commit:CLAUDE.md" > "$WP_TMP/CLAUDE.md" 2>/dev/null || : > "$WP_TMP/CLAUDE.md"
+  _urls=$(wp_board_urls "$WP_TMP/CLAUDE.md")
+  [ -n "$_urls" ] || { rm -rf "$WP_TMP"; return 0; }
+  wp_log "시작 commit=$_commit"
+  for _t in gh jq; do
+    command -v "$_t" > /dev/null 2>&1 || { wp_fail tools "PATH에서 $_t를 찾지 못함(PATH=$PATH)"; rm -rf "$WP_TMP"; return 1; }
+  done
+  git show "$_commit:docs/waypoint/STATUS.md" > "$WP_TMP/STATUS.md" 2>/dev/null || { wp_fail check "커밋 $_commit에 docs/waypoint/STATUS.md가 없다"; rm -rf "$WP_TMP"; return 1; }
+  wp_status_check "$WP_TMP/STATUS.md" 2> "$WP_TMP/check.err" || { wp_fail check "STATUS 형식 검사 실패: $(head -n 1 "$WP_TMP/check.err")"; rm -rf "$WP_TMP"; return 1; }
+  WP_REPO=$(wp_repo) || { wp_fail board "origin 원격에서 GitHub 레포를 알아내지 못함"; rm -rf "$WP_TMP"; return 1; }
+  wp_desired_cards "$WP_TMP/STATUS.md" | jq -s . > "$WP_TMP/desired.json" || { wp_fail check "STATUS를 해석하지 못함"; rm -rf "$WP_TMP"; return 1; }
+
+  gh issue list -R "$WP_REPO" --label waypoint --state all --limit 1000 --json number,title,state,url > "$WP_TMP/issues.json" 2> "$WP_TMP/gh.err" ||
+    { wp_fail issue "이슈 목록을 읽지 못함: $(head -n 1 "$WP_TMP/gh.err")"; rm -rf "$WP_TMP"; return 1; }
+  if ! gh label list -R "$WP_REPO" --json name --limit 200 | jq -e 'map(.name) | index("waypoint")' > /dev/null 2>&1; then
+    gh label create waypoint -R "$WP_REPO" --color 5319E7 --description "waypoint 스테이지 이슈(STATUS에서 만들어짐)" > /dev/null 2>&1 ||
+      { wp_fail issue "waypoint 라벨을 만들지 못함"; rm -rf "$WP_TMP"; return 1; }
+  fi
+
+  for _u in $_urls; do
+    wp_sync_project "$_u" || { rm -rf "$WP_TMP"; return 1; }
+  done
+  printf 'ok %s\n' "$(wp_now)" > "$WP_DIR/board-sync.status"
+  wp_log "성공"
+  rm -rf "$WP_TMP"
+  return 0
+}
+
 wp_main() {
-  _commit=
+  _c=
   while [ $# -gt 0 ]; do
     case $1 in
-      --commit) _commit=$2; shift 2 ;;
+      --commit) _c=$2; shift 2 ;;
       *) echo "사용: board-sync.sh [--commit <sha>]" >&2; return 2 ;;
     esac
   done
   _top=$(git rev-parse --show-toplevel) || return 1
   cd "$_top" || return 1
-  if [ -z "$_commit" ]; then
+  if [ -z "$_c" ]; then
     _def=$(wp_default_branch) || { echo "waypoint 보드 동기화: 기본 브랜치를 찾지 못함" >&2; return 1; }
-    _commit=$(git rev-parse -q --verify "refs/heads/$_def^{commit}") || return 1
+    _c=$(git rev-parse -q --verify "refs/heads/$_def^{commit}") || return 1
   fi
-  WP_TMP=$(mktemp -d) || return 1
-  trap 'rm -rf "$WP_TMP"' EXIT
-  git show "$_commit:CLAUDE.md" > "$WP_TMP/CLAUDE.md" 2>/dev/null || : > "$WP_TMP/CLAUDE.md"
-  _urls=$(wp_board_urls "$WP_TMP/CLAUDE.md")
   # 보드를 쓰지 않는 레포: 아무것도 남기지 않고 끝낸다(실패가 아니다).
-  [ -n "$_urls" ] || return 0
+  git show "$_c:CLAUDE.md" 2>/dev/null | grep -qE '^[[:space:]]*- 보드:' || return 0
 
   WP_DIR="$(git rev-parse --path-format=absolute --git-common-dir)/waypoint"
   mkdir -p "$WP_DIR" || return 1
-  wp_log "시작 commit=$_commit"
-  for _t in gh jq; do
-    command -v "$_t" > /dev/null 2>&1 || { wp_fail tools "PATH에서 $_t를 찾지 못함(PATH=$PATH)"; return 1; }
-  done
-  git show "$_commit:docs/waypoint/STATUS.md" > "$WP_TMP/STATUS.md" 2>/dev/null || { wp_fail check "커밋 $_commit에 docs/waypoint/STATUS.md가 없다"; return 1; }
-  wp_status_check "$WP_TMP/STATUS.md" 2> "$WP_TMP/check.err" || { wp_fail check "STATUS 형식 검사 실패: $(head -n 1 "$WP_TMP/check.err")"; return 1; }
-  WP_REPO=$(wp_repo) || { wp_fail board "origin 원격에서 GitHub 레포를 알아내지 못함"; return 1; }
-  wp_desired_cards "$WP_TMP/STATUS.md" | jq -s . > "$WP_TMP/desired.json" || { wp_fail check "STATUS를 해석하지 못함"; return 1; }
+  wp_lock; _lrc=$?
+  [ "$_lrc" = 2 ] && return 0
+  [ "$_lrc" = 0 ] || return 1
+  trap 'rm -rf "$WP_DIR/board-sync.lock"' EXIT
 
-  gh issue list -R "$WP_REPO" --label waypoint --state all --limit 1000 --json number,title,state,url > "$WP_TMP/issues.json" 2> "$WP_TMP/gh.err" ||
-    { wp_fail issue "이슈 목록을 읽지 못함: $(head -n 1 "$WP_TMP/gh.err")"; return 1; }
-  if ! gh label list -R "$WP_REPO" --json name --limit 200 | jq -e 'map(.name) | index("waypoint")' > /dev/null 2>&1; then
-    gh label create waypoint -R "$WP_REPO" --color 5319E7 --description "waypoint 스테이지 이슈(STATUS에서 만들어짐)" > /dev/null 2>&1 ||
-      { wp_fail issue "waypoint 라벨을 만들지 못함"; return 1; }
-  fi
-
-  for _u in $_urls; do
-    wp_sync_project "$_u" || return 1
+  _rc=0; _n=0
+  while :; do
+    wp_run "$_c"; _rc=$?
+    _n=$((_n + 1))
+    # 실행 중에 다른 push가 동기화를 청했으면, 기본 브랜치 끝 커밋(가장 최근 STATUS)으로 한 번 더 한다.
+    [ -e "$WP_DIR/board-sync.rerun" ] && [ "$_n" -lt 4 ] || break
+    rm -f "$WP_DIR/board-sync.rerun"
+    _def=$(wp_default_branch) && _c=$(git rev-parse -q --verify "refs/heads/$_def^{commit}") || break
+    wp_log "다시 실행(실행 중에 요청이 있었음)"
   done
-  printf 'ok %s\n' "$(wp_now)" > "$WP_DIR/board-sync.status"
-  wp_log "성공"
-  if [ "$(wc -l < "$WP_DIR/board-sync.log")" -gt 500 ]; then
+  rm -rf "$WP_DIR/board-sync.lock"
+  if [ "$(wc -l < "$WP_DIR/board-sync.log" 2>/dev/null || echo 0)" -gt 500 ]; then
     tail -n 500 "$WP_DIR/board-sync.log" > "$WP_DIR/board-sync.log.t" && mv "$WP_DIR/board-sync.log.t" "$WP_DIR/board-sync.log"
   fi
-  return 0
+  return "$_rc"
 }
 
 [ -n "${WP_BOARD_SYNC_LIB:-}" ] || { wp_main "$@"; exit $?; }
