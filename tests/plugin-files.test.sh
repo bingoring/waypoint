@@ -267,6 +267,10 @@ has core-rules-mediator "$CR" '중재자 세션은 `waypoint:mediator`를, 중�
 # block-cap: CLAUDE.md 블록에 검토 대기 상한 줄(설계 5.3절).
 has block-cap "$B" '- 검토 대기 상한: 3'
 
+# git-worker-status: 「스테이지 브랜치와 PR」의 STATUS 변경을 작업 세션은 보고로 대신한다(설계 5.10절 흐름 점검).
+awk '/^### 스테이지 브랜치와 PR/{f=1; next} /^### /{f=0} f' "$G" | grep -qF '`waypoint:worker`의 「보고」' \
+  || fail git-worker-status "스테이지 브랜치와 PR 절에 작업 세션은 보고로 대신한다는 문장이 없음"
+
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
 
