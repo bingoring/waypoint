@@ -240,6 +240,17 @@ has mediator-initiation "$M" '「승인」만'
 has mediator-cap "$M" '검토 대기 상한:'
 has mediator-cap "$M" '없으면 3'
 
+# stage-templates-review: 두 스테이지 템플릿의 첫 절이 「검토 요약」이고 10줄 상한을 적는다(설계 5.7절).
+for f in "$P/templates/stage-template.md" "$P/templates/review-stage-template.md"; do
+  first=$(awk '/^# /{t=1; next} t && /^## /{print; exit}' "$f")
+  [ "$first" = "## 검토 요약" ] || fail stage-templates-review "$f: 제목 다음 첫 절이 '$first'"
+  has stage-templates-review "$f" '10줄 이하'
+done
+# stage-mediator: stage 스킬에 검토 요약, 체크포인트 진행 기록 형식, PR 본문 갱신, 중재자에게 보고하는 규칙이 있다.
+for want in '## 검토 요약' '/ 다음:' '가정:' '중재자 답:' 'gh pr edit' '`waypoint:worker`의 「보고」'; do
+  has stage-mediator "$ST" "$want"
+done
+
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
 
