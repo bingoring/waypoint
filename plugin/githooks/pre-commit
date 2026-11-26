@@ -6,6 +6,7 @@
 # - 레포의 index에 docs/waypoint/STATUS.md가 없으면 아무것도 하지 않는다.
 # - 커밋에 STATUS.md나 DECISIONS.md가 있을 때만 검사한다. 검사 대상은 작업 트리가 아니라 커밋될 내용(index)이다.
 #   - 검사 1(커밋 위치): 기본 브랜치에서만 커밋한다. detached HEAD도 거부한다.
+#     단, 기본 브랜치를 rebase하는 중(HEAD가 분리됨)이면 그 브랜치에서 커밋하는 것으로 본다.
 #     WAYPOINT_ALLOW_BRANCH_STATUS=1이면 이 검사만 건너뛴다(절차 M의 STATUS 변환 커밋 전용).
 #   - 검사 2(STATUS 형식): STATUS.md가 커밋에 있으면 아래 wp_status_check로 검사한다.
 # 자세히: waypoint:git 「pre-commit 검사」, 설계 docs/superpowers/specs/2026-11-25-status-cleanup-design.md 5.5절(waypoint 레포).
@@ -14,9 +15,9 @@ WP_S=docs/waypoint/STATUS.md
 WP_D=docs/waypoint/DECISIONS.md
 
 # wp_index_ids: index에서 docs/waypoint 아래 .md 파일의 frontmatter id: 를 "<docs/waypoint 기준 경로><TAB><id>"로 출력한다.
-# frontmatter는 1행의 --- 부터 다음 --- 까지다.
+# frontmatter는 1행의 --- 부터 다음 --- 까지다. 사용자 설정(색, column, 패턴 종류, 경로 따옴표)에 영향받지 않게 옵션을 고정한다.
 wp_index_ids() {
-  git grep --cached -n -e '^---$' -e '^id: ' -- 'docs/waypoint/*.md' | LC_ALL=C awk '
+  git -c core.quotePath=false grep --cached --no-color --no-column -G -n -e '^---$' -e '^id: ' -- 'docs/waypoint/*.md' | LC_ALL=C awk '
     {
       i = index($0, ":"); p = substr($0, 1, i - 1); r = substr($0, i + 1)
       j = index(r, ":"); n = substr(r, 1, j - 1) + 0; c = substr(r, j + 1)
@@ -35,6 +36,15 @@ wp_index_ids() {
 wp_is_default() {
   _wp_d=$(git symbolic-ref -q --short refs/remotes/origin/HEAD) && { [ "$1" = "${_wp_d#origin/}" ]; return; }
   [ "$1" = main ] || [ "$1" = master ]
+}
+
+# wp_default_desc: 기본 브랜치를 어떻게 정했는지 한 구절로 출력한다(거부 메시지용).
+wp_default_desc() {
+  if _wp_d=$(git symbolic-ref -q --short refs/remotes/origin/HEAD); then
+    printf 'origin/HEAD가 가리키는 %s' "${_wp_d#origin/}"
+  else
+    printf 'origin/HEAD가 없어 main 또는 master. 다른 이름이면 git remote set-head origin -a로 맞춘다'
+  fi
 }
 
 # >>> waypoint status-check >>>
@@ -194,8 +204,22 @@ printf '%s\n' "$wp_changed" | grep -qxF "$WP_D" && wp_has_d=1
 
 if [ "${WAYPOINT_ALLOW_BRANCH_STATUS:-}" != 1 ]; then
   wp_br=$(git symbolic-ref -q --short HEAD) || wp_br=
+  wp_where=$wp_br
+  if [ -z "$wp_br" ]; then
+    # rebase 중이면 HEAD가 분리되어 있다. rebase 대상 브랜치로 판정한다.
+    for wp_rb in rebase-merge rebase-apply; do
+      wp_hn=$(git rev-parse --git-path "$wp_rb/head-name")
+      if [ -f "$wp_hn" ]; then
+        wp_ref=
+        IFS= read -r wp_ref < "$wp_hn" || true
+        wp_br=${wp_ref#refs/heads/}
+        wp_where="rebase 중인 $wp_br"
+        break
+      fi
+    done
+  fi
   if [ -z "$wp_br" ] || ! wp_is_default "$wp_br"; then
-    echo "pre-commit: STATUS.md·DECISIONS.md는 메인 체크아웃의 기본 브랜치에서 커밋한다(현재 ${wp_br:-detached HEAD}). waypoint:git 「문서 커밋 흐름」을 따른다." >&2
+    echo "pre-commit: STATUS.md·DECISIONS.md는 메인 체크아웃의 기본 브랜치에서 커밋한다(현재 ${wp_where:-detached HEAD}, 기본 브랜치: $(wp_default_desc)). waypoint:git 「문서 커밋 흐름」을 따른다." >&2
     exit 1
   fi
 fi
@@ -203,7 +227,7 @@ fi
 if [ -n "$wp_has_s" ]; then
   wp_tmp=$(mktemp -d) || exit 1
   trap 'rm -rf "$wp_tmp"' EXIT
-  git show ":$WP_S" > "$wp_tmp/STATUS.md" || exit 1
+  git cat-file blob ":$WP_S" > "$wp_tmp/STATUS.md" || exit 1
   wp_index_ids > "$wp_tmp/ids"
   if ! wp_status_check "$wp_tmp/STATUS.md" "$wp_tmp/ids"; then
     echo "pre-commit: STATUS.md 형식 검사에 실패했다. 위 줄을 고쳐 다시 add한 뒤 커밋한다(waypoint:stage 「STATUS 표」)." >&2

@@ -74,6 +74,7 @@ ok other-files "$T/r1" commit -q -m "feat: a"
 # branch-status / branch-decisions: 기능 브랜치에서 STATUS·DECISIONS를 바꾸면 거부한다.
 status "$T/r1/$S" "$GOOD" "$GOOD2" && g -C "$T/r1" add -A
 bad branch-status "$T/r1" "기본 브랜치" commit -q -m "docs(status): 1-2 PENDING"
+case $err in *"main 또는 master"*) ;; *) fail branch-status-criterion "판정 기준(main 또는 master) 안내 없음: $err" ;; esac
 g -C "$T/r1" reset -q
 echo '# d' > "$T/r1/docs/waypoint/DECISIONS.md" && g -C "$T/r1" add docs/waypoint/DECISIONS.md
 bad branch-decisions "$T/r1" "기본 브랜치" commit -q -m "docs: d"
@@ -124,6 +125,7 @@ mkrepo "$T/r4"
 g -C "$T/r4" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/develop
 status "$T/r4/$S" "$GOOD" "$GOOD2" && g -C "$T/r4" add -A
 bad origin-head-main "$T/r4" "기본 브랜치" commit -q -m "docs(status): 1-2 PENDING"
+case $err in *"origin/HEAD가 가리키는 develop"*) ;; *) fail origin-head-criterion "판정 기준(origin/HEAD) 안내 없음: $err" ;; esac
 g -C "$T/r4" switch -q -c develop
 ok origin-head-develop "$T/r4" commit -q -m "docs(status): 1-2 PENDING"
 
@@ -160,6 +162,38 @@ err=$(cd "$T/me" && GIT_EDITOR=true git rebase --continue 2>&1); rc=$?
 [ "$rc" -eq 0 ] || fail rebase-conflict "rebase --continue 실패: $err"
 [ "$(git -C "$T/me" branch --show-current)" = main ] || fail rebase-conflict "rebase가 끝나지 않음"
 git -C "$T/me" log --format=%s -1 | grep -qxF "docs(status): me" || fail rebase-conflict "로컬 커밋이 없음"
+
+# config-and-korean-path: 사용자 git 설정(색, column, 패턴 종류)과 한글 파일명에도 index의 id: 를 바르게 읽는다.
+mkrepo "$T/r7"
+mkdir -p "$T/r7/docs/waypoint/01-inception"
+printf -- '---\nid: 1-1\n---\n\n# 1-1\n' > "$T/r7/docs/waypoint/01-inception/01-한글 문서.md"
+status "$T/r7/$S" '| 1-1 | A | MERGED | | | | [문서](01-inception/01-한글 문서.md) |'
+g -C "$T/r7" add -A
+git -C "$T/r7" config color.ui always
+git -C "$T/r7" config grep.column true
+git -C "$T/r7" config grep.patternType fixed
+ok config-and-korean-path "$T/r7" commit -q -m "docs(status): 1-1 MERGED"
+
+# rebase-direct-commit: rebase 중 충돌을 풀고 rebase --continue 대신 git commit 을 직접 해도,
+# 기본 브랜치의 rebase면 검사 1을 통과하고 검사 2는 그대로 한다.
+mkrepo "$T/up2"
+g clone -q "$T/up2" "$T/me2"
+git -C "$T/me2" config core.hooksPath "$HK"
+git -C "$T/me2" config user.name t
+git -C "$T/me2" config user.email t@example.com
+status "$T/up2/$S" '| 1-1 | AA | PENDING | | | | |' && g -C "$T/up2" commit -q -am "docs(status): up"
+status "$T/me2/$S" '| 1-1 | AB | PENDING | | | | |' && git -C "$T/me2" commit -q -am "docs(status): me"
+git -C "$T/me2" pull -q --rebase > /dev/null 2>&1 && fail rebase-direct-commit "충돌이 나지 않음(테스트 오류)"
+status "$T/me2/$S" '| 1-1 | AC | READY | | | | |' && git -C "$T/me2" add "$S"
+err=$(cd "$T/me2" && git commit -q -m "docs(status): me" 2>&1); rc=$?
+[ "$rc" -ne 0 ] || fail rebase-direct-commit-bad "잘못된 STATUS 커밋이 성공함"
+case $err in *"[검사 3]"*) ;; *) fail rebase-direct-commit-bad "'[검사 3]' 없음: $err" ;; esac
+status "$T/me2/$S" '| 1-1 | AC | PENDING | | | | |' && git -C "$T/me2" add "$S"
+err=$(cd "$T/me2" && git commit -q -m "docs(status): me" 2>&1); rc=$?
+[ "$rc" -eq 0 ] || fail rebase-direct-commit "rebase 중 직접 커밋이 막힘: $err"
+err=$(cd "$T/me2" && GIT_EDITOR=true git rebase --continue 2>&1); rc=$?
+[ "$rc" -eq 0 ] || fail rebase-direct-commit "rebase --continue 실패: $err"
+[ "$(git -C "$T/me2" branch --show-current)" = main ] || fail rebase-direct-commit "rebase가 끝나지 않음"
 
 if [ "$fails" -gt 0 ]; then
   echo "$fails failed"

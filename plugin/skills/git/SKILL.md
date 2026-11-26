@@ -75,4 +75,4 @@ STATUS의 줄을 고치는 커밋은 위 「문서 커밋 흐름」대로 메인
 - **검사 1(커밋 위치):** 기본 브랜치가 아니거나 detached HEAD이면 거부한다. 기본 브랜치는 `origin/HEAD`가 가리키는 브랜치이고, 없으면 `main`이나 `master`다.
 - **검사 2(STATUS 형식):** `waypoint:stage`의 「STATUS 표」 규칙(머리 줄, 칸 7개, 상태 값, ID, 「지금」의 길이와 머리말, 링크, `id:`가 있는 문서와 표의 대응, `(막음: <ID>)`, 허용하는 줄)을 검사한다. 실패하면 줄 번호와 고치는 법이 나온다.
 - `WAYPOINT_ALLOW_BRANCH_STATUS=1`은 검사 1만 건너뛴다. 레포 이전 절차(waypoint 레포의 절차 M)의 STATUS 변환 커밋에만 쓴다. 그 밖의 예외는 오너가 판단해 `--no-verify`로 넘긴다.
-- 세션 시작 요약 앞에 「`.githooks/pre-commit`이 낡았다」는 경고가 나오면, `${CLAUDE_PLUGIN_ROOT}/githooks/pre-commit`을 Read 도구로 읽어 `.githooks/pre-commit`에 Write 도구로 쓰고 `chmod +x .githooks/pre-commit`을 실행한 뒤 메인 체크아웃에서 커밋한다.
+- 세션 시작 요약 앞에 「`.githooks/pre-commit`이 낡았다」는 경고가 나오면, `${CLAUDE_PLUGIN_ROOT}/githooks/pre-commit`을 Read 도구로 읽어 `<메인>/.githooks/pre-commit`에 Write 도구로 쓰고 `chmod +x <메인>/.githooks/pre-commit`을 실행한 뒤 메인 체크아웃에서 커밋한다. worktree의 사본을 고치지 않는다.

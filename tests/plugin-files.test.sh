@@ -198,6 +198,12 @@ done
 has init-new "$I" 'githooks/pre-commit'
 grep -qF '첫 스테이지(1-1)를 시작한다' "$I" && fail init-new "옛 마무리 문장이 남아 있음"
 
+# review-fixes: 독립 리뷰에서 고친 문장들.
+has review-fixes "$I" '메인 체크아웃의 기본 브랜치에서'
+has review-fixes "$G" '`<메인>/.githooks/pre-commit`'
+grep -qF 'HUMAN_APPROVED`로 변경' "$P/templates/gate-template.md" && fail review-fixes "gate-template에 옛 HUMAN_APPROVED 안내가 남아 있음"
+has review-fixes "$ST" 'R-1)의 결과가 승인된 뒤에 시작한다'
+
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
 
