@@ -182,7 +182,7 @@ has core-rules-new "$CR" '스테이지 상태의 원본은 메인 체크아웃'
 has core-rules-new "$CR" '메인 체크아웃은 기본 브랜치에 둔다'
 grep -qF '`HUMAN_APPROVED` 없이는' "$CR" && fail core-rules-new "옛 HUMAN_APPROVED 규칙이 남아 있음"
 n=$(wc -l < "$CR" | tr -d ' ')
-[ "$n" -le 19 ] || fail core-rules-new "$n 줄 (19 초과)"
+[ "$n" -le 20 ] || fail core-rules-new "$n 줄 (20 초과: 2단계 19줄 + 3단계 한 줄)"
 
 # start-new: start 스킬이 세션 시작 요약과 PR 상태 확인으로 시작하고, 옛 「PENDING인 가장 앞 스테이지」 절차가 없다.
 has start-new "$S0" '`gh pr view`'
@@ -261,6 +261,11 @@ for want in '### 머지 준비' '### 중재자의 머지' '작업 세션은 쓰�
 done
 has skills-mediator-links "$S0" '/waypoint:mediator'
 has skills-mediator-links "$S0" '`waypoint:worker`의 「첫 턴」'
+
+# core-rules-mediator: 중재자와 작업 세션이 compact 뒤에도 자기 스킬을 다시 읽게 하는 한 줄(설계 5.15절).
+has core-rules-mediator "$CR" '중재자 세션은 `waypoint:mediator`를, 중재자가 시작한 작업 세션은 `waypoint:worker`를 따르고 compact 뒤에도 다시 읽는다. 작업 세션은 STATUS와 DECISIONS를 고치지 않는다'
+# block-cap: CLAUDE.md 블록에 검토 대기 상한 줄(설계 5.3절).
+has block-cap "$B" '- 검토 대기 상한: 3'
 
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
