@@ -20,4 +20,4 @@ AI가 새 세션을 시작할 때 반드시 아래 순서를 따른다:
 
 스테이지 문서(`AI Proposal` 포함)를 쓰기 전에 `waypoint:stage`를 호출한다. 로직·화면·알고리즘·콘텐츠를 산출하는 스테이지면 `waypoint:build-spec`을, Construction에서 Operations로 넘어가는 리뷰 게이트면 `waypoint:review-gate`를 먼저 호출한다. 결정이 내려지면 `waypoint:decisions`를, 커밋할 때는 `waypoint:git`을 따른다.
 
-**중재자:** 데스크톱 앱에서는 `/waypoint:mediator`로 레포의 중재자 세션을 둘 수 있다. 중재자가 있으면 위 2번(머지 정리)은 중재자가 맡는다(`waypoint:mediator`).
+**중재자:** 데스크톱 앱에서는 `/waypoint:mediator`로 레포의 중재자 세션을 둘 수 있다. 중재자 세션은 이 절차 대신 `waypoint:mediator`의 「시작 절차」를 따르고, 위 2번(머지 정리)도 거기서 한다.

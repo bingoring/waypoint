@@ -11,12 +11,12 @@ fails=0
 
 fail() { echo "FAIL $1: $2"; fails=$((fails + 1)); }
 
-# skills-exist: 여섯 스킬 파일이 모두 있다.
+# skills-exist: 스킬 파일이 모두 있다(SKILLS 목록).
 for s in $SKILLS; do
   [ -f "$P/skills/$s/SKILL.md" ] || fail skills-exist "$P/skills/$s/SKILL.md 없음"
 done
 
-# skills-have-guard: 여섯 스킬 모두 옛 방식 레포를 위한 안내문을 담고 있다.
+# skills-have-guard: 모든 스킬이 옛 방식 레포를 위한 안내문을 담고 있다.
 for s in $SKILLS; do
   [ -f "$P/skills/$s/SKILL.md" ] || continue
   grep -qF -e "$GUARD" "$P/skills/$s/SKILL.md" || fail skills-have-guard "$s 에 안내문 없음"
@@ -216,7 +216,9 @@ for want in '중재자가 시작한 작업 세션' \
 done
 grep -qF 'gh pr merge' "$W" 2>/dev/null && fail worker-skill "작업 세션 스킬에 gh pr merge 가 있음(머지는 중재자가 한다)"
 # worker-scope: 적용 범위(중재자가 시작한 작업 세션만)가 스킬 앞부분에 있다.
-head -n 12 "$W" 2>/dev/null | grep -qF '중재자가 시작한 작업 세션' || fail worker-scope "스킬 앞부분에 적용 범위가 없음"
+body=$(awk 'NR==1 && /^---$/{fm=1; next} fm && /^---$/{fm=0; next} !fm' "$W" 2>/dev/null | head -n 8)
+printf '%s\n' "$body" | grep -qF '중재자가 시작한 작업 세션」이라고 적힌 세션만' || fail worker-scope "본문 앞부분에 적용 범위가 없음"
+printf '%s\n' "$body" | grep -qF 'STATUS를 직접 고친다' || fail worker-scope "그 밖의 세션은 STATUS를 직접 고친다는 문장이 본문 앞부분에 없음"
 # worker-brief: 지시문 템플릿에 스테이지마다 다른 자리와 스킬을 다시 읽으라는 문장이 있다.
 WB="$P/templates/worker-brief-template.md"
 for want in '{ID}' '{스테이지 이름}' '{줄기}' '{중재자 세션 id}' '{읽을 문서}' '{이어받기}' \
@@ -263,13 +265,63 @@ has skills-mediator-links "$S0" '/waypoint:mediator'
 has skills-mediator-links "$S0" '`waypoint:worker`의 「첫 턴」'
 
 # core-rules-mediator: 중재자와 작업 세션이 compact 뒤에도 자기 스킬을 다시 읽게 하는 한 줄(설계 5.15절).
-has core-rules-mediator "$CR" '중재자 세션은 `waypoint:mediator`를, 중재자가 시작한 작업 세션은 `waypoint:worker`를 따르고 compact 뒤에도 다시 읽는다. 작업 세션은 STATUS와 DECISIONS를 고치지 않는다'
+has core-rules-mediator "$CR" '중재자 세션은 `waypoint:mediator`를, 중재자가 시작한 작업 세션은 `waypoint:worker`를 따르고 compact 뒤에도 다시 읽는다. 중재자가 시작한 작업 세션은 STATUS와 DECISIONS를 고치지 않는다'
 # block-cap: CLAUDE.md 블록에 검토 대기 상한 줄(설계 5.3절).
 has block-cap "$B" '- 검토 대기 상한: 3'
 
 # git-worker-status: 「스테이지 브랜치와 PR」의 STATUS 변경을 작업 세션은 보고로 대신한다(설계 5.10절 흐름 점검).
 awk '/^### 스테이지 브랜치와 PR/{f=1; next} /^### /{f=0} f' "$G" | grep -qF '`waypoint:worker`의 「보고」' \
   || fail git-worker-status "스테이지 브랜치와 PR 절에 작업 세션은 보고로 대신한다는 문장이 없음"
+
+# flow-branches: 독립 리뷰에서 빠졌던 흐름의 갈래(설계 스테이지, 중간 PR, 머지 보류, 이어받기, 커밋 전 확인, 늦은 턴 끝 보고).
+gsec() { awk -v h="$2" '$0 == h {f=1; next} /^##/ {f=0} f' "$1"; }
+gsec "$G" '### 머지 준비' | grep -qF '머지를 미룬 승인' || fail flow-branches "git 머지 준비에 머지를 미룬 승인의 처리가 없음"
+gsec "$G" '### 머지 준비' | grep -qF '설계 스테이지' || fail flow-branches "git 머지 준비에 설계 스테이지가 없음"
+gsec "$G" '### 중재자의 머지' | grep -qF '머지 준비 보고가 와도 머지하지 않는다' || fail flow-branches "git 중재자의 머지에 머지 보류(HUMAN_APPROVED) 줄을 머지하지 않는다는 문장이 없음"
+gsec "$G" '### 중재자의 머지' | grep -qF '중간 PR' || fail flow-branches "git 중재자의 머지에 중간 PR이 없음"
+gsec "$M" '## 검토 요청' | grep -qF '설계 스테이지' || fail flow-branches "mediator 검토 요청에 설계 스테이지가 없음"
+gsec "$M" '## 보고 처리' | grep -qF '앞선 상태로 되돌리지 않는다' || fail flow-branches "mediator 보고 처리에 늦은 턴 끝 보고 보호가 없음"
+gsec "$M" '## 보고 처리' | grep -qF '「머지 준비」' || fail flow-branches "mediator 보고 처리가 worker의 머지 준비 형식을 가리키지 않음"
+gsec "$W" '## 첫 턴' | grep -qF 'git rev-parse --git-common-dir' || fail flow-branches "worker 첫 턴에 커밋 전 작업 위치 확인이 없음"
+gsec "$W" '## 첫 턴' | grep -qF 'git push origin HEAD:<기존 브랜치>' || fail flow-branches "worker 첫 턴에 기존 PR 이어받기 방법이 없음"
+gsec "$W" '## 보고' | grep -qF '중간 PR' || fail flow-branches "worker 보고 형식에 중간 PR 표시가 없음"
+for f in "$P/templates/stage-template.md" "$P/templates/review-stage-template.md"; do
+  grep -qF '/ 다음: <다음 할 일>' "$f" || fail flow-branches "$f 진행 기록 안내가 옛 형식"
+done
+# 조건은 「중재자를 쓰는 동안」이 아니라 지시문 기준이다(설계 5.14절).
+for f in "$ST" "$P/skills/decisions/SKILL.md" "$S0" "$G"; do
+  grep -nE '중재자[^「」]*쓰는 동안|중재자가 있으면' "$f" | grep -v '### 중재자를 쓰는 동안' | grep -vF '「중재자를 쓰는 동안」' | grep -q . \
+    && fail flow-scope "$f 에 지시문 기준이 아닌 조건(중재자를 쓰는 동안/있으면)이 남아 있음"
+done
+# git 6번이 살아 있는 작업 세션의 worktree를 지우라고 하지 않는다.
+gsec "$G" '### 스테이지 브랜치와 PR' | grep '^6\.' | grep -qF '보관' || fail flow-branches "git 6번에 작업 세션 보관 때 worktree가 정리된다는 말이 없음"
+# xref: 스킬 본문의 「`waypoint:X`의 「Y」」가 스킬 X의 절(## Y, ### Y로 시작)이나 굵은 표시(**Y)로 있다.
+xref_out=$(python3 - "$P/skills" <<'PY'
+import os, re, sys
+root = sys.argv[1]
+skills = {d: open(os.path.join(root, d, "SKILL.md"), encoding="utf-8").read()
+          for d in os.listdir(root) if os.path.isfile(os.path.join(root, d, "SKILL.md"))}
+def has_target(text, y):
+    for line in text.splitlines():
+        l = line.lstrip("- ")
+        if re.match(r"#{2,4} " + re.escape(y), l) or l.startswith("**" + y):
+            return True
+    return False
+pat = re.compile(r"`waypoint:([a-z-]+)`의 「([^」]+)」")
+bad = []
+# 검사기 자체 확인: 없는 절을 가리키면 잡아야 한다.
+if has_target("## 보고\n", "없는 절"):
+    bad.append("SELFTEST: 없는 절을 통과시킴")
+for name, text in skills.items():
+    for x, y in pat.findall(text):
+        if x not in skills:
+            bad.append(f"{name}: 없는 스킬 waypoint:{x}")
+        elif not has_target(skills[x], y):
+            bad.append(f"{name}: waypoint:{x}의 「{y}」 절이 없음")
+print("\n".join(bad))
+PY
+)
+[ -z "$xref_out" ] || fail xref "$xref_out"
 
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'

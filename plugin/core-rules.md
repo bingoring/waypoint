@@ -7,7 +7,7 @@
 - 비가역 게이트(`⚠️` 표시)에서는 추가 체크리스트 항목을 반드시 확인한다 (자세히: `waypoint:stage`)
 - 코드를 산출하는 Construction phase 이후, Operations 진입 전 **독립 코드 리뷰 게이트**(`🔍`)를 통과해야 한다 (자세히: `waypoint:review-gate`)
 - 스테이지 상태의 원본은 메인 체크아웃 `docs/waypoint/STATUS.md`의 표 한 곳이다. 상태가 바뀌면 그 줄을 고친다 (자세히: `waypoint:stage`)
-- 중재자 세션은 `waypoint:mediator`를, 중재자가 시작한 작업 세션은 `waypoint:worker`를 따르고 compact 뒤에도 다시 읽는다. 작업 세션은 STATUS와 DECISIONS를 고치지 않는다 (자세히: `waypoint:mediator`, `waypoint:worker`)
+- 중재자 세션은 `waypoint:mediator`를, 중재자가 시작한 작업 세션은 `waypoint:worker`를 따르고 compact 뒤에도 다시 읽는다. 중재자가 시작한 작업 세션은 STATUS와 DECISIONS를 고치지 않는다 (자세히: `waypoint:mediator`, `waypoint:worker`)
 - 중요한 결정이 내려지면 메인 체크아웃의 `docs/waypoint/DECISIONS.md`에 항목을 추가한다 (자세히: `waypoint:decisions`)
 - 사람이 채팅으로 게이트에 답하면 AI는 `AI Proposal`을 고쳐 쓰지 않고 검토 게이트 아래 **`승인 결과`** 에 기록한다 (자세히: `waypoint:stage`)
 - 버전·가격·스토어 정책 같은 **외부 사실**은 조회일·출처 URL·확인 수준을 함께 적는다 (자세히: `waypoint:stage`)
