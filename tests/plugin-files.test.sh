@@ -91,6 +91,24 @@ else
   fail commit-msg-rejects "$H 없음 또는 실행 권한 없음"
 fi
 
+# hook-block-match: pre-commit 훅의 검사 블록이 status-check.sh의 블록과 글자 그대로 같다.
+# 훅은 각 레포의 .githooks/에 사본으로 들어가므로, 블록을 고치면 훅도 같이 고치고 둘째 줄의 버전을 올린다.
+PC="$P/githooks/pre-commit"
+SC="$P/scripts/status-check.sh"
+block() { sed -n '/^# >>> waypoint status-check >>>$/,/^# <<< waypoint status-check <<<$/p' "$1"; }
+if [ -x "$PC" ] && [ -f "$SC" ]; then
+  b1=$(block "$SC"); b2=$(block "$PC")
+  [ -n "$b1" ] || fail hook-block-match "$SC 에 검사 블록이 없음"
+  [ "$b1" = "$b2" ] || fail hook-block-match "$PC 의 검사 블록이 $SC 와 다름"
+  second=$(sed -n 2p "$PC")
+  case $second in
+    '# waypoint-hook-version: '[0-9]*) ;;
+    *) fail hook-block-match "$PC 둘째 줄이 버전 줄이 아님: $second" ;;
+  esac
+else
+  fail hook-block-match "$PC(실행 권한) 또는 $SC 없음"
+fi
+
 # init-skill: init 스킬이 있고 블록과 설정 템플릿을 쓴다.
 I="$P/skills/init/SKILL.md"
 if [ -f "$I" ]; then
