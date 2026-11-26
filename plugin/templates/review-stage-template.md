@@ -1,8 +1,7 @@
 ---
+id: R-1
 phase: 0R-review
 stage: 01-independent-review
-status: PENDING
-updated: YYYY-MM-DD
 ---
 
 # [Stage R-1] Independent Code Review 🔍
@@ -51,10 +50,31 @@ updated: YYYY-MM-DD
 
 ## 검토 게이트 (Human Gate)
 
+> 오너가 아래 항목을 확인하고 답하면, AI가 아래 「승인 결과」에 기록하고 메인 체크아웃 STATUS의 R-1 줄을 고친다(`waypoint:stage`).
+
 - [ ] 채택/반박 판정에 동의하는가?
 - [ ] 수정된 결함(특히 CRITICAL/HIGH)이 적절히 해결되었는가?
 - [ ] Operations 진입을 승인하는가?
 
+### 승인 결과
+
+> AI가 기록한다. 사람의 답이 AI 기본안과 다르면 어느 절을 대체하는지 명시한다(`waypoint:stage`).
+> 코드를 만드는 스테이지는 계획 승인과 결과 승인을 따로 적는다. 설계 스테이지는 계획 승인만 쓴다.
+
+#### 계획 승인 (YYYY-MM-DD, 결정자)
+
+| # | 답변 |
+|---|------|
+
+#### 결과 승인 (YYYY-MM-DD, 결정자)
+
+| # | 답변 |
+|---|------|
+
 ## 다음 단계
 
-승인 후 → `STATUS.md` 의 R-1 을 `HUMAN_APPROVED` 로 → Operations phase.
+결과가 승인되면 Operations phase로 넘어간다. STATUS를 고치는 방법은 `waypoint:stage`의 「STATUS 표」를 따른다.
+
+## 진행 기록
+
+> 묶음, 차수, 중간 PR 머지 같은 하위 진행을 `- YYYY-MM-DD 내용` 형식으로 한 줄씩 아래쪽에 덧붙인다. 이 절은 이 스테이지의 작업 브랜치에서 커밋한다.

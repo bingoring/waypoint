@@ -1,8 +1,7 @@
 ---
+id: X-Y
 phase: XX-phase-name
 stage: XX-stage-name
-status: PENDING
-updated: YYYY-MM-DD
 ---
 
 # [Stage X-Y] 스테이지 이름
@@ -36,19 +35,31 @@ updated: YYYY-MM-DD
 
 ## 검토 게이트 (Human Gate)
 
-> 아래 항목을 확인 후 frontmatter의 status를 `HUMAN_APPROVED`로 변경하세요.
+> 오너가 아래 항목을 확인하고 답하면, AI가 아래 「승인 결과」에 기록하고 메인 체크아웃 STATUS의 이 스테이지 줄을 고친다(`waypoint:stage`).
 
 - [ ] AI 제안이 PRD 요구사항과 일치하는가?
 - [ ] 다음 스테이지 진행에 필요한 결정이 모두 내려졌는가?
 - [ ] 산출물이 명확하게 정의되었는가?
 
-### 승인 결과 (YYYY-MM-DD, 결정자)
+### 승인 결과
 
 > AI가 기록한다. 사람의 답이 AI 기본안과 다르면 어느 절을 대체하는지 명시한다(`waypoint:stage`).
+> 코드를 만드는 스테이지는 계획 승인과 결과 승인을 따로 적는다. 설계 스테이지는 계획 승인만 쓴다.
+
+#### 계획 승인 (YYYY-MM-DD, 결정자)
+
+| # | 답변 |
+|---|------|
+
+#### 결과 승인 (YYYY-MM-DD, 결정자)
 
 | # | 답변 |
 |---|------|
 
 ## 다음 단계
 
-승인 후 → `STATUS.md`의 이 스테이지 상태를 `HUMAN_APPROVED`로 업데이트 → `XX-next-stage.md`로 이동
+계획이 승인되면 다음 스테이지(`XX-next-stage.md`)를 시작할 수 있다. STATUS를 고치는 방법은 `waypoint:stage`의 「STATUS 표」를 따른다.
+
+## 진행 기록
+
+> 묶음, 차수, 중간 PR 머지 같은 하위 진행을 `- YYYY-MM-DD 내용` 형식으로 한 줄씩 아래쪽에 덧붙인다. 이 절은 이 스테이지의 작업 브랜치에서 커밋한다.

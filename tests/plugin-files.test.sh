@@ -147,6 +147,29 @@ has init-precheck "$I" '이미 있으면 멈추고'
 # block-outside-repo: CLAUDE.md 블록이 「레포 밖에서 시작한 세션」 가능성을 함께 안내한다.
 has block-outside-repo "$B" '레포 밖에서 시작'
 
+# status-template-valid: 새 STATUS 템플릿이 형식 검사(검사 1~10)를 통과한다.
+W=$(mktemp -d)
+sed 's/{Project Name}/x/' "$P/templates/STATUS.template.md" > "$W/STATUS.md"
+: > "$W/ids"
+out=$(sh "$SC" "$W/STATUS.md" "$W/ids" 2>&1) || fail status-template-valid "$out"
+rm -rf "$W"
+
+# stage-templates: 스테이지 문서 템플릿은 상태를 들고 있지 않고(id: 만), 승인 결과를 계획·결과로 나누고, 진행 기록을 둔다.
+for f in "$P/templates/stage-template.md" "$P/templates/review-stage-template.md"; do
+  case $(sed -n 2p "$f") in
+    'id: '*) ;;
+    *) fail stage-templates "$f: frontmatter 첫 키가 id: 가 아님" ;;
+  esac
+  grep -qE '^(status|updated):' "$f" && fail stage-templates "$f: status:/updated: 가 남아 있음"
+  grep -qF 'HUMAN_APPROVED' "$f" && fail stage-templates "$f: HUMAN_APPROVED 로 바꾸라는 안내가 남아 있음"
+  has stage-templates "$f" '## 진행 기록'
+  has stage-templates "$f" '#### 계획 승인 (YYYY-MM-DD, 결정자)'
+  has stage-templates "$f" '#### 결과 승인 (YYYY-MM-DD, 결정자)'
+done
+
+# block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
+has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
+
 if [ "$fails" -gt 0 ]; then
   echo "$fails failed"
   exit 1
