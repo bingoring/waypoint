@@ -102,6 +102,38 @@ FAKE_GH_FAIL="project link" sh "$SETUP" repo "$R" https://github.com/users/test/
 grep -qF -- '- 보드: https://github.com/users/test/projects/2' "$R/CLAUDE.md" || fail repo-link-fail "보드 줄이 없음"
 grep -qF 'gh project link 2 --owner test --repo test/repo' "$T/out" || fail repo-link-fail "직접 연결 명령 안내 없음: $(cat "$T/out")"
 
+# repo-reuse: 같은 제목의 Project가 이미 있으면(앞선 실행이 복사한 뒤 멈춘 경우) 다시 복사하지 않고 그것을 쓴다.
+mk; board_seed_project
+echo '[{"number":5,"title":"repo 보드","url":"https://github.com/users/test/projects/5","id":"PVT_5"}]' > "$FAKE_GH_DIR/projects.json"
+sh "$SETUP" repo "$R" https://github.com/users/test/projects/9 "$H" > "$T/out" 2>&1; rc=$?
+[ "$rc" = 0 ] || fail repo-reuse "exit $rc: $(cat "$T/out")"
+[ "$(board_calls '^project copy')" = 0 ] || fail repo-reuse "또 복사함"
+[ "$(sed -n '/검토 대기 상한/{n;p;}' "$R/CLAUDE.md")" = "- 보드: https://github.com/users/test/projects/5" ] || fail repo-reuse "$(cat "$R/CLAUDE.md")"
+[ "$(board_calls '^project link 5 ')" = 1 ] || fail repo-reuse "연결하지 않음"
+rm -f "$FAKE_GH_DIR/projects.json"
+
+# repo-hook-fail: 훅 사본을 넣지 못하면 CLAUDE.md에 보드 줄을 쓰지 않는다(다시 실행할 수 있게).
+mk; board_seed_project
+: > "$R/.githooks"
+sh "$SETUP" repo "$R" https://github.com/users/test/projects/9 "$H" > "$T/out" 2>&1; rc=$?
+[ "$rc" != 0 ] || fail repo-hook-fail "멈추지 않음"
+grep -qF -- '- 보드:' "$R/CLAUDE.md" && fail repo-hook-fail "보드 줄을 씀"
+
+# repo-ssh-alias: ssh 설정의 별칭 호스트(git@github.com-work:…)도 GitHub 레포로 읽는다.
+mk; board_seed_project
+g remote set-url origin git@github.com-work:test/repo.git
+sh "$SETUP" repo "$R" https://github.com/users/test/projects/9 "$H" > "$T/out" 2>&1; rc=$?
+[ "$rc" = 0 ] || fail repo-ssh-alias "exit $rc: $(cat "$T/out")"
+[ "$(board_calls '^project link 2 --owner test --repo test/repo')" = 1 ] || fail repo-ssh-alias "$(cat "$FAKE_GH_LOG")"
+
+# repo-real-block: 실제 CLAUDE.md 블록 템플릿으로 적용하면 board-sync가 주소를 정확히 하나, 경고 없이 읽는다.
+mk; board_seed_project
+{ printf '# repo\n\n'; cat "$ROOT/plugin/templates/claude-md-block.md"; } > "$R/CLAUDE.md"
+sh "$SETUP" repo "$R" https://github.com/users/test/projects/9 "$H" > "$T/out" 2>&1 || fail repo-real-block "$(cat "$T/out")"
+urls=$(WP_BOARD_SYNC_LIB=1; . "$ROOT/plugin/scripts/board-sync.sh"; wp_board_urls "$R/CLAUDE.md" 2> "$T/err")
+[ "$urls" = "https://github.com/users/test/projects/2" ] || fail repo-real-block "주소: $urls"
+[ -s "$T/err" ] && fail repo-real-block "경고: $(cat "$T/err")"
+
 # repo-foreign-hook: waypoint가 아닌 pre-push가 있으면 멈춘다.
 mk; board_seed_project
 mkdir -p "$R/.githooks"; printf '#!/bin/sh\necho 내 훅\n' > "$R/.githooks/pre-push"

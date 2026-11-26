@@ -108,11 +108,11 @@ CLAUDE.md waypoint 블록에 `- 보드: <Project 주소>` 줄이 있는 레포�
 - **언제 도는가:** `.githooks/pre-push`가 기본 브랜치로 가는 push에서 `docs/waypoint/STATUS.md`가 바뀌었으면 `.githooks/board-sync.sh`를 백그라운드로 띄운다. push는 동기화를 기다리지 않고, 동기화가 실패해도 막히지 않는다.
 - **결과:** 메인 체크아웃의 `.git/waypoint/board-sync.status` 첫 줄이 `ok <시각>`이거나 `fail <시각> <단계>: <이유>`다. 자세한 기록은 같은 폴더의 `board-sync.log`에 있다.
 - **실패가 드러나는 곳:** 다음 push 출력의 `waypoint: 직전 보드 동기화 실패` 줄과 세션 시작 요약의 `경고: 보드 동기화 실패` 줄.
-- **직접 실행:** 메인 체크아웃에서 `sh .githooks/board-sync.sh`. 인자가 없으면 기본 브랜치 끝 커밋의 STATUS로 맞춘다. 매번 전체를 맞추므로 밀린 변경도 함께 반영된다.
+- **직접 실행:** 메인 체크아웃에서 `sh .githooks/board-sync.sh`. 기본 브랜치 끝 커밋의 STATUS로 맞추고 결과(성공 또는 실패)를 한 줄로 알린다. 다른 동기화가 돌고 있으면 끝나기를 기다렸다가 실행한다. 매번 전체를 맞추므로 밀린 변경도 함께 반영된다.
 - **단계별 원인:**
   - `tools`: PATH에 `gh`나 `jq`가 없다.
   - `check`: 커밋의 STATUS가 형식 검사를 통과하지 못했다. 메시지대로 STATUS를 고쳐 커밋하고 push한다.
-  - `board`: Project를 읽지 못했거나 origin이 GitHub 레포가 아니다. `gh auth status`로 토큰에 `project` 권한이 있는지 본다. 권한이 없으면 오너가 `gh auth refresh -s project`를 실행해야 한다. 「보드:」 줄의 주소도 확인한다.
+  - `board`: Project를 읽지 못했거나, 「보드:」 줄의 주소 형식이 틀렸거나, origin이 GitHub 레포가 아니다. `gh auth status`로 토큰에 `project` 권한이 있는지 본다. 권한이 없으면 오너가 `gh auth refresh -s project`를 실행해야 한다. 「보드:」 줄의 주소도 확인한다.
   - `fields`: Project에 필요한 필드나 선택지가 없다. 템플릿에서 복사한 Project인지 본다.
   - `issue`, `items`, `field-edit`: 이슈 만들기, 카드 넣기, 필드 고치기 중 하나가 실패했다. `board-sync.log`의 마지막 줄을 보고, 대개는 다시 실행하면 된다.
   - `lock`: 앞선 동기화가 10분 넘게 끝나지 않았다. `.git/waypoint/board-sync.lock/pid`의 프로세스가 없으면 그 폴더를 지우고 다시 실행한다.

@@ -7,8 +7,9 @@
 #     API로 할 수 없는 설정 세 가지는 끝에 출력한다. 오너가 GitHub 화면에서 하거나, 오너가 허락하면 AI가 앱의 브라우저로 한다.
 #
 #   sh board-setup.sh repo <레포 경로> <템플릿 주소> [<훅 사본 폴더>]
-#     템플릿을 「<레포 이름> 보드」로 복사하고(비공개), CLAUDE.md waypoint 블록의 「검토 대기 상한」 줄 아래에
-#     「- 보드: <주소>」 줄을 넣고, .githooks/에 pre-push와 board-sync.sh 사본을 넣은 뒤 Project를 레포에 연결한다.
+#     템플릿을 「<레포 이름> 보드」로 복사하고(비공개, 같은 제목의 Project가 이미 있으면 그것을 쓴다), .githooks/에
+#     pre-push와 board-sync.sh 사본을 넣고, CLAUDE.md waypoint 블록의 「검토 대기 상한」 줄 아래에 보드 줄을 넣은 뒤
+#     Project를 레포에 연결한다. 중간에 멈추면 같은 명령을 다시 실행하면 된다.
 #     커밋은 하지 않는다. 세션이 바뀐 파일을 waypoint:git대로 메인 체크아웃의 기본 브랜치에 커밋한다.
 #     훅 사본 폴더를 빼면 이 스크립트가 있는 폴더에서 board-sync.sh와 pre-push를 찾는다(플러그인 안에서는 ../githooks/pre-push).
 #
@@ -132,9 +133,9 @@ GitHub 화면에서 할 일 세 가지(API로 설정할 수 없다. 복사본에
 EOF
 }
 
-# bs_repo_name <origin 주소>: owner/repo를 출력한다(https, git@, ssh:// 모양).
+# bs_repo_name <origin 주소>: owner/repo를 출력한다(https, git@, ssh:// 모양. ssh 설정의 별칭 호스트 github…도 받는다).
 bs_repo_name() {
-  printf '%s\n' "$1" | sed -E -e 's#^(https://|ssh://git@|git@)github\.com[:/]##' -e 's#\.git$##' -e 's#/$##' |
+  printf '%s\n' "$1" | sed -E -e 's#^https://github\.com/##' -e 's#^ssh://git@github[^/]*/##' -e 's#^git@github[^:]*:##' -e 's#\.git$##' -e 's#/$##' |
     grep -E '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$'
 }
 
@@ -173,23 +174,31 @@ bs_repo() {
   done
   bs_tools
 
-  # 1. 복사(비공개)
-  gh project copy "$_tnum" --source-owner "$_towner" --target-owner "$_owner" --title "$_name 보드" --format json > "$BS_TMP/copy.json" ||
-    bs_die "템플릿을 복사하지 못했다. 주소($_tpl)와 gh 토큰의 project 권한을 확인한다"
+  # 1. 복사(비공개). 같은 제목의 Project가 이미 있으면(앞선 실행이 복사한 뒤 멈춤) 다시 만들지 않고 그것을 쓴다.
+  gh project list --owner "$_owner" --format json --limit 200 > "$BS_TMP/list.json" ||
+    bs_die "Project 목록을 읽지 못했다. gh 토큰의 project 권한을 확인한다"
+  jq -c --arg t "$_name 보드" '[.projects[] | select(.title == $t)] | .[0] // empty' "$BS_TMP/list.json" > "$BS_TMP/copy.json"
+  if [ -s "$BS_TMP/copy.json" ]; then
+    echo "이미 있는 Project를 쓴다: $(jq -r .url "$BS_TMP/copy.json")"
+  else
+    gh project copy "$_tnum" --source-owner "$_towner" --target-owner "$_owner" --title "$_name 보드" --format json > "$BS_TMP/copy.json" ||
+      bs_die "템플릿을 복사하지 못했다. 주소($_tpl)와 gh 토큰의 project 권한을 확인한다"
+  fi
   _url=$(jq -r '.url // ""' "$BS_TMP/copy.json")
   _num=$(jq -r '.number // ""' "$BS_TMP/copy.json")
   _url=${_url%/}
   [ -n "$_url" ] && [ -n "$_num" ] || bs_die "복사본의 주소를 알 수 없다: $(cat "$BS_TMP/copy.json")"
   echo "복사함: $_url"
 
-  # 2. CLAUDE.md: 「검토 대기 상한」 줄 바로 아래(waypoint 블록의 끝)에 보드 줄
-  awk -v line="- 보드: $_url" '{ print } /^- 검토 대기 상한:/ && !done { print line; done = 1 }' "$_md" > "$BS_TMP/md" &&
-    cat "$BS_TMP/md" > "$_md" || bs_die "CLAUDE.md를 고치지 못했다. 복사본($_url)은 남아 있다"
-
-  # 3. 훅 사본
-  mkdir -p "$_top/.githooks" &&
+  # 2. 훅 사본. 실패하면 CLAUDE.md를 고치지 않고 멈춘다(같은 명령으로 다시 실행할 수 있다).
+  { mkdir -p "$_top/.githooks" &&
     cp "$_pp" "$_top/.githooks/pre-push" && cp "$_bs" "$_top/.githooks/board-sync.sh" &&
-    chmod +x "$_top/.githooks/pre-push" "$_top/.githooks/board-sync.sh" || bs_die "훅 사본을 넣지 못했다"
+    chmod +x "$_top/.githooks/pre-push" "$_top/.githooks/board-sync.sh"; } 2> "$BS_TMP/cp.err" ||
+    bs_die "훅 사본을 넣지 못했다($(head -n 1 "$BS_TMP/cp.err")). 고친 뒤 같은 명령을 다시 실행한다. Project($_url)는 그대로 다시 쓴다"
+
+  # 3. CLAUDE.md: 「검토 대기 상한」 줄 바로 아래(waypoint 블록의 끝)에 보드 줄
+  awk -v line="- 보드: $_url" '{ print } /^- 검토 대기 상한:/ && !done { print line; done = 1 }' "$_md" > "$BS_TMP/md" &&
+    cat "$BS_TMP/md" > "$_md" || bs_die "CLAUDE.md를 고치지 못했다. 고친 뒤 같은 명령을 다시 실행한다"
 
   _changed="바뀐 파일(커밋하지 않았다): CLAUDE.md, .githooks/pre-push, .githooks/board-sync.sh"
   # 4. 레포에 연결. 실패해도 위의 일은 남기고 직접 연결하는 명령을 알린다.
