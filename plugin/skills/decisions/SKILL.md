@@ -15,4 +15,8 @@ description: waypoint 프로젝트에서 중요한 결정이 내려져 DECISIONS
 - STATUS.md에서 링크한다. 스테이지 문서(*무엇을/결과*)·git 커밋과 상호보완하는 **감사 추적**이다.
 - 템플릿: `${CLAUDE_PLUGIN_ROOT}/templates/decisions-template.md`.
 
+### 중재자를 쓰는 동안
+
+중재자 세션(`waypoint:mediator`)을 쓰는 동안에는 DECISIONS를 중재자만 쓴다. 게이트 답처럼 작업 세션이 근거와 탈락한 대안을 알고 있는 결정은, 작업 세션이 위 형식으로 항목 초안을 써서 중재자에게 보내고(`waypoint:worker`의 「결정 기록」), 중재자가 그대로 붙인다. 중재자가 스테이지 문서를 읽어 항목을 새로 쓰지 않는다.
+
 > 템플릿 파일은 Read 도구로 읽어 Write 도구로 프로젝트에 복사한다. Bash 명령 안에서는 `${CLAUDE_PLUGIN_ROOT}`를 쓰지 않는다(환경변수로 노출되지 않는다).

@@ -7,6 +7,8 @@ description: waypoint 프로젝트에서 세션을 시작하거나 다음 작업
 
 ## 세션 시작 프로토콜
 
+지시문에 「중재자가 시작한 작업 세션」이라고 적힌 세션은 이 절차 대신 `waypoint:worker`의 「첫 턴」을 따른다.
+
 AI가 새 세션을 시작할 때 반드시 아래 순서를 따른다:
 
 1. 세션 시작 때 주입된 `<waypoint>` 블록의 요약(「현황(<레포>)」 줄, 활성 줄, 오너 할 일)을 확인한다. STATUS 전체가 필요할 때만 메인 체크아웃의 `docs/waypoint/STATUS.md`를 읽는다. 요약 앞에 경고가 있으면 먼저 오너에게 알린다.
@@ -17,3 +19,5 @@ AI가 새 세션을 시작할 때 반드시 아래 순서를 따른다:
 6. 스테이지를 이어 가거나 시작할 때는 해당 스테이지 문서를 열고 `Inputs` 섹션에 명시된 파일을 모두 읽는다.
 
 스테이지 문서(`AI Proposal` 포함)를 쓰기 전에 `waypoint:stage`를 호출한다. 로직·화면·알고리즘·콘텐츠를 산출하는 스테이지면 `waypoint:build-spec`을, Construction에서 Operations로 넘어가는 리뷰 게이트면 `waypoint:review-gate`를 먼저 호출한다. 결정이 내려지면 `waypoint:decisions`를, 커밋할 때는 `waypoint:git`을 따른다.
+
+**중재자:** 데스크톱 앱에서는 `/waypoint:mediator`로 레포의 중재자 세션을 둘 수 있다. 중재자가 있으면 위 2번(머지 정리)은 중재자가 맡는다(`waypoint:mediator`).

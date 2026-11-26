@@ -251,6 +251,17 @@ for want in '## 검토 요약' '/ 다음:' '가정:' '중재자 답:' 'gh pr edi
   has stage-mediator "$ST" "$want"
 done
 
+# skills-mediator-links: decisions·review-gate·git·start가 중재자 흐름의 자기 몫을 담는다(설계 5.15절).
+has skills-mediator-links "$P/skills/decisions/SKILL.md" '### 중재자를 쓰는 동안'
+has skills-mediator-links "$P/skills/decisions/SKILL.md" '중재자가 그대로 붙인다'
+has skills-mediator-links "$P/skills/review-gate/SKILL.md" '## 코드 스테이지의 리뷰어 서브에이전트'
+has skills-mediator-links "$P/skills/review-gate/SKILL.md" '별도 세션을 열지 않는다'
+for want in '### 머지 준비' '### 중재자의 머지' '작업 세션은 쓰지 않는다' '머지 지시를 겸한다'; do
+  has skills-mediator-links "$G" "$want"
+done
+has skills-mediator-links "$S0" '/waypoint:mediator'
+has skills-mediator-links "$S0" '`waypoint:worker`의 「첫 턴」'
+
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
 
