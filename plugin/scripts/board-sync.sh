@@ -215,9 +215,233 @@ wp_board_urls() {
     done
 }
 
-wp_main() {
-  echo "board-sync: 아직 구현하지 않음" >&2
+# Project를 읽는 GraphQL. OWNERKIND는 user 또는 organization으로 바꾼다.
+# 카드는 gh project item-list가 아니라 이 질의로 읽는다(item-list JSON은 한글 필드 이름의 키를 깨뜨린다).
+WP_GQL_PROJECT='query($owner: String!, $number: Int!, $after: String) {
+  OWNERKIND(login: $owner) {
+    projectV2(number: $number) {
+      id
+      fields(first: 50) { nodes { __typename ... on ProjectV2FieldCommon { id name dataType } ... on ProjectV2SingleSelectField { options { id name color description } } } }
+      items(first: 100, after: $after) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          id
+          isArchived
+          content { __typename ... on Issue { number title state url } }
+          fieldValues(first: 30) { nodes { __typename
+            ... on ProjectV2ItemFieldTextValue { text field { ... on ProjectV2FieldCommon { name } } }
+            ... on ProjectV2ItemFieldSingleSelectValue { name optionId field { ... on ProjectV2FieldCommon { name } } } } }
+        }
+      }
+    }
+  }
+}'
+
+# 읽은 Project에서 카드 목록: [{item, number, title, state, url, v:{필드 이름: 값}}] (ID 값이 있는 이슈 카드만)
+WP_JQ_CARDS='.data[$k].projectV2.items.nodes
+  | map(select(.content.__typename == "Issue"))
+  | map({item: .id, number: .content.number, title: .content.title, state: .content.state, url: .content.url,
+         v: ([.fieldValues.nodes[] | select(.field.name != null) | {key: .field.name, value: (.text // .name)}] | from_entries)})
+  | map(select((.v.ID // "") != ""))'
+
+WP_BODY='이 이슈는 waypoint STATUS에서 만들어졌다. 상태는 STATUS가 정하고, 이 본문은 작업 세션이 세부 진행을 적는 곳이다.
+
+## 체크리스트
+
+## 최근 진행
+'
+
+wp_now() { date +%Y-%m-%dT%H:%M:%S%z; }
+wp_log() { printf '%s %s\n' "$(wp_now)" "$*" >> "$WP_DIR/board-sync.log"; }
+# wp_fail <단계> <이유>: 상태 파일에 실패를 적는다. 호출한 쪽이 return 1 한다.
+wp_fail() {
+  printf 'fail %s %s: %s\n' "$(wp_now)" "$1" "$2" > "$WP_DIR/board-sync.status"
+  wp_log "실패 $1: $2"
+  echo "waypoint 보드 동기화 실패($1): $2" >&2
+}
+
+wp_default_branch() {
+  _d=$(git symbolic-ref -q --short refs/remotes/origin/HEAD) && { printf '%s\n' "${_d#origin/}"; return 0; }
+  for _b in main master; do
+    git show-ref -q --verify "refs/heads/$_b" && { printf '%s\n' "$_b"; return 0; }
+  done
   return 1
+}
+
+# origin 원격 주소에서 owner/repo
+wp_repo() {
+  _u=$(git remote get-url origin 2>/dev/null) || return 1
+  _u=${_u%.git}
+  case $_u in
+    https://github.com/*) printf '%s\n' "${_u#https://github.com/}" ;;
+    git@github.com:*) printf '%s\n' "${_u#git@github.com:}" ;;
+    ssh://git@github.com/*) printf '%s\n' "${_u#ssh://git@github.com/}" ;;
+    *) return 1 ;;
+  esac
+}
+
+# wp_read_project <user|organization> <소유자> <번호> <출력 파일>: 모든 페이지를 읽어 하나로 합친다.
+wp_read_project() {
+  _q=$(printf '%s' "$WP_GQL_PROJECT" | sed "s/OWNERKIND/$1/")
+  _after=; _i=0
+  while :; do
+    _i=$((_i + 1))
+    if [ -z "$_after" ]; then
+      gh api graphql -F owner="$2" -F number="$3" -f query="$_q" > "$WP_TMP/page$_i.json" || return 1
+    else
+      gh api graphql -F owner="$2" -F number="$3" -f after="$_after" -f query="$_q" > "$WP_TMP/page$_i.json" || return 1
+    fi
+    jq -e --arg k "$1" '.data[$k].projectV2.id' "$WP_TMP/page$_i.json" > /dev/null 2>&1 || return 1
+    if [ "$(jq -r --arg k "$1" '.data[$k].projectV2.items.pageInfo.hasNextPage' "$WP_TMP/page$_i.json")" = true ]; then
+      _after=$(jq -r --arg k "$1" '.data[$k].projectV2.items.pageInfo.endCursor' "$WP_TMP/page$_i.json")
+    else
+      break
+    fi
+  done
+  _j=1
+  while [ "$_j" -le "$_i" ]; do cat "$WP_TMP/page$_j.json"; _j=$((_j + 1)); done |
+    jq -s --arg k "$1" '.[0].data[$k].projectV2.items.nodes = [.[].data[$k].projectV2.items.nodes[]] | .[0]' > "$4" || return 1
+  rm -f "$WP_TMP"/page*.json
+}
+
+# wp_sync_project <주소>: 한 Project의 카드와 이슈를 STATUS에 맞춘다.
+wp_sync_project() {
+  _url=$1
+  _path=${_url#https://github.com/}
+  case $_path in users/*) _kind=user ;; *) _kind=organization ;; esac
+  _rest=${_path#*/}; _owner=${_rest%%/*}; _num=${_rest##*/}
+  _pj="$WP_TMP/project.json"
+  wp_read_project "$_kind" "$_owner" "$_num" "$_pj" || { wp_fail board "Project를 읽지 못함($_url). gh 토큰의 project 권한과 주소를 확인한다"; return 1; }
+  _pid=$(jq -r --arg k "$_kind" '.data[$k].projectV2.id' "$_pj")
+
+  # 필드와 선택지
+  jq --arg k "$_kind" '[.data[$k].projectV2.fields.nodes[] | select(.name != null) | {key: .name, value: .}] | from_entries' "$_pj" > "$WP_TMP/fields.json"
+  for _f in Status 줄기 지금 기다림 단계 ID; do
+    jq -e --arg f "$_f" 'has($f)' "$WP_TMP/fields.json" > /dev/null || { wp_fail fields "Project에 「$_f」 필드가 없다($_url). board-setup.sh로 만든 템플릿에서 복사한 Project인지 확인한다"; return 1; }
+  done
+  _miss=$(jq -r --slurpfile d "$WP_TMP/desired.json" '
+    ([.Status.options[].name]) as $s | ([.["단계"].options[].name]) as $p
+    | [$d[0][] | (select(.status as $x | $s | index($x) | not) | "Status=" + .status), (select(.phase as $x | $p | index($x) | not) | "단계=" + .phase)] | unique | join(", ")' "$WP_TMP/fields.json")
+  [ -z "$_miss" ] || { wp_fail fields "Project에 없는 선택지: $_miss($_url)"; return 1; }
+
+  # 줄기: 처음 보는 값은 선택지를 더한다. 기존 선택지의 id를 함께 넘겨야 카드의 값이 지워지지 않는다.
+  _new=$(jq -r --slurpfile d "$WP_TMP/desired.json" '([.["줄기"].options[].name]) as $o | [$d[0][] | .stem | select(. != "") | select(. as $x | $o | index($x) | not)] | unique | length' "$WP_TMP/fields.json")
+  if [ "$_new" != 0 ]; then
+    jq --slurpfile d "$WP_TMP/desired.json" '.["줄기"] as $f | ([$f.options[].name]) as $o
+      | {query: "mutation($f: ID!, $o: [ProjectV2SingleSelectFieldOptionInput!]) { updateProjectV2Field(input: {fieldId: $f, singleSelectOptions: $o}) { projectV2Field { ... on ProjectV2SingleSelectField { options { id name color description } } } } }",
+         variables: {f: $f.id, o: ([$f.options[] | {id, name, color, description: (.description // "")}]
+           + ([$d[0][] | .stem | select(. != "") | select(. as $x | $o | index($x) | not)] | unique | map({name: ., color: "GRAY", description: ""})))}}' \
+      "$WP_TMP/fields.json" > "$WP_TMP/stem.json"
+    gh api graphql --input "$WP_TMP/stem.json" > "$WP_TMP/stem-out.json" || { wp_fail fields "줄기 선택지를 더하지 못함($_url)"; return 1; }
+    jq --slurpfile o "$WP_TMP/stem-out.json" '.["줄기"].options = $o[0].data.updateProjectV2Field.projectV2Field.options' "$WP_TMP/fields.json" > "$WP_TMP/f2" && mv "$WP_TMP/f2" "$WP_TMP/fields.json"
+    wp_log "줄기 선택지 추가: $(jq -r '[.["줄기"].options[].name] | join(", ")' "$WP_TMP/fields.json")"
+  fi
+  _fid_id=$(jq -r '.ID.id' "$WP_TMP/fields.json")
+
+  # 가: 카드가 없는 줄(MERGED 제외) → 이슈를 찾거나 만들고 카드에 넣는다.
+  jq -c --arg k "$_kind" "$WP_JQ_CARDS" "$_pj" > "$WP_TMP/cards.json"
+  jq -r --slurpfile c "$WP_TMP/cards.json" '.[] | select(.open) | select(.id as $i | $c[0] | map(.v.ID) | index($i) | not) | .id' "$WP_TMP/desired.json" |
+    while IFS= read -r _id; do
+      _title=$(jq -r --arg i "$_id" '.[] | select(.id == $i) | .title' "$WP_TMP/desired.json")
+      _iurl=$(jq -r --arg i "$_id" '[.[] | select(.title | startswith("[" + $i + "] ") or . == ("[" + $i + "]"))] | sort_by(.number) | .[0].url // ""' "$WP_TMP/issues.json")
+      if [ -z "$_iurl" ]; then
+        printf '%s' "$WP_BODY" > "$WP_TMP/body.md"
+        _iurl=$(gh issue create -R "$WP_REPO" --title "$_title" --label waypoint --body-file "$WP_TMP/body.md") || { wp_fail issue "이슈를 만들지 못함($_id)"; exit 1; }
+        _inum=${_iurl##*/}
+        jq --argjson n "$_inum" --arg t "$_title" --arg u "$_iurl" '. + [{number: $n, title: $t, state: "OPEN", url: $u}]' "$WP_TMP/issues.json" > "$WP_TMP/i2" && mv "$WP_TMP/i2" "$WP_TMP/issues.json"
+        wp_log "이슈 만듦 $_id $_iurl"
+      fi
+      _item=$(gh project item-add "$_num" --owner "$_owner" --url "$_iurl" --format json | jq -r .id) && [ -n "$_item" ] && [ "$_item" != null ] ||
+        { wp_fail items "카드에 넣지 못함($_id, $_url)"; exit 1; }
+      gh project item-edit --project-id "$_pid" --id "$_item" --field-id "$_fid_id" --text "$_id" > /dev/null ||
+        { wp_fail field-edit "ID를 적지 못함($_id)"; exit 1; }
+      wp_log "카드 넣음 $_id ($_url)"
+    done || return 1
+  # 카드를 넣었으면 다시 읽는다
+  if [ "$(jq -r --slurpfile c "$WP_TMP/cards.json" '[.[] | select(.open) | select(.id as $i | $c[0] | map(.v.ID) | index($i) | not)] | length' "$WP_TMP/desired.json")" != 0 ]; then
+    wp_read_project "$_kind" "$_owner" "$_num" "$_pj" || { wp_fail board "Project를 다시 읽지 못함($_url)"; return 1; }
+    jq -c --arg k "$_kind" "$WP_JQ_CARDS" "$_pj" > "$WP_TMP/cards.json"
+  fi
+
+  # 나: 카드가 있는 줄 → 다른 것만 고친다. 고칠 호출을 gh 인자(@sh)로 만든다.
+  jq -r --slurpfile c "$WP_TMP/cards.json" --slurpfile f "$WP_TMP/fields.json" --arg repo "$WP_REPO" --arg pid "$_pid" '
+    $f[0] as $f
+    | def opt($fname; $v): ([$f[$fname].options[] | select(.name == $v) | .id] | .[0]);
+      def edit($card; $fname; $want):
+        ($card.v[$fname] // "") as $cur
+        | if $cur == $want then empty
+          elif $want == "" then ["project", "item-edit", "--project-id", $pid, "--id", $card.item, "--field-id", $f[$fname].id, "--clear"]
+          elif $f[$fname].dataType == "SINGLE_SELECT" then ["project", "item-edit", "--project-id", $pid, "--id", $card.item, "--field-id", $f[$fname].id, "--single-select-option-id", opt($fname; $want)]
+          else ["project", "item-edit", "--project-id", $pid, "--id", $card.item, "--field-id", $f[$fname].id, "--text", $want] end;
+    .[] as $d
+    | ($c[0] | map(select(.v.ID == $d.id)) | .[0]) as $card
+    | select($card != null)
+    | (if $card.title != $d.title then ["issue", "edit", ($card.number|tostring), "-R", $repo, "--title", $d.title] else empty end),
+      (if $d.open and $card.state == "CLOSED" then ["issue", "reopen", ($card.number|tostring), "-R", $repo] else empty end),
+      (if ($d.open | not) and $card.state == "OPEN" then ["issue", "close", ($card.number|tostring), "-R", $repo] else empty end),
+      edit($card; "Status"; $d.status), edit($card; "줄기"; $d.stem), edit($card; "지금"; $d.now),
+      edit($card; "기다림"; $d.wait), edit($card; "단계"; $d.phase)
+    | @sh' "$WP_TMP/desired.json" > "$WP_TMP/actions.txt" || { wp_fail field-edit "고칠 목록을 만들지 못함($_url)"; return 1; }
+  while IFS= read -r _a; do
+    eval "set -- $_a"
+    gh "$@" > /dev/null || { wp_fail field-edit "gh $1 $2 실패($_url)"; return 1; }
+  done < "$WP_TMP/actions.txt"
+  wp_log "고침 $(wc -l < "$WP_TMP/actions.txt" | tr -d ' ')건 ($_url)"
+
+  # STATUS에 없는 ID의 카드는 지우지 않고 경고만 남긴다
+  jq -r --slurpfile d "$WP_TMP/desired.json" '.[] | select(.v.ID as $i | $d[0] | map(.id) | index($i) | not) | "\(.v.ID) #\(.number)"' "$WP_TMP/cards.json" |
+    while IFS= read -r _w; do wp_log "경고: STATUS에 없는 카드 $_w ($_url)"; done
+  return 0
+}
+
+wp_main() {
+  _commit=
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --commit) _commit=$2; shift 2 ;;
+      *) echo "사용: board-sync.sh [--commit <sha>]" >&2; return 2 ;;
+    esac
+  done
+  _top=$(git rev-parse --show-toplevel) || return 1
+  cd "$_top" || return 1
+  if [ -z "$_commit" ]; then
+    _def=$(wp_default_branch) || { echo "waypoint 보드 동기화: 기본 브랜치를 찾지 못함" >&2; return 1; }
+    _commit=$(git rev-parse -q --verify "refs/heads/$_def^{commit}") || return 1
+  fi
+  WP_TMP=$(mktemp -d) || return 1
+  trap 'rm -rf "$WP_TMP"' EXIT
+  git show "$_commit:CLAUDE.md" > "$WP_TMP/CLAUDE.md" 2>/dev/null || : > "$WP_TMP/CLAUDE.md"
+  _urls=$(wp_board_urls "$WP_TMP/CLAUDE.md")
+  # 보드를 쓰지 않는 레포: 아무것도 남기지 않고 끝낸다(실패가 아니다).
+  [ -n "$_urls" ] || return 0
+
+  WP_DIR="$(git rev-parse --path-format=absolute --git-common-dir)/waypoint"
+  mkdir -p "$WP_DIR" || return 1
+  wp_log "시작 commit=$_commit"
+  for _t in gh jq; do
+    command -v "$_t" > /dev/null 2>&1 || { wp_fail tools "PATH에서 $_t를 찾지 못함(PATH=$PATH)"; return 1; }
+  done
+  git show "$_commit:docs/waypoint/STATUS.md" > "$WP_TMP/STATUS.md" 2>/dev/null || { wp_fail check "커밋 $_commit에 docs/waypoint/STATUS.md가 없다"; return 1; }
+  wp_status_check "$WP_TMP/STATUS.md" 2> "$WP_TMP/check.err" || { wp_fail check "STATUS 형식 검사 실패: $(head -n 1 "$WP_TMP/check.err")"; return 1; }
+  WP_REPO=$(wp_repo) || { wp_fail board "origin 원격에서 GitHub 레포를 알아내지 못함"; return 1; }
+  wp_desired_cards "$WP_TMP/STATUS.md" | jq -s . > "$WP_TMP/desired.json" || { wp_fail check "STATUS를 해석하지 못함"; return 1; }
+
+  gh issue list -R "$WP_REPO" --label waypoint --state all --limit 1000 --json number,title,state,url > "$WP_TMP/issues.json" 2> "$WP_TMP/gh.err" ||
+    { wp_fail issue "이슈 목록을 읽지 못함: $(head -n 1 "$WP_TMP/gh.err")"; return 1; }
+  if ! gh label list -R "$WP_REPO" --json name --limit 200 | jq -e 'map(.name) | index("waypoint")' > /dev/null 2>&1; then
+    gh label create waypoint -R "$WP_REPO" --color 5319E7 --description "waypoint 스테이지 이슈(STATUS에서 만들어짐)" > /dev/null 2>&1 ||
+      { wp_fail issue "waypoint 라벨을 만들지 못함"; return 1; }
+  fi
+
+  for _u in $_urls; do
+    wp_sync_project "$_u" || return 1
+  done
+  printf 'ok %s\n' "$(wp_now)" > "$WP_DIR/board-sync.status"
+  wp_log "성공"
+  if [ "$(wc -l < "$WP_DIR/board-sync.log")" -gt 500 ]; then
+    tail -n 500 "$WP_DIR/board-sync.log" > "$WP_DIR/board-sync.log.t" && mv "$WP_DIR/board-sync.log.t" "$WP_DIR/board-sync.log"
+  fi
+  return 0
 }
 
 [ -n "${WP_BOARD_SYNC_LIB:-}" ] || { wp_main "$@"; exit $?; }

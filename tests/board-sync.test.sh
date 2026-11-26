@@ -15,7 +15,10 @@ export PATH="$ROOT/tests/fake-gh:$PATH"
 . "$ROOT/tests/board-lib.sh"
 
 # ---- Task 3: STATUS에서 원하는 카드 계산 ----
-WP_BOARD_SYNC_LIB=1 . "$BS"
+# 함수만 읽는다. 특수 내장 명령(.) 앞의 변수 지정은 셸에 남아 자식에게 넘어가므로 읽은 뒤 지운다.
+WP_BOARD_SYNC_LIB=1
+. "$BS"
+unset WP_BOARD_SYNC_LIB
 
 cat > "$T/STATUS.md" <<'EOF'
 # t — waypoint 현황
@@ -72,6 +75,151 @@ printf -- '- 보드: https://example.com/x https://github.com/users/test/project
 out=$(wp_board_urls "$T/c3.md" 2> "$T/err")
 [ "$out" = "https://github.com/users/test/projects/1" ] || fail urls-bad "$out"
 grep -qF 'example.com' "$T/err" || fail urls-bad-warn "경고 없음"
+
+# ---- Task 4: Project와 이슈 맞추기 ----
+
+# parity: 실제 GitHub 응답(픽스처)을 board-sync의 카드 해석으로 읽을 수 있다.
+jq -c --arg k user "$WP_JQ_CARDS" "$ROOT/tests/fixtures/board/project-graphql.json" > "$T/real-cards.json"
+[ "$(jq -r '.[0].v.ID' "$T/real-cards.json")" = 2-1 ] || fail parity "ID: $(cat "$T/real-cards.json")"
+[ "$(jq -r '.[0].v["줄기"]' "$T/real-cards.json")" = 앱 ] || fail parity "줄기: $(cat "$T/real-cards.json")"
+[ "$(jq -r '.[0].number' "$T/real-cards.json")" = 1 ] || fail parity "이슈 번호"
+
+R="$T/repo"
+g() { git -C "$R" -c user.name=t -c user.email=t@example.com -c core.hooksPath=/dev/null "$@"; }
+# mkrepo <CLAUDE.md의 보드 줄(없으면 빈 문자열)> <STATUS 표 본문 줄>... [-- <오너 할 일>...]
+mkrepo() {
+  rm -rf "$R"; git init -q -b main "$R"; g remote add origin https://github.com/test/repo.git
+  if [ -n "$1" ]; then printf '# r\n\n## Waypoint\n\n%s\n' "$1" > "$R/CLAUDE.md"; else printf '# r\n' > "$R/CLAUDE.md"; fi
+  shift
+  mkdir -p "$R/docs/waypoint"
+  {
+    printf '# r — waypoint 현황\n\n## 스테이지\n\n| ID | 스테이지 | 상태 | 줄기 | 지금 | 기다림 | 링크 |\n|---|---|---|---|---|---|---|\n'
+    while [ "$#" -gt 0 ] && [ "$1" != -- ]; do printf '%s\n' "$1"; shift; done
+    if [ "$1" = -- ]; then shift; printf '\n## 오너 할 일\n\n'; for o in "$@"; do printf -- '- [ ] %s\n' "$o"; done; fi
+  } > "$R/docs/waypoint/STATUS.md"
+  g add -A; g commit -q -m init
+}
+BOARD="- 보드: $FAKE_URL"
+ROW_21='| 2-1 | 구현 | IN_PROGRESS | 앱 | 구현: 시험 | | [#1](https://github.com/test/repo/pull/1) |'
+run_sync() { (cd "$R" && sh "$BS" "$@") > "$T/out" 2>&1; }
+status_line() { cat "$R/.git/waypoint/board-sync.status" 2>/dev/null; }
+card_val() { board_card "$1" | jq -r --arg k "$2" '.values[$k] // ""'; }
+# 모든 필드 값이 맞는 2-1 카드(이슈 1)를 만든다
+seed_21() {
+  board_add_issue 1 "[2-1] 구현" "${1:-OPEN}"
+  board_add_item PVTI_1 1 '{"ID":"2-1","Status":"s2","줄기":"t1","지금":"구현: 시험","단계":"p2"}'
+}
+
+# create-new: 카드도 이슈도 없는 진행 중 줄 → 이슈를 만들고 카드에 넣고 필드를 채운다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+run_sync
+case $(status_line) in ok*) ;; *) fail create-new "상태: $(status_line) / $(cat "$T/out")" ;; esac
+[ "$(board_calls '^issue create')" = 1 ] || fail create-new "issue create $(board_calls '^issue create')번"
+[ "$(board_calls '^label create waypoint')" = 1 ] || fail create-new "라벨을 만들지 않음"
+for kv in "Status=진행 중" "줄기=앱" "지금=구현: 시험" "단계=2" "ID=2-1"; do
+  [ "$(card_val 2-1 "${kv%%=*}")" = "${kv#*=}" ] || fail create-new "${kv%%=*}: $(board_card 2-1)"
+done
+jq -r '.[0].body' "$FAKE_GH_DIR/issues.json" | grep -qF '## 최근 진행' || fail create-new "본문 틀 없음"
+
+# find-before-create: 이슈는 있는데 카드가 없음 → 이슈를 새로 만들지 않고 카드만 넣는다.
+board_seed_project; board_add_issue 5 "[2-1] 구현" OPEN; mkrepo "$BOARD" "$ROW_21"
+run_sync
+[ "$(board_calls '^issue create')" = 0 ] || fail find-before-create "이슈를 또 만듦"
+[ "$(board_card 2-1 | jq -r .issue)" = 5 ] || fail find-before-create "$(board_card 2-1)"
+
+# merged-no-card: 카드 없는 MERGED 줄은 아무것도 만들지 않는다.
+board_seed_project; mkrepo "$BOARD" '| 1-1 | 설계 | MERGED | | | | [문서](a.md) |'
+run_sync
+[ "$(board_calls '^(issue create|project item-add)')" = 0 ] || fail merged-no-card "$(cat "$FAKE_GH_LOG")"
+
+# diff-only: 「지금」만 다르면 item-edit 한 번.
+board_seed_project; seed_21; mkrepo "$BOARD" '| 2-1 | 구현 | IN_PROGRESS | 앱 | 구현: 바뀜 | | [#1](https://github.com/test/repo/pull/1) |'
+run_sync
+[ "$(board_calls '^project item-edit')" = 1 ] || fail diff-only "item-edit $(board_calls '^project item-edit')번: $(grep item-edit "$FAKE_GH_LOG")"
+[ "$(card_val 2-1 지금)" = "구현: 바뀜" ] || fail diff-only "$(board_card 2-1)"
+[ "$(board_calls '^(issue edit|issue close|issue reopen)')" = 0 ] || fail diff-only "이슈를 고침"
+
+# no-change: 모두 같으면 쓰는 호출이 없다.
+board_seed_project; seed_21; mkrepo "$BOARD" "$ROW_21"
+run_sync
+[ "$(board_calls '^(project item-edit|issue edit|issue close|issue reopen|issue create|project item-add)')" = 0 ] || fail no-change "$(cat "$FAKE_GH_LOG")"
+
+# close-merged: MERGED가 되면 이슈를 닫고 Status를 머지됨으로.
+board_seed_project; seed_21; mkrepo "$BOARD" '| 2-1 | 구현 | MERGED | 앱 | | | [문서](a.md) |'
+run_sync
+[ "$(board_card 2-1 | jq -r .state)" = CLOSED ] || fail close-merged "$(board_card 2-1)"
+[ "$(card_val 2-1 Status)" = 머지됨 ] || fail close-merged "$(board_card 2-1)"
+[ "$(card_val 2-1 지금)" = "" ] || fail close-merged "지금을 비우지 않음"
+
+# reopen: 손으로 닫힌 이슈인데 MERGED가 아니면 다시 연다.
+board_seed_project; seed_21 CLOSED; mkrepo "$BOARD" "$ROW_21"
+run_sync
+[ "$(board_card 2-1 | jq -r .state)" = OPEN ] || fail reopen "$(board_card 2-1)"
+
+# title-change: 스테이지 이름이 바뀌면 제목만 고친다.
+board_seed_project; seed_21; mkrepo "$BOARD" '| 2-1 | 새 이름 | IN_PROGRESS | 앱 | 구현: 시험 | | [#1](https://github.com/test/repo/pull/1) |'
+run_sync
+[ "$(board_card 2-1 | jq -r .title)" = "[2-1] 새 이름" ] || fail title-change "$(board_card 2-1)"
+
+# unknown-card: STATUS에 없는 ID의 카드는 지우지 않고 경고한다.
+board_seed_project; seed_21; board_add_issue 9 "[9-9] 옛" OPEN; board_add_item PVTI_9 9 '{"ID":"9-9"}'; mkrepo "$BOARD" "$ROW_21"
+run_sync
+grep -qF '9-9' "$R/.git/waypoint/board-sync.log" || fail unknown-card "경고 없음"
+[ "$(board_card 9-9 | jq -r .issue)" = 9 ] || fail unknown-card "카드가 사라짐"
+
+# new-stem: 처음 보는 줄기는 선택지를 더하고, 기존 카드의 줄기 값은 남는다.
+board_seed_project; seed_21; mkrepo "$BOARD" "$ROW_21" '| 3-1 | 배포 | IN_PROGRESS | 출시 | 계획: 시작 | | [#2](https://github.com/test/repo/pull/2) |'
+run_sync
+[ "$(card_val 2-1 줄기)" = 앱 ] || fail new-stem "기존 값이 지워짐: $(board_card 2-1)"
+[ "$(card_val 3-1 줄기)" = 출시 ] || fail new-stem "새 값: $(board_card 3-1)"
+
+# wait-expand: 「기다림」이 오너 할 일이면 그 내용을 적는다.
+board_seed_project; mkrepo "$BOARD" '| 3-1 | 배포 | AI_PROPOSED | 출시 | 결과 검토: 시험 | 오너 할 일 | [#2](https://github.com/test/repo/pull/2) |' -- '키 발급 (막음: 3-1)'
+run_sync
+[ "$(card_val 3-1 기다림)" = "오너 할 일: 키 발급" ] || fail wait-expand "$(board_card 3-1)"
+
+# two-boards: 주소가 둘이어도 이슈는 하나다(가짜 gh는 두 주소에 같은 Project를 돌려준다).
+board_seed_project; mkrepo "- 보드: $FAKE_URL https://github.com/users/test/projects/2" "$ROW_21"
+run_sync
+[ "$(board_calls '^issue create')" = 1 ] || fail two-boards "issue create $(board_calls '^issue create')번"
+[ "$(board_calls 'number=2')" -ge 1 ] || fail two-boards "두 번째 Project를 읽지 않음"
+
+# no-board: 「보드:」 줄이 없으면 gh를 부르지 않고 상태 파일도 만들지 않는다.
+board_seed_project; mkrepo "" "$ROW_21"
+run_sync; rc=$?
+[ "$rc" = 0 ] || fail no-board "exit $rc"
+[ -s "$FAKE_GH_LOG" ] && fail no-board "gh를 부름: $(cat "$FAKE_GH_LOG")"
+[ -e "$R/.git/waypoint" ] && fail no-board "상태 디렉터리를 만듦"
+
+# no-gh: PATH에 gh가 없으면 실패를 기록한다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+(cd "$R" && PATH=/usr/bin:/bin sh "$BS") > "$T/out" 2>&1
+case $(status_line) in "fail "*" tools: "*) ;; *) fail no-gh "상태: $(status_line)" ;; esac
+
+# check-fail: 내용 검사에 실패한 STATUS는 gh를 부르지 않고 실패로 기록한다.
+board_seed_project; mkrepo "$BOARD" '| 2-1 | 구현 | READY | | | | |'
+run_sync
+case $(status_line) in "fail "*" check: "*) ;; *) fail check-fail "상태: $(status_line)" ;; esac
+[ -s "$FAKE_GH_LOG" ] && fail check-fail "gh를 부름"
+
+# gh-error: item-add가 실패하면 실패로 기록하고, 다음 실행은 이슈를 다시 만들지 않는다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+(cd "$R" && FAKE_GH_FAIL="project item-add" sh "$BS") > "$T/out" 2>&1
+case $(status_line) in "fail "*) ;; *) fail gh-error "상태: $(status_line)" ;; esac
+run_sync
+case $(status_line) in ok*) ;; *) fail gh-error-retry "상태: $(status_line) / $(cat "$T/out")" ;; esac
+[ "$(board_calls '^issue create')" = 1 ] || fail gh-error-retry "이슈를 또 만듦"
+
+# body-untouched: 지금까지 어떤 경우에도 이미 있는 이슈의 본문을 고치지 않았다(이번 경우 기록 기준).
+grep -E '^issue edit' "$FAKE_GH_LOG" | grep -qE -- '--body' && fail body-untouched "본문을 고침"
+# commit-arg: --commit 으로 준 커밋의 STATUS를 읽는다(작업 트리가 아니라).
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+first=$(g rev-parse HEAD)
+printf '%s\n' '| 2-2 | 다음 | IN_PROGRESS | | 계획: x | | [#3](https://github.com/test/repo/pull/3) |' >> "$R/docs/waypoint/STATUS.md"
+g commit -qam two
+run_sync --commit "$first"
+[ -z "$(board_card 2-2)" ] || fail commit-arg "주지 않은 커밋의 줄을 반영함"
+[ -n "$(board_card 2-1)" ] || fail commit-arg "준 커밋의 줄을 반영하지 않음"
 
 if [ "$fails" -gt 0 ]; then
   echo "$fails failed"
