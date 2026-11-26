@@ -5,7 +5,7 @@
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT" || exit 1
 P=plugin
-SKILLS="start stage build-spec review-gate decisions git"
+SKILLS="start stage build-spec review-gate decisions git worker"
 GUARD='docs/waypoint/STATUS.md`가 있는 레포에서만 적용한다'
 fails=0
 
@@ -203,6 +203,26 @@ has review-fixes "$I" '메인 체크아웃의 기본 브랜치에서'
 has review-fixes "$G" '`<메인>/.githooks/pre-commit`'
 grep -qF 'HUMAN_APPROVED`로 변경' "$P/templates/gate-template.md" && fail review-fixes "gate-template에 옛 HUMAN_APPROVED 안내가 남아 있음"
 has review-fixes "$ST" 'R-1)의 결과가 승인된 뒤에 시작한다'
+
+# worker-skill: 작업 세션 스킬에 3단계의 보고·질문·머지 준비 형식과 금지 규칙이 있다(설계 5.2·5.4·5.5·5.11절).
+W="$P/skills/worker/SKILL.md"
+for want in '중재자가 시작한 작업 세션' \
+  '[<ID> <상태>] <지금> | 기다림: <기다림> | PR: <링크>' \
+  '[<ID> 머지 준비] <한 줄> | PR: <링크> | 문서: <스테이지 문서 경로>' \
+  '[<ID> 질문] <정해야 할 것> / <선택지와 추천> / <찾아본 문서>' \
+  '오너 직접 결정:' '보내지 말라고 하지만' 'STATUS와 DECISIONS를 고치지 않는다' 'gh pr edit' \
+  '## 첫 턴' '## 보고' '## 질문' '## 머지 준비'; do
+  has worker-skill "$W" "$want"
+done
+grep -qF 'gh pr merge' "$W" 2>/dev/null && fail worker-skill "작업 세션 스킬에 gh pr merge 가 있음(머지는 중재자가 한다)"
+# worker-scope: 적용 범위(중재자가 시작한 작업 세션만)가 스킬 앞부분에 있다.
+head -n 12 "$W" 2>/dev/null | grep -qF '중재자가 시작한 작업 세션' || fail worker-scope "스킬 앞부분에 적용 범위가 없음"
+# worker-brief: 지시문 템플릿에 스테이지마다 다른 자리와 스킬을 다시 읽으라는 문장이 있다.
+WB="$P/templates/worker-brief-template.md"
+for want in '{ID}' '{스테이지 이름}' '{줄기}' '{중재자 세션 id}' '{읽을 문서}' '{이어받기}' \
+  '`waypoint:worker` 스킬을 먼저 읽고' 'compact된 뒤에도 다시 읽는다'; do
+  has worker-brief "$WB" "$want"
+done
 
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
