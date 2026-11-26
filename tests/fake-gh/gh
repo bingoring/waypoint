@@ -1,0 +1,126 @@
+#!/bin/sh
+# 보드 동기화 테스트용 가짜 gh. 진짜 GitHub에 접속하지 않는다.
+# 상태는 $FAKE_GH_DIR 의 JSON 파일(tests/board-lib.sh 참조), 호출 기록은 $FAKE_GH_LOG.
+# $FAKE_GH_FAIL 에 "<명령> <하위 명령>"(예: "project item-add")을 넣으면 그 호출은 실패한다.
+# 지원하는 모양은 board-sync.sh·board-setup.sh가 쓰는 것뿐이다.
+
+D=${FAKE_GH_DIR:?}
+printf '%s\n' "$*" >> "${FAKE_GH_LOG:-/dev/null}"
+case " ${FAKE_GH_FAIL:-} " in
+  *" $1 $2 "*) echo "fake gh: 실패 주입($1 $2)" >&2; exit 1 ;;
+esac
+
+P="$D/project.json" I="$D/items.json" IS="$D/issues.json" L="$D/labels.json" W="$D/workflows.json"
+upd() { f=$1; shift; jq "$@" "$f" > "$f.t" && mv "$f.t" "$f"; }
+# opt <이름> <값> ...: --이름 값 형태의 인자에서 값을 꺼낸다
+arg() { want=$1; shift; while [ $# -gt 0 ]; do [ "$1" = "$want" ] && { printf '%s' "$2"; return 0; }; shift; done; return 1; }
+has() { want=$1; shift; for a; do [ "$a" = "$want" ] && return 0; done; return 1; }
+
+read_project() {
+  jq -n --slurpfile p "$P" --slurpfile it "$I" --slurpfile is "$IS" --slurpfile w "$W" --arg kind "$1" --arg wf "$2" '
+    $p[0] as $p | $is[0] as $is
+    | ($p.fields | map({key:.id, value:.}) | from_entries) as $byid
+    | ($p.fields | map({key:.name, value:.}) | from_entries) as $byname
+    | {data:{($kind):{projectV2:{
+        id:$p.id, title:$p.title, number:$p.number,
+        fields:{nodes:[$p.fields[] | {__typename:(if .dataType=="SINGLE_SELECT" then "ProjectV2SingleSelectField" else "ProjectV2Field" end), id, name, dataType} + (if .options then {options} else {} end)]},
+        items:{pageInfo:{hasNextPage:false, endCursor:null}, nodes:[$it[0][] | . as $item
+          | ($is | map(select(.number == $item.issue)) | .[0]) as $iss
+          | {id, isArchived,
+             content:{__typename:"Issue", id:("I_"+($iss.number|tostring)), number:$iss.number, title:$iss.title, state:$iss.state, url:$iss.url,
+                      repository:{nameWithOwner:"test/repo"}, labels:{nodes:[$iss.labels[] | {name:.}]}},
+             fieldValues:{nodes:([{__typename:"ProjectV2ItemFieldTextValue", text:$iss.title, field:{name:"Title"}}]
+               + [$item.values | to_entries[] | . as $e | $byname[$e.key] as $f
+                  | if $f.dataType == "SINGLE_SELECT" then
+                      (($f.options | map(select(.id == $e.value)) | .[0]) as $o
+                       | if $o then {__typename:"ProjectV2ItemFieldSingleSelectValue", name:$o.name, optionId:$o.id, field:{name:$f.name}} else empty end)
+                    else {__typename:"ProjectV2ItemFieldTextValue", text:$e.value, field:{name:$f.name}} end])}}]}}}}}
+    | if $wf == "1" then .data[$kind].projectV2.workflows = {nodes:$w[0]} else . end'
+}
+
+case "$1 $2" in
+  "api graphql")
+    if f=$(arg --input "$@"); then
+      body=$(cat "$f")
+      q=$(printf '%s' "$body" | jq -r .query)
+      case $q in
+        *updateProjectV2Field*)
+          fid=$(printf '%s' "$body" | jq -r .variables.f)
+          printf '%s' "$body" | jq -c '.variables.o' > "$D/newopts.json"
+          upd "$P" --arg fid "$fid" --slurpfile no "$D/newopts.json" '
+            ([.fields[] | select(.id == $fid) | (.options // [])[] | .id]) as $oldids
+            | .fields |= map(if .id == $fid then .options = [ $no[0] | to_entries[] | .key as $k | .value | (.id // "") as $i
+                | if ($i != "" and ($oldids | index($i)) != null) then . else . + {id:("n" + ($k|tostring) + "x" + (now|floor|tostring))} end ] else . end)'
+          # 없어진 선택지 id를 쓰던 값은 지워진다(GitHub이 그렇게 한다)
+          upd "$I" --slurpfile p "$P" '
+            ($p[0].fields | map(select(.dataType=="SINGLE_SELECT")) | map({key:.name, value:[.options[].id]}) | from_entries) as $ids
+            | map(.values |= with_entries(. as $e | select(($ids[$e.key] == null) or (($ids[$e.key] | index($e.value)) != null))))'
+          jq -n --slurpfile p "$P" --arg fid "$fid" '{data:{updateProjectV2Field:{projectV2Field:($p[0].fields[] | select(.id == $fid) | {options})}}}'
+          ;;
+        *deleteProjectV2Workflow*)
+          wid=$(printf '%s' "$body" | jq -r .variables.w)
+          upd "$W" --arg w "$wid" 'map(select(.id != $w))'
+          echo '{"data":{"deleteProjectV2Workflow":{"deletedWorkflowId":"'"$wid"'"}}}'
+          ;;
+        *createProjectV2View*|*updateProjectV2View*)
+          printf '%s' "$body" | jq -c '{data:{view:{name:.variables.name, layout:.variables.layout}}}'
+          ;;
+        *) echo "fake gh: 모르는 graphql mutation" >&2; exit 1 ;;
+      esac
+    else
+      q=
+      for a; do
+        case $a in
+          query=*) q=${a#query=} ;;
+        esac
+      done
+      wf=0
+      case $q in *"workflows("*) wf=1 ;; esac
+      case $q in
+        *"organization(login"*) read_project organization "$wf" ;;
+        *) read_project user "$wf" ;;
+      esac
+    fi
+    ;;
+  "issue list")
+    jq -c '[.[] | {number, title, state, url}]' "$IS"
+    ;;
+  "issue create")
+    t=$(arg --title "$@"); lb=$(arg --label "$@"); bf=$(arg --body-file "$@")
+    n=$(jq '(map(.number) | max // 0) + 1' "$IS")
+    upd "$IS" --argjson n "$n" --arg t "$t" --arg lb "$lb" --rawfile b "$bf" \
+      '. + [{number:$n, title:$t, state:"OPEN", url:("https://github.com/test/repo/issues/"+($n|tostring)), labels:[$lb], body:$b}]'
+    echo "https://github.com/test/repo/issues/$n"
+    ;;
+  "issue edit")
+    t=$(arg --title "$@")
+    upd "$IS" --argjson n "$3" --arg t "$t" 'map(if .number == $n then .title = $t else . end)'
+    ;;
+  "issue close") upd "$IS" --argjson n "$3" 'map(if .number == $n then .state = "CLOSED" else . end)' ;;
+  "issue reopen") upd "$IS" --argjson n "$3" 'map(if .number == $n then .state = "OPEN" else . end)' ;;
+  "label list") jq -c 'map({name:.})' "$L" ;;
+  "label create") upd "$L" --arg n "$3" '. + [$n]' ;;
+  "project item-add")
+    u=$(arg --url "$@")
+    n=${u##*/}
+    id="PVTI_$(jq 'length + 1' "$I")"
+    upd "$I" --arg id "$id" --argjson n "$n" '. + [{id:$id, issue:$n, isArchived:false, values:{}}]'
+    jq -nc --arg id "$id" --arg u "$u" '{id:$id, url:$u, type:"Issue"}'
+    ;;
+  "project item-edit")
+    iid=$(arg --id "$@"); fid=$(arg --field-id "$@")
+    fname=$(jq -r --arg f "$fid" '.fields[] | select(.id == $f) | .name' "$P")
+    [ -n "$fname" ] || { echo "fake gh: 모르는 필드 $fid" >&2; exit 1; }
+    if has --clear "$@"; then
+      upd "$I" --arg i "$iid" --arg k "$fname" 'map(if .id == $i then .values |= del(.[$k]) else . end)'
+    elif v=$(arg --text "$@"); then
+      upd "$I" --arg i "$iid" --arg k "$fname" --arg v "$v" 'map(if .id == $i then .values[$k] = $v else . end)'
+    elif v=$(arg --single-select-option-id "$@"); then
+      upd "$I" --arg i "$iid" --arg k "$fname" --arg v "$v" 'map(if .id == $i then .values[$k] = $v else . end)'
+    fi
+    ;;
+  *)
+    echo "fake gh: 지원하지 않는 호출: $*" >&2
+    exit 1
+    ;;
+esac

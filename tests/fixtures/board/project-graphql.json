@@ -1,0 +1,143 @@
+{
+  "data": {
+    "user": {
+      "projectV2": {
+        "id": "PVT_kwHOAwQlDM4BtSIS",
+        "title": "waypoint 보드 시험",
+        "fields": {
+          "nodes": [
+            {
+              "__typename": "ProjectV2SingleSelectField",
+              "id": "PVTSSF_lAHOAwQlDM4BtSISzhrcU1k",
+              "name": "Status",
+              "dataType": "SINGLE_SELECT",
+              "options": [
+                {
+                  "id": "f75ad846",
+                  "name": "Todo"
+                },
+                {
+                  "id": "47fc9ee4",
+                  "name": "In Progress"
+                },
+                {
+                  "id": "98236657",
+                  "name": "Done"
+                }
+              ]
+            },
+            {
+              "__typename": "ProjectV2SingleSelectField",
+              "id": "PVTSSF_lAHOAwQlDM4BtSISzhrcVIA",
+              "name": "줄기",
+              "dataType": "SINGLE_SELECT",
+              "options": [
+                {
+                  "id": "b60feba7",
+                  "name": "앱"
+                }
+              ]
+            },
+            {
+              "__typename": "ProjectV2Field",
+              "id": "PVTF_lAHOAwQlDM4BtSISzhrcVI8",
+              "name": "지금",
+              "dataType": "TEXT"
+            },
+            {
+              "__typename": "ProjectV2Field",
+              "id": "PVTF_lAHOAwQlDM4BtSISzhrcVKA",
+              "name": "ID",
+              "dataType": "TEXT"
+            }
+          ]
+        },
+        "items": {
+          "pageInfo": {
+            "hasNextPage": false,
+            "endCursor": "Y3Vyc29yOnYyOpKqMDAwMDAwMDAuNc4TATmj"
+          },
+          "nodes": [
+            {
+              "id": "PVTI_lAHOAwQlDM4BtSISzhMBOW0",
+              "isArchived": false,
+              "content": {
+                "__typename": "Issue",
+                "id": "I_kwDOV8j_pc8AAAABiqnutQ",
+                "number": 1,
+                "title": "[2-1] 시험 구현",
+                "state": "OPEN",
+                "url": "https://github.com/bingoring/waypoint-board-test/issues/1",
+                "repository": {
+                  "nameWithOwner": "bingoring/waypoint-board-test"
+                },
+                "labels": {
+                  "nodes": [
+                    {
+                      "name": "waypoint"
+                    }
+                  ]
+                }
+              },
+              "fieldValues": {
+                "nodes": [
+                  {
+                    "__typename": "ProjectV2ItemFieldRepositoryValue"
+                  },
+                  {
+                    "__typename": "ProjectV2ItemFieldLabelValue"
+                  },
+                  {
+                    "__typename": "ProjectV2ItemFieldTextValue",
+                    "text": "[2-1] 시험 구현",
+                    "field": {
+                      "name": "Title"
+                    }
+                  },
+                  {
+                    "__typename": "ProjectV2ItemFieldSingleSelectValue",
+                    "name": "In Progress",
+                    "optionId": "47fc9ee4",
+                    "field": {
+                      "name": "Status"
+                    }
+                  },
+                  {
+                    "__typename": "ProjectV2ItemFieldSingleSelectValue",
+                    "name": "앱",
+                    "optionId": "b60feba7",
+                    "field": {
+                      "name": "줄기"
+                    }
+                  },
+                  {
+                    "__typename": "ProjectV2ItemFieldTextValue",
+                    "text": "구현: 시험 중",
+                    "field": {
+                      "name": "지금"
+                    }
+                  },
+                  {
+                    "__typename": "ProjectV2ItemFieldSingleSelectValue",
+                    "name": "2",
+                    "optionId": "0c956704",
+                    "field": {
+                      "name": "단계"
+                    }
+                  },
+                  {
+                    "__typename": "ProjectV2ItemFieldTextValue",
+                    "text": "2-1",
+                    "field": {
+                      "name": "ID"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
