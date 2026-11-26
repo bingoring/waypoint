@@ -167,6 +167,23 @@ for f in "$P/templates/stage-template.md" "$P/templates/review-stage-template.md
   has stage-templates "$f" '#### 결과 승인 (YYYY-MM-DD, 결정자)'
 done
 
+# stage-states / stage-no-old: stage 스킬에 2단계의 상태 값·STATUS 표·진행 기록 규칙이 있고 옛 갱신 문장이 없다.
+ST="$P/skills/stage/SKILL.md"
+for want in '| `MERGED` | 머지됨 |' '| `DEFERRED` | 보류 |' '| ID | 스테이지 | 상태 | 줄기 | 지금 | 기다림 | 링크 |' \
+  '`계획 검토: `' '`결과 검토: `' '80자' '## STATUS 표' '## 진행 기록' 'docs(status)'; do
+  has stage-states "$ST" "$want"
+done
+grep -qF 'STATUS.md의 테이블을 함께 업데이트' "$ST" && fail stage-no-old "옛 STATUS 갱신 문장이 남아 있음"
+
+# core-rules-new: core-rules의 세 규칙이 2단계 문장으로 바뀌었고 줄 수가 늘지 않았다.
+CR="$P/core-rules.md"
+has core-rules-new "$CR" '앞 스테이지의 계획이 승인되기 전에는'
+has core-rules-new "$CR" '스테이지 상태의 원본은 메인 체크아웃'
+has core-rules-new "$CR" '메인 체크아웃은 기본 브랜치에 둔다'
+grep -qF '`HUMAN_APPROVED` 없이는' "$CR" && fail core-rules-new "옛 HUMAN_APPROVED 규칙이 남아 있음"
+n=$(wc -l < "$CR" | tr -d ' ')
+[ "$n" -le 19 ] || fail core-rules-new "$n 줄 (19 초과)"
+
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
 
