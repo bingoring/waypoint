@@ -173,6 +173,14 @@ run_sync
 [ "$(card_val 2-1 줄기)" = 앱 ] || fail new-stem "기존 값이 지워짐: $(board_card 2-1)"
 [ "$(card_val 3-1 줄기)" = 출시 ] || fail new-stem "새 값: $(board_card 3-1)"
 
+# stem-placeholder: 템플릿 줄기의 자리표시 「(없음)」은 줄기 선택지를 처음 더할 때 지운다. 쓰는 줄이 있으면 남긴다.
+board_seed_project
+jq '.fields |= map(if .name == "줄기" then .options = [{id:"t0", name:"(없음)", color:"GRAY", description:""}] else . end)' "$FAKE_GH_DIR/project.json" > "$T/p" && mv "$T/p" "$FAKE_GH_DIR/project.json"
+mkrepo "$BOARD" "$ROW_21"
+run_sync
+[ "$(jq -r '.fields[] | select(.name == "줄기") | [.options[].name] | join(",")' "$FAKE_GH_DIR/project.json")" = "앱" ] || fail stem-placeholder "$(jq -c '.fields[] | select(.name == "줄기")' "$FAKE_GH_DIR/project.json")"
+[ "$(card_val 2-1 줄기)" = 앱 ] || fail stem-placeholder "$(board_card 2-1)"
+
 # wait-expand: 「기다림」이 오너 할 일이면 그 내용을 적는다.
 board_seed_project; mkrepo "$BOARD" '| 3-1 | 배포 | AI_PROPOSED | 출시 | 결과 검토: 시험 | 오너 할 일 | [#2](https://github.com/test/repo/pull/2) |' -- '키 발급 (막음: 3-1)'
 run_sync

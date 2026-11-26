@@ -10,14 +10,15 @@ case " ${FAKE_GH_FAIL:-} " in
   *" $1 $2 "*) echo "fake gh: 실패 주입($1 $2)" >&2; exit 1 ;;
 esac
 
-P="$D/project.json" I="$D/items.json" IS="$D/issues.json" L="$D/labels.json" W="$D/workflows.json"
+P="$D/project.json" I="$D/items.json" IS="$D/issues.json" L="$D/labels.json" W="$D/workflows.json" V="$D/views.json"
+[ -f "$V" ] || echo '[]' > "$V"
 upd() { f=$1; shift; jq "$@" "$f" > "$f.t" && mv "$f.t" "$f"; }
 # opt <이름> <값> ...: --이름 값 형태의 인자에서 값을 꺼낸다
 arg() { want=$1; shift; while [ $# -gt 0 ]; do [ "$1" = "$want" ] && { printf '%s' "$2"; return 0; }; shift; done; return 1; }
 has() { want=$1; shift; for a; do [ "$a" = "$want" ] && return 0; done; return 1; }
 
 read_project() {
-  jq -n --slurpfile p "$P" --slurpfile it "$I" --slurpfile is "$IS" --slurpfile w "$W" --arg kind "$1" --arg wf "$2" '
+  jq -n --slurpfile p "$P" --slurpfile it "$I" --slurpfile is "$IS" --slurpfile w "$W" --slurpfile v "$V" --arg kind "$1" --arg wf "$2" --arg vw "$3" '
     $p[0] as $p | $is[0] as $is
     | ($p.fields | map({key:.id, value:.}) | from_entries) as $byid
     | ($p.fields | map({key:.name, value:.}) | from_entries) as $byname
@@ -35,7 +36,8 @@ read_project() {
                       (($f.options | map(select(.id == $e.value)) | .[0]) as $o
                        | if $o then {__typename:"ProjectV2ItemFieldSingleSelectValue", name:$o.name, optionId:$o.id, field:{name:$f.name}} else empty end)
                     else {__typename:"ProjectV2ItemFieldTextValue", text:$e.value, field:{name:$f.name}} end])}}]}}}}}
-    | if $wf == "1" then .data[$kind].projectV2.workflows = {nodes:$w[0]} else . end'
+    | if $wf == "1" then .data[$kind].projectV2.workflows = {nodes:$w[0]} else . end
+    | if $vw == "1" then .data[$kind].projectV2.views = {nodes:[$v[0][] | {id, name, layout}]} else . end'
 }
 
 case "$1 $2" in
@@ -62,8 +64,15 @@ case "$1 $2" in
           upd "$W" --arg w "$wid" 'map(select(.id != $w))'
           echo '{"data":{"deleteProjectV2Workflow":{"deletedWorkflowId":"'"$wid"'"}}}'
           ;;
-        *createProjectV2View*|*updateProjectV2View*)
-          printf '%s' "$body" | jq -c '{data:{view:{name:.variables.name, layout:.variables.layout}}}'
+        *createProjectV2View*)
+          printf '%s' "$body" | jq -c '.variables' > "$D/view.json"
+          upd "$V" --slurpfile n "$D/view.json" '. + [{id:("V_" + ((length + 1)|tostring)), name:$n[0].name, layout:$n[0].layout, visible:($n[0].f // [])}]'
+          jq -c '{data:{createProjectV2View:{projectV2View:(.[-1] | {id, name, layout})}}}' "$V"
+          ;;
+        *updateProjectV2View*)
+          printf '%s' "$body" | jq -c '.variables' > "$D/view.json"
+          upd "$V" --slurpfile n "$D/view.json" 'map(if .id == $n[0].v then .name = ($n[0].name // .name) | .visible = ($n[0].f // .visible) else . end)'
+          jq -c --slurpfile n "$D/view.json" '{data:{updateProjectV2View:{projectV2View:(.[] | select(.id == $n[0].v) | {id, name, layout})}}}' "$V"
           ;;
         *) echo "fake gh: 모르는 graphql mutation" >&2; exit 1 ;;
       esac
@@ -74,11 +83,12 @@ case "$1 $2" in
           query=*) q=${a#query=} ;;
         esac
       done
-      wf=0
+      wf=0 vw=0
       case $q in *"workflows("*) wf=1 ;; esac
+      case $q in *"views("*) vw=1 ;; esac
       case $q in
-        *"organization(login"*) read_project organization "$wf" ;;
-        *) read_project user "$wf" ;;
+        *"organization(login"*) read_project organization "$wf" "$vw" ;;
+        *) read_project user "$wf" "$vw" ;;
       esac
     fi
     ;;
@@ -119,6 +129,33 @@ case "$1 $2" in
       upd "$I" --arg i "$iid" --arg k "$fname" --arg v "$v" 'map(if .id == $i then .values[$k] = $v else . end)'
     fi
     ;;
+  "project create")
+    # 새 Project: 기본 필드(Title, Status 세 선택지), 기본 자동화 여섯 개, 표 보기 하나. 이전 상태는 버린다.
+    o=$(arg --owner "$@"); t=$(arg --title "$@")
+    jq -n --arg t "$t" '{id:"PVT_new", title:$t, number:1, fields:[
+      {id:"F_TITLE", name:"Title", dataType:"TITLE"},
+      {id:"F_STATUS", name:"Status", dataType:"SINGLE_SELECT", options:[
+        {id:"o_todo", name:"Todo", color:"GRAY", description:""},
+        {id:"o_prog", name:"In Progress", color:"YELLOW", description:""},
+        {id:"o_done", name:"Done", color:"GREEN", description:""}]}]}' > "$P"
+    echo '[]' > "$I"
+    jq -n '[range(1; 7) | {id:("W_" + tostring), name:("기본 자동화 " + tostring), enabled:true}]' > "$W"
+    echo '[{"id":"V_1","name":"View 1","layout":"TABLE_LAYOUT","visible":[]}]' > "$V"
+    jq -nc --arg o "$o" '{number:1, url:("https://github.com/users/" + $o + "/projects/1"), id:"PVT_new"}'
+    ;;
+  "project field-create")
+    nm=$(arg --name "$@"); ty=$(arg --data-type "$@"); so=$(arg --single-select-options "$@" || true)
+    fid="F_new$(jq '.fields | length' "$P")"
+    upd "$P" --arg id "$fid" --arg n "$nm" --arg ty "$ty" --arg so "$so" \
+      '.fields += [{id:$id, name:$n, dataType:$ty} + (if $ty == "SINGLE_SELECT" then {options:[$so | split(",") | to_entries[] | {id:($id + "_" + (.key|tostring)), name:.value, color:"GRAY", description:""}]} else {} end)]'
+    jq -nc --arg id "$fid" --arg n "$nm" '{id:$id, name:$n}'
+    ;;
+  "project copy")
+    # 복사본은 원본과 같은 필드를 가진다. 가짜 gh는 Project 하나만 두므로 상태는 그대로 두고 새 번호만 돌려준다.
+    o=$(arg --target-owner "$@")
+    jq -nc --arg o "$o" '{number:2, url:("https://github.com/users/" + $o + "/projects/2"), id:"PVT_copy"}'
+    ;;
+  "project link") ;;
   *)
     echo "fake gh: 지원하지 않는 호출: $*" >&2
     exit 1

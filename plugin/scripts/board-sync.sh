@@ -325,11 +325,13 @@ wp_sync_project() {
   [ -z "$_miss" ] || { wp_fail fields "Project에 없는 선택지: $_miss($_url)"; return 1; }
 
   # 줄기: 처음 보는 값은 선택지를 더한다. 기존 선택지의 id를 함께 넘겨야 카드의 값이 지워지지 않는다.
+  # 템플릿의 자리표시 선택지 「(없음)」(board-setup.sh가 만든다. 단일 선택 필드는 선택지가 하나 이상 있어야 한다)은
+  # 이때 함께 지운다. STATUS에 그 값을 쓰는 줄이 있으면 남긴다.
   _new=$(jq -r --slurpfile d "$WP_TMP/desired.json" '([.["줄기"].options[].name]) as $o | [$d[0][] | .stem | select(. != "") | select(. as $x | $o | index($x) | not)] | unique | length' "$WP_TMP/fields.json")
   if [ "$_new" != 0 ]; then
-    jq --slurpfile d "$WP_TMP/desired.json" '.["줄기"] as $f | ([$f.options[].name]) as $o
+    jq --slurpfile d "$WP_TMP/desired.json" '.["줄기"] as $f | ([$f.options[].name]) as $o | ([$d[0][] | .stem]) as $used
       | {query: "mutation($f: ID!, $o: [ProjectV2SingleSelectFieldOptionInput!]) { updateProjectV2Field(input: {fieldId: $f, singleSelectOptions: $o}) { projectV2Field { ... on ProjectV2SingleSelectField { options { id name color description } } } } }",
-         variables: {f: $f.id, o: ([$f.options[] | {id, name, color, description: (.description // "")}]
+         variables: {f: $f.id, o: ([$f.options[] | select(.name != "(없음)" or ($used | index("(없음)"))) | {id, name, color, description: (.description // "")}]
            + ([$d[0][] | .stem | select(. != "") | select(. as $x | $o | index($x) | not)] | unique | map({name: ., color: "GRAY", description: ""})))}}' \
       "$WP_TMP/fields.json" > "$WP_TMP/stem.json"
     gh api graphql --input "$WP_TMP/stem.json" > "$WP_TMP/stem-out.json" || { wp_fail fields "줄기 선택지를 더하지 못함($_url)"; return 1; }

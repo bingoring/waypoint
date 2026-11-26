@@ -120,6 +120,8 @@ for f in "$BSY" "$PP"; do
   esac
 done
 [ -f "$BSY" ] && [ "$(block "$BSY")" = "$(block "$SC")" ] || fail board-sync-files "$BSY 의 검사 블록이 $SC 와 다름"
+# board-setup.sh: 보드 설정 스크립트. 세션이 임시 폴더에 사본을 만들어 sh로 실행하지만, 플러그인 안에서도 바로 실행할 수 있게 둔다.
+[ -x "$P/scripts/board-setup.sh" ] || fail board-setup-file "$P/scripts/board-setup.sh 없음 또는 실행 권한 없음"
 
 # init-skill: init 스킬이 있고 블록과 설정 템플릿을 쓴다.
 I="$P/skills/init/SKILL.md"

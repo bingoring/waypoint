@@ -7,6 +7,7 @@
 #   issues.json   [{"number","title","state":"OPEN|CLOSED","url","labels":[..],"body"}]
 #   labels.json   ["waypoint", ...]
 #   workflows.json [{"id","name","enabled"}]
+#   views.json    [{"id","name","layout","visible":[<필드 id>]}] (없으면 가짜 gh가 빈 목록으로 만든다)
 
 FAKE_REPO=test/repo
 FAKE_URL=https://github.com/users/test/projects/1
@@ -42,6 +43,7 @@ EOF
   echo '[]' > "$FAKE_GH_DIR/issues.json"
   echo '["bug"]' > "$FAKE_GH_DIR/labels.json"
   echo '[]' > "$FAKE_GH_DIR/workflows.json"
+  echo '[]' > "$FAKE_GH_DIR/views.json"
   : > "$FAKE_GH_LOG"
 }
 
