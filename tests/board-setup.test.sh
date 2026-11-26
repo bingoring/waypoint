@@ -36,11 +36,21 @@ jq -e '.[] | select(.name == "보드" and .layout == "BOARD_LAYOUT")' "$FAKE_GH_
 # 기본 표 보기(View 1)는 이름을 「표」로 바꾸고, 새 필드가 보이게 한다.
 jq -e '.[] | select(.name == "표" and .layout == "TABLE_LAYOUT" and (.visible | length) == 6)' "$FAKE_GH_DIR/views.json" > /dev/null || fail template-table-view "$(cat "$FAKE_GH_DIR/views.json")"
 [ "$(jq 'length' "$FAKE_GH_DIR/views.json")" = 2 ] || fail template-views "보기 수: $(cat "$FAKE_GH_DIR/views.json")"
-# 보드 보기에는 지금·기다림만 보인다
-[ "$(jq -r --slurpfile p "$FAKE_GH_DIR/project.json" '.[] | select(.name == "보드") | [.visible[] as $v | $p[0].fields[] | select(.id == $v) | .name] | join(",")' "$FAKE_GH_DIR/views.json")" = "지금,기다림" ] || fail template-board-fields "$(cat "$FAKE_GH_DIR/views.json")"
-for want in 'Swimlanes' 'is:issue is:closed updated:<@today-14d' 'Sync with issue status' 'https://github.com/users/test/projects/1'; do
+# 보드 보기: 보이는 필드는 지금·기다림, 열은 Status, 가로 묶음은 줄기. REST(만들 때만 가로 묶음을 받는다)로 만든다.
+vnames() { jq -r --slurpfile p "$FAKE_GH_DIR/project.json" --arg k "$1" '.[] | select(.name == "보드") | [(.[$k] // [])[] as $v | $p[0].fields[] | select(.id == $v) | .name] | join(",")' "$FAKE_GH_DIR/views.json"; }
+[ "$(vnames visible)" = "지금,기다림" ] || fail template-board-fields "$(cat "$FAKE_GH_DIR/views.json")"
+[ "$(vnames group)" = "줄기" ] || fail template-board-swimlanes "가로 묶음: $(vnames group)"
+[ "$(vnames vertical)" = "Status" ] || fail template-board-columns "열: $(vnames vertical)"
+[ "$(board_calls '^api -X POST -H X-GitHub-Api-Version: 2026-03-10 /users/test/projectsV2/1/views ')" = 1 ] || fail template-board-rest "$(grep '^api' "$FAKE_GH_LOG")"
+for want in 'is:issue is:closed updated:<@today-14d' 'Sync with issue status' 'https://github.com/users/test/projects/1'; do
   grep -qF -e "$want" "$T/out" || fail template-output "출력에 '$want' 없음"
 done
+grep -qF 'Swimlanes' "$T/out" && fail template-output "가로 묶음을 화면 할 일로 안내함(이제 API로 정한다)"
+
+# template-org: 조직 소유자면 REST 경로가 /orgs/ 다.
+board_seed_project
+FAKE_GH_OWNER_KIND=orgs sh "$SETUP" template acme > "$T/out" 2>&1 || fail template-org "$(cat "$T/out")"
+[ "$(board_calls '^api -X POST -H X-GitHub-Api-Version: 2026-03-10 /orgs/acme/projectsV2/1/views ')" = 1 ] || fail template-org "$(grep '^api' "$FAKE_GH_LOG")"
 
 # ---- repo ----
 R="$T/repo"; H="$T/hooks"

@@ -29,7 +29,7 @@ read_project() {
     | ($p.fields | map({key:.name, value:.}) | from_entries) as $byname
     | {data:{($kind):{projectV2:{
         id:$p.id, title:$p.title, number:$p.number,
-        fields:{nodes:[$p.fields[] | {__typename:(if .dataType=="SINGLE_SELECT" then "ProjectV2SingleSelectField" else "ProjectV2Field" end), id, name, dataType} + (if .options then {options} else {} end)]},
+        fields:{nodes:[$p.fields[] | {__typename:(if .dataType=="SINGLE_SELECT" then "ProjectV2SingleSelectField" else "ProjectV2Field" end), id, name, dataType} + (if .options then {options} else {} end) + (if .databaseId then {databaseId} else {} end)]},
         items:{pageInfo:{hasNextPage:(($st + $sz) < ($it[0] | length)), endCursor:(($st + $sz) | tostring)}, nodes:[$it[0][$st:($st + $sz)][] | . as $item
           | ($is | map(select(.number == $item.issue)) | .[0]) as $iss
           | {id, isArchived,
@@ -98,6 +98,25 @@ case "$1 $2" in
       esac
     fi
     ;;
+  "api -X")
+    # REST: 보기 만들기(POST /users|orgs/<소유자>/projectsV2/<번호>/views). 숫자 필드 id(databaseId)를 받는다.
+    m=$3; rp=
+    for a; do case $a in /users/* | /orgs/*) rp=$a ;; esac; done
+    f=$(arg --input "$@")
+    case "$m $rp" in
+      "POST /users/"*"/projectsV2/"*"/views" | "POST /orgs/"*"/projectsV2/"*"/views")
+        jq -c . "$f" > "$D/rview.json"
+        upd "$V" --slurpfile n "$D/rview.json" --slurpfile p "$P" '
+          ($p[0].fields | map(select(.databaseId)) | map({key: (.databaseId | tostring), value: .id}) | from_entries) as $m
+          | $n[0] as $n
+          | . + [{id: ("V_" + ((length + 1) | tostring)), name: $n.name, layout: (($n.layout | ascii_upcase) + "_LAYOUT"),
+                  visible: [($n.visible_fields // [])[] | $m[tostring]], group: [($n.group_by // [])[] | $m[tostring]],
+                  vertical: [($n.vertical_group_by // [])[] | $m[tostring]]}]'
+        jq -c '. + {id: 9001, number: 3}' "$D/rview.json"
+        ;;
+      *) echo "fake gh: 모르는 REST 호출: $*" >&2; exit 1 ;;
+    esac
+    ;;
   "issue list")
     # 이슈마다 "repo"(없으면 test/repo)가 있고, -R 의 레포 것만 돌려준다.
     r=$(arg -R "$@" || echo test/repo)
@@ -143,23 +162,24 @@ case "$1 $2" in
     ;;
   "project create")
     # 새 Project: 기본 필드(Title, Status 세 선택지), 기본 자동화 여섯 개, 표 보기 하나. 이전 상태는 버린다.
+    # $FAKE_GH_OWNER_KIND=orgs 이면 조직 소유 Project 주소를 돌려준다. 필드의 databaseId는 REST의 숫자 id와 같다.
     o=$(arg --owner "$@"); t=$(arg --title "$@")
     jq -n --arg t "$t" '{id:"PVT_new", title:$t, number:1, fields:[
-      {id:"F_TITLE", name:"Title", dataType:"TITLE"},
-      {id:"F_STATUS", name:"Status", dataType:"SINGLE_SELECT", options:[
+      {id:"F_TITLE", name:"Title", dataType:"TITLE", databaseId:101},
+      {id:"F_STATUS", name:"Status", dataType:"SINGLE_SELECT", databaseId:102, options:[
         {id:"o_todo", name:"Todo", color:"GRAY", description:""},
         {id:"o_prog", name:"In Progress", color:"YELLOW", description:""},
         {id:"o_done", name:"Done", color:"GREEN", description:""}]}]}' > "$P"
     echo '[]' > "$I"
     jq -n '[range(1; 7) | {id:("W_" + tostring), name:("기본 자동화 " + tostring), enabled:true}]' > "$W"
     echo '[{"id":"V_1","name":"View 1","layout":"TABLE_LAYOUT","visible":[]}]' > "$V"
-    jq -nc --arg o "$o" '{number:1, url:("https://github.com/users/" + $o + "/projects/1"), id:"PVT_new"}'
+    jq -nc --arg o "$o" --arg k "${FAKE_GH_OWNER_KIND:-users}" '{number:1, url:("https://github.com/" + $k + "/" + $o + "/projects/1"), id:"PVT_new"}'
     ;;
   "project field-create")
     nm=$(arg --name "$@"); ty=$(arg --data-type "$@"); so=$(arg --single-select-options "$@" || true)
     fid="F_new$(jq '.fields | length' "$P")"
     upd "$P" --arg id "$fid" --arg n "$nm" --arg ty "$ty" --arg so "$so" \
-      '.fields += [{id:$id, name:$n, dataType:$ty} + (if $ty == "SINGLE_SELECT" then {options:[$so | split(",") | to_entries[] | {id:($id + "_" + (.key|tostring)), name:.value, color:"GRAY", description:""}]} else {} end)]'
+      '.fields += [{id:$id, name:$n, dataType:$ty, databaseId:(100 + (.fields | length) + 1)} + (if $ty == "SINGLE_SELECT" then {options:[$so | split(",") | to_entries[] | {id:($id + "_" + (.key|tostring)), name:.value, color:"GRAY", description:""}]} else {} end)]'
     jq -nc --arg id "$fid" --arg n "$nm" '{id:$id, name:$n}'
     ;;
   "project list")

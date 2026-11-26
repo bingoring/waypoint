@@ -213,7 +213,7 @@ Yawn         [2-15]    [2-12] 구현: 갈래 B 3차    [2-14] 결과 검토: …
 
 **한 번만 하는 일:**
 1. 오너가 `gh auth refresh -s project`를 실행한다. 브라우저 로그인이 필요해서 오너가 직접 한다.
-2. 템플릿 Project를 만든다. 필드와 선택지는 `plugin/scripts/board-setup.sh`가 만든다. 보기 설정과 자동화 설정(기본 두 자동화 끄기, 14일 보관 켜기)은 GitHub 화면에서만 할 수 있으므로 오너 할 일로 둔다. 오너가 원하면 AI가 앱의 브라우저로 대신 설정한다.
+2. 템플릿 Project를 만든다. 필드와 선택지, 기본 자동화 삭제, 표 보기와 보드 보기(열과 가로 묶음 포함)는 `plugin/scripts/board-setup.sh`가 만든다. 자동화 두 가지(14일 보관 켜기, 「Sync with issue status」 끄기)는 공개 API가 없어 GitHub 화면에서만 할 수 있으므로 오너 할 일로 둔다. 오너가 원하면 AI가 앱의 브라우저로 대신 설정한다(10절의 확인과 정정).
 
 **레포마다 하는 일:**
 1. 템플릿을 복사해 `<레포> 보드`를 만든다.
@@ -338,6 +338,7 @@ Yawn         [2-15]    [2-12] 구현: 갈래 B 3차    [2-14] 결과 검토: …
   - **확인(2026-11-26, 비공개 시험 레포 `bingoring/waypoint-board-test`와 시험 Project).** `updateProjectV2Field`의 `singleSelectOptions`로 선택지를 더하거나 이름을 바꿀 때, 기존 선택지의 `id`를 함께 넘기면 카드의 값이 유지된다(줄기에 새 선택지 추가, Status를 `Todo/In Progress/Done`에서 `대기`~`보류` 여섯 개로 바꾸면서 `In Progress` 카드가 `진행 중`으로 따라옴). `id` 없이 넘기면 선택지가 새 `id`로 다시 만들어지고 카드의 값이 지워진다. 그래서 동기화는 선택지를 더할 때 늘 기존 `id`를 넘기고, 5.14절의 「값을 다시 적기」 물러서기는 쓰지 않는다. `gh project copy` 복사본에는 필드·선택지, 보기(열·가로 묶음·보이는 필드), 자동화의 켜짐·꺼짐과 조건이 모두 옮겨지고, 카드는 옮겨지지 않으며 비공개로 만들어진다.
 - **Project의 보기를 API로 만들 수 있는지**(미확인). 이 설계는 템플릿의 보기를 화면에서 한 번 설정하고 복사로 옮기므로, API가 없어도 된다.
   - **확인(2026-11-26, GraphQL 스키마와 시험 Project).** `createProjectV2View`로 보드 보기를 만들 수 있고 보이는 필드(`visibleFieldIds`)도 정할 수 있다. 열은 기본으로 Status가 된다. 가로 묶음(Swimlanes)은 API로 정할 수 없어 화면에서 설정했고, 복사로 옮겨진다.
+  - **정정(2026-11-26, REST 문서와 템플릿 Project #4에서 시험).** 위 확인은 GraphQL만 본 것이다. REST의 보기 만들기(`POST /users/<로그인>/projectsV2/<번호>/views`, 조직은 `/orgs/<조직>/…`, API 버전 `2026-03-10`)는 `group_by`(가로 묶음), `vertical_group_by`(열), `sort_by`, `visible_fields`를 받는다. 필드 값은 숫자 id이고 GraphQL의 `databaseId`와 같다. 문서는 경로에 `user_id`를 쓰라고 하지만 숫자 id는 404였고 로그인 이름이 맞았다. REST에는 보기 만들기만 있고 고치기는 없으며 GraphQL `updateProjectV2View`도 이름·레이아웃·필터·보이는 필드만 바꾼다. 그래서 이미 있는 보기의 가로 묶음은 API로 바꿀 수 없고, `board-setup.sh template`이 보드 보기를 처음부터 REST로 만든다. 자동화는 여전히 공개 API가 없다(GraphQL은 `deleteProjectV2Workflow`뿐이고 REST의 Project 문서는 drafts·fields·items·projects·views뿐). 출처: https://docs.github.com/en/rest/projects/views (조회 2026-11-26, 공식 확인)
 - **보관 자동화의 조건을 「닫힌 지 14일」로 정확히 줄 수 있는지**(미확인). 보관 자동화의 필터가 닫힌 시각이 아니라 마지막 수정 시각을 기준으로 할 수 있다. 구현 때 템플릿에서 확인하고, 안 되면 비슷한 조건을 쓴다.
   - **확인(2026-11-26): 닫힌 시각으로는 줄 수 없다.** 보관 자동화의 조건에는 `updated:`만 쓸 수 있고 `closed:`, `closed-at:`, `last-closed:`는 「알 수 없는 필드」로 거부된다. 그래서 `is:issue is:closed updated:<@today-14d`(닫힌 뒤 14일 동안 바뀌지 않은 이슈)를 쓴다. 닫힌 스테이지 이슈는 동기화가 더 고치지 않으므로 사실상 「닫힌 지 14일」과 같다. 이 자동화는 12시간마다 돈다.
 - **Project 사이드 패널이 이슈 본문의 체크리스트 진척을 따로 보여 주는지**(미확인). 본문은 그대로 보이므로 체크리스트 자체는 보인다. 카드 위에 진척률을 보여 주는 일은 이 설계에 넣지 않았다.

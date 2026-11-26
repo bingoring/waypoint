@@ -3,8 +3,9 @@
 #
 #   sh board-setup.sh template <소유자>
 #     「waypoint 보드 템플릿」 Project를 만든다. 소유자(사용자 또는 조직)마다 한 번만 실행한다.
-#     Status 선택지 여섯 개, 필드 다섯 개(줄기, 지금, 기다림, 단계, ID), 기본 자동화 삭제, 표 보기와 보드 보기.
-#     API로 할 수 없는 설정 세 가지는 끝에 출력한다. 오너가 GitHub 화면에서 하거나, 오너가 허락하면 AI가 앱의 브라우저로 한다.
+#     Status 선택지 여섯 개, 필드 다섯 개(줄기, 지금, 기다림, 단계, ID), 기본 자동화 삭제, 표 보기와
+#     보드 보기(열은 Status, 가로 묶음은 줄기. 가로 묶음은 REST로 보기를 만들 때만 정할 수 있다).
+#     API로 할 수 없는 자동화 설정 두 가지는 끝에 출력한다. 오너가 GitHub 화면에서 하거나, 오너가 허락하면 AI가 앱의 브라우저로 한다.
 #
 #   sh board-setup.sh repo <레포 경로> <템플릿 주소> [<훅 사본 폴더>]
 #     템플릿을 「<레포 이름> 보드」로 복사하고(비공개, 같은 제목의 Project가 이미 있으면 그것을 쓴다), .githooks/에
@@ -52,7 +53,7 @@ bs_parse_url() {
 
 # bs_read: BS_KIND·BS_OWNER·BS_NUM의 Project를 읽어 $BS_TMP/fields.json(이름 → 필드), workflows.json, views.json, pid를 만든다.
 bs_read() {
-  _q='query($owner: String!, $number: Int!) { OWNERKIND(login: $owner) { projectV2(number: $number) { id fields(first: 50) { nodes { ... on ProjectV2FieldCommon { id name dataType } ... on ProjectV2SingleSelectField { options { id name color description } } } } workflows(first: 50) { nodes { id name } } views(first: 20) { nodes { id name layout } } } } }'
+  _q='query($owner: String!, $number: Int!) { OWNERKIND(login: $owner) { projectV2(number: $number) { id fields(first: 50) { nodes { ... on ProjectV2FieldCommon { id databaseId name dataType } ... on ProjectV2SingleSelectField { options { id name color description } } } } workflows(first: 50) { nodes { id name } } views(first: 20) { nodes { id name layout } } } } }'
   _q=$(printf '%s' "$_q" | sed "s/OWNERKIND/$BS_KIND/")
   gh api graphql -F owner="$BS_OWNER" -F number="$BS_NUM" -f query="$_q" > "$BS_TMP/read.json" || return 1
   _k=$BS_KIND
@@ -61,6 +62,11 @@ bs_read() {
   jq --arg k "$_k" '[.data[$k].projectV2.fields.nodes[] | select(.name != null) | {key: .name, value: .}] | from_entries' "$BS_TMP/read.json" > "$BS_TMP/fields.json"
   jq --arg k "$_k" '[.data[$k].projectV2.workflows.nodes[]]' "$BS_TMP/read.json" > "$BS_TMP/workflows.json"
   jq --arg k "$_k" '[.data[$k].projectV2.views.nodes[]]' "$BS_TMP/read.json" > "$BS_TMP/views.json"
+}
+
+# bs_dbids <필드 이름>...: 필드의 숫자 id(GraphQL databaseId = REST 필드 id)들을 JSON 배열로 출력한다.
+bs_dbids() {
+  jq -c '[$ARGS.positional[] as $n | .[$n].databaseId]' --args "$@" < "$BS_TMP/fields.json"
 }
 
 # bs_ids <필드 이름>...: 필드 id들을 JSON 배열로 출력한다.
@@ -118,17 +124,24 @@ bs_template() {
     jq -n --arg p "$_pid" --argjson f "$_tf" '{query: "mutation($p: ID!, $name: String!, $layout: ProjectV2ViewLayout!, $f: [ID!]) { createProjectV2View(input: {projectId: $p, name: $name, layout: $layout, configuration: {visibleFieldIds: $f}}) { projectV2View { id name layout } } }", variables: {p: $p, name: "표", layout: "TABLE_LAYOUT", f: $f}}' > "$BS_TMP/view.json"
   fi
   gh api graphql --input "$BS_TMP/view.json" > /dev/null || bs_die "표 보기를 설정하지 못했다. $_stop"
-  jq -n --arg p "$_pid" --argjson f "$(bs_ids 지금 기다림)" '{query: "mutation($p: ID!, $name: String!, $layout: ProjectV2ViewLayout!, $f: [ID!]) { createProjectV2View(input: {projectId: $p, name: $name, layout: $layout, configuration: {visibleFieldIds: $f}}) { projectV2View { id name layout } } }", variables: {p: $p, name: "보드", layout: "BOARD_LAYOUT", f: $f}}' > "$BS_TMP/view.json"
-  gh api graphql --input "$BS_TMP/view.json" > /dev/null || bs_die "보드 보기를 만들지 못했다. $_stop"
+  # 보드 보기는 REST로 만든다. GraphQL의 보기 입력은 보이는 필드만 받고, REST는 만들 때 열(vertical_group_by)과
+  # 가로 묶음(group_by)도 받는다. REST에는 보기 고치기가 없으므로 처음 만들 때 정한다. 경로에는 소유자 로그인 이름을 쓴다
+  # (문서는 user_id라 하지만 숫자 id는 404였다, 2026-11-26 확인).
+  case $BS_KIND in user) _kp=users ;; *) _kp=orgs ;; esac
+  jq -n --argjson f "$(bs_dbids 지금 기다림)" --argjson g "$(bs_dbids 줄기)" --argjson c "$(bs_dbids Status)" \
+    '{name: "보드", layout: "board", visible_fields: $f, group_by: $g, vertical_group_by: $c}' > "$BS_TMP/view.json"
+  gh api -X POST -H "X-GitHub-Api-Version: 2026-03-10" "/$_kp/$BS_OWNER/projectsV2/$BS_NUM/views" --input "$BS_TMP/view.json" > "$BS_TMP/view-out.json" ||
+    bs_die "보드 보기를 만들지 못했다. $_stop"
+  jq -e '(.value // .) | (.group_by | length) == 1 and (.vertical_group_by | length) == 1' "$BS_TMP/view-out.json" > /dev/null ||
+    bs_die "보드 보기에 열이나 가로 묶음이 들어가지 않았다: $(cat "$BS_TMP/view-out.json"). $_stop"
 
   _base=${_url%/}
   cat <<EOF
 
 템플릿을 만들었다: $_base
-GitHub 화면에서 할 일 세 가지(API로 설정할 수 없다. 복사본에 그대로 옮겨진다):
-1. 「보드」 보기의 View 메뉴에서 Swimlanes를 「줄기」로 정하고 Save를 누른다.
-2. $_base/workflows 에서 Auto-archive items를 켜고 필터를 「is:issue is:closed updated:<@today-14d」로 정한 뒤 저장한다.
-3. 같은 화면의 「Sync with issue status」를 끈다(Status는 동기화만 바꾼다).
+GitHub 화면에서 할 일 두 가지(공개 API가 없다. 복사본에 그대로 옮겨진다):
+1. $_base/workflows 에서 Auto-archive items를 켜고 필터를 「is:issue is:closed updated:<@today-14d」로 정한 뒤 저장한다.
+2. 같은 화면의 「Sync with issue status」를 끈다(Status는 동기화만 바꾼다).
 레포에 적용할 때 이 주소를 템플릿 주소로 쓴다: sh board-setup.sh repo <레포 경로> $_base
 EOF
 }
