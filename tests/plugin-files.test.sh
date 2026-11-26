@@ -184,6 +184,20 @@ grep -qF '`HUMAN_APPROVED` 없이는' "$CR" && fail core-rules-new "옛 HUMAN_AP
 n=$(wc -l < "$CR" | tr -d ' ')
 [ "$n" -le 19 ] || fail core-rules-new "$n 줄 (19 초과)"
 
+# start-new: start 스킬이 세션 시작 요약과 PR 상태 확인으로 시작하고, 옛 「PENDING인 가장 앞 스테이지」 절차가 없다.
+has start-new "$S0" '`gh pr view`'
+grep -qF 'PENDING` 상태인 가장 앞 스테이지를 찾는다' "$S0" && fail start-new "옛 시작 절차가 남아 있음"
+
+# git-new: git 스킬에 스테이지 브랜치·PR·worktree 흐름, STATUS 커밋 메시지, pre-commit 검사가 있다.
+for want in '### 스테이지 브랜치와 PR' 'worktree add' 'git worktree remove' '[작업 중]' \
+  '`docs(status): <ID> <새 상태>`' 'WAYPOINT_ALLOW_BRANCH_STATUS=1' '### pre-commit 검사'; do
+  has git-new "$G" "$want"
+done
+
+# init-new: init 스킬이 pre-commit 훅도 복사하고, 첫 스테이지를 정하지 않고 오너와 정한다.
+has init-new "$I" 'githooks/pre-commit'
+grep -qF '첫 스테이지(1-1)를 시작한다' "$I" && fail init-new "옛 마무리 문장이 남아 있음"
+
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
 
