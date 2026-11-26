@@ -21,7 +21,7 @@ description: 새 프로젝트 레포를 waypoint에 연결할 때 사용한다. 
 5. **보드를 붙인다(오너가 원할 때).** 보드는 STATUS를 GitHub Project 보드와 스테이지 이슈로 보여 준다(`waypoint:git`의 「보드 동기화」). 오너에게 보드를 쓸지와 템플릿 Project 주소(「waypoint 보드 템플릿」)를 묻는다. 쓰지 않으면 6번으로 간다.
    - `gh auth status`의 토큰 권한에 `project`가 없으면 오너에게 `gh auth refresh -s project` 실행을 부탁한다. 브라우저 로그인이 필요해서 오너가 직접 한다.
    - `${CLAUDE_PLUGIN_ROOT}/scripts/board-setup.sh`, `${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.sh`, `${CLAUDE_PLUGIN_ROOT}/githooks/pre-push`를 Read 도구로 읽어, 레포 밖의 같은 임시 폴더(예: 세션의 scratchpad 안 `waypoint-board/`)에 Write 도구로 쓴다.
-   - 템플릿이 아직 없으면 `sh <임시 폴더>/board-setup.sh template <소유자>`로 만든다. 출력 끝의 「GitHub 화면에서 할 일」 세 가지를 오너에게 안내한다. 오너가 허락하면 앱의 브라우저로 대신 설정한다. 템플릿은 소유자마다 한 번만 만든다.
+   - 템플릿이 아직 없으면 `sh <임시 폴더>/board-setup.sh template <소유자>`로 만든다. 출력 끝의 「GitHub 화면에서 할 일」 두 가지(보관 자동화 켜기, Sync with issue status 끄기)를 오너에게 안내한다. 오너가 허락하면 앱의 브라우저로 대신 설정한다. 템플릿은 소유자마다 한 번만 만든다.
    - 레포 루트에서 `sh <임시 폴더>/board-setup.sh repo . <템플릿 주소>`를 실행한다. 템플릿을 `<레포 이름> 보드`로 복사해 레포에 연결하고, CLAUDE.md의 「검토 대기 상한」 줄 아래에 `- 보드: <주소>` 줄을, `.githooks/`에 `pre-push`와 `board-sync.sh` 사본을 넣는다. 커밋은 하지 않는다. 기존 `pre-push`가 있어서 멈추면 합치는 방법을 오너와 정한다.
 6. **커밋하고 push한다.** 만든 파일을 기본 브랜치에 바로 커밋하고 push한다(예: `chore(waypoint): waypoint 연결`).
 7. **첫 동기화(보드를 붙였을 때).** 레포 루트에서 `sh .githooks/board-sync.sh`를 실행하고 `.git/waypoint/board-sync.status`가 `ok`로 시작하는지 본다. `MERGED`가 아닌 STATUS 줄마다 이슈가 만들어져 보드에 들어간다.
