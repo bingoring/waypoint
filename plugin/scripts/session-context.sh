@@ -17,7 +17,6 @@ case "$0" in
   *) here=. ;;
 esac
 core="$here/../core-rules.md"
-plugin_hook="$here/../githooks/pre-commit"
 
 NL='
 '
@@ -145,7 +144,17 @@ hook_ver() {
   ver=$_v
 }
 
-# warnings <메인>: 메인 체크아웃이 기본 브랜치가 아니거나 레포의 pre-commit 사본이 낡았으면 경고 줄을 출력한다.
+# stale <메인> <사본 이름> <플러그인 안 경로> <이름 뒤 조사(이/가)> <경로 뒤 조사(으로/로)>:
+# 레포의 .githooks/<사본 이름>이 있고 플러그인의 것보다 버전이 낮으면 경고 한 줄.
+stale() {
+  [ -f "$1/.githooks/$2" ] || return 0
+  hook_ver "$here/../$3"; pv=$ver
+  hook_ver "$1/.githooks/$2"; rv=$ver
+  [ "$rv" -lt "$pv" ] && printf '%s\n' "경고: .githooks/$2$4 낡았다(레포 $rv, 플러그인 $pv). 플러그인의 $3$5 바꿔라."
+  return 0
+}
+
+# warnings <메인>: 메인 체크아웃이 기본 브랜치가 아니거나, 레포의 훅 사본이 낡았거나, 직전 보드 동기화가 실패했으면 경고 줄을 출력한다.
 warnings() {
   if [ -d "$1/.git" ]; then
     h=
@@ -169,10 +178,19 @@ warnings() {
     fi
     [ -n "$isdef" ] || printf '%s\n' "경고: 메인 체크아웃이 기본 브랜치가 아니다(현재 ${br:-detached HEAD}). 요약이 낡았을 수 있다."
   fi
-  if [ -f "$1/.githooks/pre-commit" ]; then
-    hook_ver "$plugin_hook"; pv=$ver
-    hook_ver "$1/.githooks/pre-commit"; rv=$ver
-    [ "$rv" -lt "$pv" ] && printf '%s\n' "경고: .githooks/pre-commit이 낡았다(레포 $rv, 플러그인 $pv). 플러그인의 githooks/pre-commit으로 바꿔라."
+  stale "$1" pre-commit githooks/pre-commit 이 으로
+  stale "$1" pre-push githooks/pre-push 가 로
+  stale "$1" board-sync.sh scripts/board-sync.sh 가 로
+  # 보드 동기화 상태 파일: 「ok <시각>」 또는 「fail <시각> <단계>: <이유>」(board-sync.sh)
+  if [ -r "$1/.git/waypoint/board-sync.status" ]; then
+    st=
+    IFS= read -r st < "$1/.git/waypoint/board-sync.status" || [ -n "$st" ] || true
+    case $st in
+      'fail '*)
+        st=${st#fail }
+        printf '%s\n' "경고: 보드 동기화 실패(${st%% *}): ${st#* }"
+        ;;
+    esac
   fi
   return 0
 }
