@@ -91,6 +91,24 @@ else
   fail commit-msg-rejects "$H 없음 또는 실행 권한 없음"
 fi
 
+# hook-block-match: pre-commit 훅의 검사 블록이 status-check.sh의 블록과 글자 그대로 같다.
+# 훅은 각 레포의 .githooks/에 사본으로 들어가므로, 블록을 고치면 훅도 같이 고치고 둘째 줄의 버전을 올린다.
+PC="$P/githooks/pre-commit"
+SC="$P/scripts/status-check.sh"
+block() { sed -n '/^# >>> waypoint status-check >>>$/,/^# <<< waypoint status-check <<<$/p' "$1"; }
+if [ -x "$PC" ] && [ -f "$SC" ]; then
+  b1=$(block "$SC"); b2=$(block "$PC")
+  [ -n "$b1" ] || fail hook-block-match "$SC 에 검사 블록이 없음"
+  [ "$b1" = "$b2" ] || fail hook-block-match "$PC 의 검사 블록이 $SC 와 다름"
+  second=$(sed -n 2p "$PC")
+  case $second in
+    '# waypoint-hook-version: '[0-9]*) ;;
+    *) fail hook-block-match "$PC 둘째 줄이 버전 줄이 아님: $second" ;;
+  esac
+else
+  fail hook-block-match "$PC(실행 권한) 또는 $SC 없음"
+fi
+
 # init-skill: init 스킬이 있고 블록과 설정 템플릿을 쓴다.
 I="$P/skills/init/SKILL.md"
 if [ -f "$I" ]; then
@@ -128,6 +146,66 @@ has init-precheck "$I" '이미 있으면 멈추고'
 
 # block-outside-repo: CLAUDE.md 블록이 「레포 밖에서 시작한 세션」 가능성을 함께 안내한다.
 has block-outside-repo "$B" '레포 밖에서 시작'
+
+# status-template-valid: 새 STATUS 템플릿이 형식 검사(검사 1~10)를 통과한다.
+W=$(mktemp -d)
+sed 's/{Project Name}/x/' "$P/templates/STATUS.template.md" > "$W/STATUS.md"
+: > "$W/ids"
+out=$(sh "$SC" "$W/STATUS.md" "$W/ids" 2>&1) || fail status-template-valid "$out"
+rm -rf "$W"
+
+# stage-templates: 스테이지 문서 템플릿은 상태를 들고 있지 않고(id: 만), 승인 결과를 계획·결과로 나누고, 진행 기록을 둔다.
+for f in "$P/templates/stage-template.md" "$P/templates/review-stage-template.md"; do
+  case $(sed -n 2p "$f") in
+    'id: '*) ;;
+    *) fail stage-templates "$f: frontmatter 첫 키가 id: 가 아님" ;;
+  esac
+  grep -qE '^(status|updated):' "$f" && fail stage-templates "$f: status:/updated: 가 남아 있음"
+  grep -qF 'HUMAN_APPROVED' "$f" && fail stage-templates "$f: HUMAN_APPROVED 로 바꾸라는 안내가 남아 있음"
+  has stage-templates "$f" '## 진행 기록'
+  has stage-templates "$f" '#### 계획 승인 (YYYY-MM-DD, 결정자)'
+  has stage-templates "$f" '#### 결과 승인 (YYYY-MM-DD, 결정자)'
+done
+
+# stage-states / stage-no-old: stage 스킬에 2단계의 상태 값·STATUS 표·진행 기록 규칙이 있고 옛 갱신 문장이 없다.
+ST="$P/skills/stage/SKILL.md"
+for want in '| `MERGED` | 머지됨 |' '| `DEFERRED` | 보류 |' '| ID | 스테이지 | 상태 | 줄기 | 지금 | 기다림 | 링크 |' \
+  '`계획 검토: `' '`결과 검토: `' '80자' '## STATUS 표' '## 진행 기록' 'docs(status)'; do
+  has stage-states "$ST" "$want"
+done
+grep -qF 'STATUS.md의 테이블을 함께 업데이트' "$ST" && fail stage-no-old "옛 STATUS 갱신 문장이 남아 있음"
+
+# core-rules-new: core-rules의 세 규칙이 2단계 문장으로 바뀌었고 줄 수가 늘지 않았다.
+CR="$P/core-rules.md"
+has core-rules-new "$CR" '앞 스테이지의 계획이 승인되기 전에는'
+has core-rules-new "$CR" '스테이지 상태의 원본은 메인 체크아웃'
+has core-rules-new "$CR" '메인 체크아웃은 기본 브랜치에 둔다'
+grep -qF '`HUMAN_APPROVED` 없이는' "$CR" && fail core-rules-new "옛 HUMAN_APPROVED 규칙이 남아 있음"
+n=$(wc -l < "$CR" | tr -d ' ')
+[ "$n" -le 19 ] || fail core-rules-new "$n 줄 (19 초과)"
+
+# start-new: start 스킬이 세션 시작 요약과 PR 상태 확인으로 시작하고, 옛 「PENDING인 가장 앞 스테이지」 절차가 없다.
+has start-new "$S0" '`gh pr view`'
+grep -qF 'PENDING` 상태인 가장 앞 스테이지를 찾는다' "$S0" && fail start-new "옛 시작 절차가 남아 있음"
+
+# git-new: git 스킬에 스테이지 브랜치·PR·worktree 흐름, STATUS 커밋 메시지, pre-commit 검사가 있다.
+for want in '### 스테이지 브랜치와 PR' 'worktree add' 'git worktree remove' '[작업 중]' \
+  '`docs(status): <ID> <새 상태>`' 'WAYPOINT_ALLOW_BRANCH_STATUS=1' '### pre-commit 검사'; do
+  has git-new "$G" "$want"
+done
+
+# init-new: init 스킬이 pre-commit 훅도 복사하고, 첫 스테이지를 정하지 않고 오너와 정한다.
+has init-new "$I" 'githooks/pre-commit'
+grep -qF '첫 스테이지(1-1)를 시작한다' "$I" && fail init-new "옛 마무리 문장이 남아 있음"
+
+# review-fixes: 독립 리뷰에서 고친 문장들.
+has review-fixes "$I" '메인 체크아웃의 기본 브랜치에서'
+has review-fixes "$G" '`<메인>/.githooks/pre-commit`'
+grep -qF 'HUMAN_APPROVED`로 변경' "$P/templates/gate-template.md" && fail review-fixes "gate-template에 옛 HUMAN_APPROVED 안내가 남아 있음"
+has review-fixes "$ST" 'R-1)의 결과가 승인된 뒤에 시작한다'
+
+# block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
+has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
 
 if [ "$fails" -gt 0 ]; then
   echo "$fails failed"

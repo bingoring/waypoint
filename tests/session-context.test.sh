@@ -87,6 +87,150 @@ if kill -0 "$pid" 2>/dev/null; then
   fail relative-dir "1초 안에 끝나지 않음"
 fi
 
+# ---- 새 형식 STATUS의 요약과 경고(설계 5.6절). 모든 경우를 기본 PATH와 PATH=''에서 돌린다. ----
+
+# new_status <파일> <표 본문 줄>... [-- <오너 할 일 줄>...]
+new_status() {
+  f=$1; shift
+  mkdir -p "${f%/*}"
+  {
+    printf '# t — waypoint 현황\n\n[결정 로그](DECISIONS.md)\n\n## 스테이지\n\n'
+    printf '| ID | 스테이지 | 상태 | 줄기 | 지금 | 기다림 | 링크 |\n|---|---|---|---|---|---|---|\n'
+    while [ "$#" -gt 0 ] && [ "$1" != -- ]; do printf '%s\n' "$1"; shift; done
+    if [ "$1" = -- ]; then
+      shift
+      printf '\n## 오너 할 일\n\n'
+      for o in "$@"; do printf -- '- [ ] %s\n' "$o"; done
+    fi
+  } > "$f"
+}
+
+# summary_of <출력>: `waypoint:start` 안내 줄과 </waypoint> 사이의 줄
+summary_of() { printf '%s\n' "$1" | sed -n '/waypoint:start/,/^<\/waypoint>$/p' | sed '1d;$d'; }
+
+# run2 <경우> <기대 요약 파일> <CLAUDE_PROJECT_DIR>: 두 PATH에서 요약 부분이 기대와 같은지 본다.
+run2() {
+  for pth in default empty; do
+    if [ "$pth" = empty ]; then out=$(PATH='' CLAUDE_PROJECT_DIR="$3" /bin/sh "$S"); rc=$?
+    else out=$(CLAUDE_PROJECT_DIR="$3" /bin/sh "$S"); rc=$?; fi
+    [ "$rc" -eq 0 ] || fail "$1($pth)" "exit $rc"
+    got=$(summary_of "$out")
+    want=$(cat "$2")
+    [ "$got" = "$want" ] || fail "$1($pth)" "요약이 다름
+--- 기대
+$want
+--- 실제
+$got"
+  done
+}
+
+ROWS_NEW='| 1-1 | A | MERGED | | | | [문서](01-inception/01-a.md) |
+| 2-1 | 진행 | IN_PROGRESS | 콘텐츠 | 구현: OR 묶음 7 저작 중 | | [#38](https://x/pull/38) |
+| 2-2 | 대기1 | PENDING | | | | |
+| 2-3 | 대기2 | PENDING | | | | |
+| 3-1 | 배포 | AI_PROPOSED | 출시 | 결과 검토: Android 첫 빌드 | 오너 할 일 | [#40](https://x/pull/40) |
+| 3-2 | 모니터링 | HUMAN_APPROVED | | 배포 묶음을 모아 한 번에 머지 | | [#41](https://x/pull/41) |
+| 3-3 | 알림 | DEFERRED | | 구현: 오너 보류 | | |'
+OWN1='Google Play 서비스 계정 키 발급 (막음: 3-1)'
+OWN2='도메인 구입'
+
+g init -q -b main "$T/new"
+# shellcheck disable=SC2086
+(IFS='
+'; new_status "$T/new/docs/waypoint/STATUS.md" $ROWS_NEW -- "$OWN1" "$OWN2")
+g -C "$T/new" add -A
+g -C "$T/new" commit -q -m init
+
+cat > "$T/want-new" <<'EOF'
+현황(new): 진행 중 1 · 검토 대기 1 · 승인 1 · 대기 2 · 보류 1 · 오너 할 일 2
+- 2-1 IN_PROGRESS [콘텐츠] 구현: OR 묶음 7 저작 중
+- 3-1 AI_PROPOSED [출시] 결과 검토: Android 첫 빌드 (기다림: 오너 할 일)
+- 3-2 HUMAN_APPROVED 배포 묶음을 모아 한 번에 머지
+오너 할 일:
+- Google Play 서비스 계정 키 발급 (막음: 3-1)
+- 도메인 구입
+EOF
+
+# 9 summary: 개수 줄, 활성 줄, 오너 할 일이 안내 뒤, </waypoint> 앞에 나온다. 경고는 없다.
+run2 summary "$T/want-new" "$T/new"
+
+# 10 old-format: 옛 형식 STATUS에는 요약도 경고도 붙이지 않는다.
+for pth in default empty; do
+  if [ "$pth" = empty ]; then out=$(PATH='' CLAUDE_PROJECT_DIR="$T/repo" /bin/sh "$S"); else out=$(CLAUDE_PROJECT_DIR="$T/repo" /bin/sh "$S"); fi
+  printf '%s\n' "$out" | grep -qE '^(현황\(|경고:)' && fail "old-format($pth)" "요약이나 경고가 있음: $out"
+done
+
+# 11 cap: 요약은 20줄까지. 넘치면 20번째 줄이 「… 외 N개」다.
+g init -q -b main "$T/cap"
+rows=
+i=1
+while [ "$i" -le 25 ]; do
+  rows="$rows| 2-$i | s$i | IN_PROGRESS | | 구현: x$i | | [#$i](https://x/pull/$i) |
+"
+  i=$((i + 1))
+done
+# shellcheck disable=SC2086
+(IFS='
+'; new_status "$T/cap/docs/waypoint/STATUS.md" $rows)
+{
+  echo '현황(cap): 진행 중 25 · 검토 대기 0 · 승인 0 · 대기 0 · 보류 0 · 오너 할 일 0'
+  i=1
+  while [ "$i" -le 18 ]; do echo "- 2-$i IN_PROGRESS 구현: x$i"; i=$((i + 1)); done
+  echo '… 외 7개 (STATUS.md 참조)'
+} > "$T/want-cap"
+run2 cap "$T/want-cap" "$T/cap"
+
+# 12 branch-warn: 메인 체크아웃이 기본 브랜치가 아니면 요약 앞에 경고 한 줄.
+g -C "$T/new" switch -q -c feature
+{ echo '경고: 메인 체크아웃이 기본 브랜치가 아니다(현재 feature). 요약이 낡았을 수 있다.'; cat "$T/want-new"; } > "$T/want-feature"
+run2 branch-warn-feature "$T/want-feature" "$T/new"
+g -C "$T/new" checkout -q --detach
+{ echo '경고: 메인 체크아웃이 기본 브랜치가 아니다(현재 detached HEAD). 요약이 낡았을 수 있다.'; cat "$T/want-new"; } > "$T/want-detached"
+run2 branch-warn-detached "$T/want-detached" "$T/new"
+g -C "$T/new" switch -q main
+mkdir -p "$T/new/.git/refs/remotes/origin"
+echo 'ref: refs/remotes/origin/develop' > "$T/new/.git/refs/remotes/origin/HEAD"
+{ echo '경고: 메인 체크아웃이 기본 브랜치가 아니다(현재 main). 요약이 낡았을 수 있다.'; cat "$T/want-new"; } > "$T/want-originhead"
+run2 branch-warn-origin-head "$T/want-originhead" "$T/new"
+rm -f "$T/new/.git/refs/remotes/origin/HEAD"
+
+# 13 stale-hook: 레포의 .githooks/pre-commit 버전이 플러그인보다 낮으면 경고 한 줄.
+PV=$(sed -n 's/^# waypoint-hook-version: //p' "$ROOT/plugin/githooks/pre-commit")
+mkdir -p "$T/new/.githooks"
+printf '#!/bin/sh\n# waypoint-hook-version: 0\n' > "$T/new/.githooks/pre-commit"
+{ echo "경고: .githooks/pre-commit이 낡았다(레포 0, 플러그인 $PV). 플러그인의 githooks/pre-commit으로 바꿔라."; cat "$T/want-new"; } > "$T/want-stale"
+run2 stale-hook "$T/want-stale" "$T/new"
+printf '#!/bin/sh\necho old\n' > "$T/new/.githooks/pre-commit"
+run2 stale-hook-noversion "$T/want-stale" "$T/new"
+printf '#!/bin/sh\n# waypoint-hook-version: %s\n' "$PV" > "$T/new/.githooks/pre-commit"
+run2 stale-hook-current "$T/want-new" "$T/new"
+rm -rf "$T/new/.githooks"
+run2 stale-hook-none "$T/want-new" "$T/new"
+
+# 14 parent-dedupe: 레포 밖 세션은 레포마다 개수 줄만, 같은 메인 체크아웃은 한 번만, 숫자는 메인 체크아웃의 STATUS에서.
+g init -q -b main "$T/parent2/proj"
+# shellcheck disable=SC2086
+(IFS='
+'; new_status "$T/parent2/proj/docs/waypoint/STATUS.md" $ROWS_NEW -- "$OWN1" "$OWN2")
+g -C "$T/parent2/proj" add -A
+g -C "$T/parent2/proj" commit -q -m init
+g -C "$T/parent2/proj" worktree add -q "$T/parent2/proj-2-9" -b content/2-9
+new_status "$T/parent2/proj-2-9/docs/waypoint/STATUS.md" '| 2-1 | 진행 | IN_PROGRESS | | 구현: 낡은 사본 | | [#1](https://x/pull/1) |'
+want='현황(proj): 진행 중 1 · 검토 대기 1 · 승인 1 · 대기 2 · 보류 1 · 오너 할 일 2'
+for pth in default empty; do
+  if [ "$pth" = empty ]; then out=$(PATH='' CLAUDE_PROJECT_DIR="$T/parent2" /bin/sh "$S"); else out=$(CLAUDE_PROJECT_DIR="$T/parent2" /bin/sh "$S"); fi
+  n=$(printf '%s\n' "$out" | grep -c '^현황(proj): 진행 중')
+  [ "$n" -eq 1 ] || fail "parent-dedupe($pth)" "개수 줄이 ${n}개: $out"
+  printf '%s\n' "$out" | grep -qxF "$want" || fail "parent-dedupe($pth)" "줄 '$want' 없음: $out"
+  n=$(printf '%s\n' "$out" | grep -cxF "메인 체크아웃(proj): $T/parent2/proj")
+  [ "$n" -eq 1 ] || fail "parent-dedupe($pth)" "메인 체크아웃 줄이 ${n}개"
+  printf '%s\n' "$out" | grep -qF 'proj-2-9' && fail "parent-dedupe($pth)" "worktree 이름이 나옴: $out"
+  printf '%s\n' "$out" | grep -qE '^(- [123R]-[0-9]+ |경고:|오너 할 일:)' && fail "parent-dedupe($pth)" "개수 줄 밖의 요약이나 경고가 있음: $out"
+done
+# 옛 형식 레포는 레포 밖 세션에서도 개수 줄이 없다(7번의 $T/parent).
+out=$(CLAUDE_PROJECT_DIR="$T/parent" /bin/sh "$S")
+printf '%s\n' "$out" | grep -q '^현황(proj): 진행 중' && fail parent-old-format "옛 형식에 개수 줄이 있음"
+
 if [ "$fails" -gt 0 ]; then
   echo "$fails failed"
   exit 1
