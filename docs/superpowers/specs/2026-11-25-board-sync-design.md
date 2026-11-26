@@ -350,3 +350,6 @@ Yawn         [2-15]    [2-12] 구현: 갈래 B 3차    [2-14] 결과 검토: …
   - `gh project item-list --format json`은 필드 이름을 JSON 키로 쓰며 첫 글자를 소문자로 바꾸는데, 한글 필드 이름에서는 첫 바이트를 깨뜨린다(`단계`→`���계`). 동기화는 카드를 GraphQL(`gh api graphql`)로 읽는다.
   - `gh project link`는 `--owner @me`를 「소유자가 다르다」며 거부한다. 소유자 이름을 직접 준다.
   - 카드를 Project에 넣으면 기본 자동화(지우기 전)가 Status를 `Todo`로 바꾼다. 템플릿에서 자동화를 지우므로 동기화에는 영향이 없다.
+  - 단일 선택 필드는 선택지가 하나 이상 있어야 만들 수 있다. `gh project field-create`는 `--single-select-options`를 요구하고, GraphQL `createProjectV2Field`도 「At least one singleSelectOption is required」로 거부한다. 그래서 템플릿의 「줄기」에 자리표시 선택지 「(없음)」을 두고, 동기화가 줄기 선택지를 처음 더할 때 지운다(STATUS에 그 값을 쓰는 줄이 있으면 남긴다).
+  - API로 만든 필드는 기존 표 보기(「View 1」)에 숨겨진다. `updateProjectV2View`로 보기 이름과 보이는 필드(`visibleFieldIds`)를 바꿀 수 있다(시험 Project #3에서 확인). 그래서 `board-setup.sh template`이 「View 1」을 「표」로 바꾸고 새 필드를 보이게 한다.
+  - `gh project list --format json`은 `{"projects": [{number, title, url, id, closed, …}], "totalCount": N}` 모양이다. `board-setup.sh repo`는 같은 제목의 Project가 이미 있으면 다시 복사하지 않고 그것을 쓴다.

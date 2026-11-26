@@ -109,6 +109,20 @@ else
   fail hook-block-match "$PC(실행 권한) 또는 $SC 없음"
 fi
 
+# board-sync-files: 4단계의 board-sync.sh와 pre-push. 검사 블록이 status-check.sh와 같고, 둘째 줄이 버전 줄이고, 실행 권한이 있다.
+BSY="$P/scripts/board-sync.sh"
+PP="$P/githooks/pre-push"
+for f in "$BSY" "$PP"; do
+  [ -x "$f" ] || { fail board-sync-files "$f 없음 또는 실행 권한 없음"; continue; }
+  case $(sed -n 2p "$f") in
+    '# waypoint-hook-version: '[0-9]*) ;;
+    *) fail board-sync-files "$f 둘째 줄이 버전 줄이 아님" ;;
+  esac
+done
+[ -f "$BSY" ] && [ "$(block "$BSY")" = "$(block "$SC")" ] || fail board-sync-files "$BSY 의 검사 블록이 $SC 와 다름"
+# board-setup.sh: 보드 설정 스크립트. 세션이 임시 폴더에 사본을 만들어 sh로 실행하지만, 플러그인 안에서도 바로 실행할 수 있게 둔다.
+[ -x "$P/scripts/board-setup.sh" ] || fail board-setup-file "$P/scripts/board-setup.sh 없음 또는 실행 권한 없음"
+
 # init-skill: init 스킬이 있고 블록과 설정 템플릿을 쓴다.
 I="$P/skills/init/SKILL.md"
 if [ -f "$I" ]; then
@@ -210,7 +224,7 @@ for want in '중재자가 시작한 작업 세션' \
   '[<ID> <상태>] <지금> | 기다림: <기다림> | PR: <링크>' \
   '[<ID> 머지 준비] <한 줄> | PR: <링크> | 문서: <스테이지 문서 경로>' \
   '[<ID> 질문] <정해야 할 것> / <선택지와 추천> / <찾아본 문서>' \
-  '오너 직접 결정:' '보내지 말라고 하지만' 'STATUS와 DECISIONS를 고치지 않는다' 'gh pr edit' \
+  '오너 직접 결정:' '보내지 말라고 하지만' 'STATUS와 DECISIONS를 고치지 않는다' 'gh issue edit' \
   '## 첫 턴' '## 보고' '## 질문' '## 머지 준비'; do
   has worker-skill "$W" "$want"
 done
@@ -322,6 +336,34 @@ print("\n".join(bad))
 PY
 )
 [ -z "$xref_out" ] || fail xref "$xref_out"
+
+# board-skills: 4단계의 세부 진행 자리(스테이지 이슈 본문), PR의 Refs, 동기화 안내와 실패 처리(설계 5.8·5.10·5.11·5.13절).
+for want in '## 체크리스트' '## 최근 진행' 'gh issue edit <번호> --body-file' 'Refs #<이슈 번호>' '`Closes`나 `Fixes`는 쓰지 않는다' \
+  '보드 동기화만 고친다' '보드가 없는 레포에서는'; do
+  has board-skills "$ST" "$want"
+done
+for want in 'gh issue edit' '「스테이지 이슈」' 'Refs #<이슈 번호>' '스테이지 이슈: 없음'; do
+  has board-skills "$W" "$want"
+done
+grep -qF 'gh pr edit' "$W" 2>/dev/null && fail board-skills "작업 세션 스킬에 gh pr edit 가 남음(세부 진행은 이슈 본문, 보드 없는 레포는 stage의 「진행 기록」)"
+for want in '{이슈 번호}' '**스테이지 이슈 번호:**' '스테이지 이슈: 없음(보드 없음)' '## 보드 동기화 실패' 'sh .githooks/board-sync.sh' 'gh auth refresh -s project'; do
+  has board-skills "$M" "$want"
+done
+for want in '### 보드 동기화' 'Refs #<이슈 번호>' 'board-sync.status' 'board-sync.log' 'sh .githooks/board-sync.sh' \
+  '`tools`' '`check`' '`board`' '`fields`' '`field-edit`' '`lock`' 'scripts/board-sync.sh'; do
+  has board-skills "$G" "$want"
+done
+# git의 단계별 원인이 board-sync.sh가 쓰는 단계 이름을 모두 다룬다.
+for step in $(grep -o 'wp_fail [a-z-]*' "$P/scripts/board-sync.sh" | sed 's/wp_fail //' | grep . | sort -u); do
+  gsec "$G" '### 보드 동기화' | grep -qF "\`$step\`" || fail board-skills "git 「보드 동기화」에 실패 단계 $step 의 원인이 없음"
+done
+for want in 'board-setup.sh template' 'board-setup.sh repo' 'gh auth refresh -s project' 'sh .githooks/board-sync.sh'; do
+  has board-skills "$I" "$want"
+done
+has board-skills "$WB" '- 스테이지 이슈: #{이슈 번호}'
+has board-skills "$B" 'board-setup.sh'
+# 보드 줄은 「검토 대기 상한」 줄 아래에 들어가므로(board-setup.sh), 블록의 마지막 줄이 상한 줄이어야 한다.
+grep . "$B" | tail -n 1 | grep -q '^- 검토 대기 상한: 3' || fail board-skills "CLAUDE.md 블록의 마지막 줄이 검토 대기 상한 줄이 아님"
 
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'

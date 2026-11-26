@@ -56,7 +56,7 @@ description: 데스크톱 앱에서 waypoint 레포의 중재자 세션을 맡�
 |---|---|
 | `initiation` | 위 시작 조건대로 `user_asked` 또는 `own_initiative` |
 | `context` | `fresh` |
-| `prompt` | `${CLAUDE_PLUGIN_ROOT}/templates/worker-brief-template.md`를 Read 도구로 읽어 채운다. `{중재자 세션 id}`는 `get_session`(`"self"`)의 id, `{읽을 문서}`는 PRD·앞 스테이지 문서·관련 DECISIONS 항목·쌓았다면 앞 브랜치, `{이어받기}`는 「없음」이거나 기존 스테이지 문서·PR·브랜치다. |
+| `prompt` | `${CLAUDE_PLUGIN_ROOT}/templates/worker-brief-template.md`를 Read 도구로 읽어 채운다. `{중재자 세션 id}`는 `get_session`(`"self"`)의 id, `{읽을 문서}`는 PRD·앞 스테이지 문서·관련 DECISIONS 항목·쌓았다면 앞 브랜치, `{이어받기}`는 「없음」이거나 기존 스테이지 문서·PR·브랜치다. `{이슈 번호}`는 아래 「스테이지 이슈 번호」대로 채운다. |
 | `background` | 프로젝트의 목적, 이 스테이지가 맡는 일, 지금까지의 관련 결정(80자 이상) |
 | `use_worktree` | `true`. 생략하면 메인 체크아웃을 함께 쓰게 되므로 반드시 적는다. |
 | `branch_name` | `<ID 소문자>-<짧은 설명>`(예: `2-9-or-batch7`). 앱이 오너의 접두사와 접미사를 붙인다. |
@@ -64,6 +64,11 @@ description: 데스크톱 앱에서 waypoint 레포의 중재자 세션을 맡�
 | `name` | 스테이지 ID 소문자(예: `2-9`, `r-1`) |
 | `title` | `<ID> <스테이지 이름>` |
 | `permission_mode` | 생략한다. 권한 모드가 같아야 `SendMessage`가 승인 대기에 걸리지 않는다. |
+
+**스테이지 이슈 번호:** 보드를 쓰는 레포(CLAUDE.md waypoint 블록에 `- 보드:` 줄이 있는 레포)에서는 STATUS 줄이 기본 브랜치에 push되면 보드 동기화가 그 스테이지의 이슈를 만든다.
+- 번호는 `gh issue list --label waypoint --state all --limit 1000 --json number,title`에서 제목이 `[<ID>] `로 시작하는 이슈의 번호다.
+- 없으면 동기화가 아직 끝나지 않았거나 실패한 것이다. 몇 초 뒤 다시 찾고, 그래도 없으면 아래 「보드 동기화 실패」대로 동기화를 직접 실행한 뒤 찾는다.
+- 보드가 없는 레포에서는 지시문의 그 줄을 `- 스테이지 이슈: 없음(보드 없음)`으로 쓴다.
 
 **첫 보고 확인:** 일하는 세션은 메시지를 턴이 끝난 뒤에 받으므로, 작업 세션은 첫 커밋 전에 작업 위치를 스스로 확인한다(`waypoint:worker`의 「첫 턴」). 중재자도 작업 세션의 첫 보고(`IN_PROGRESS`와 PR 링크)를 받으면 `get_session`으로 그 세션의 브랜치와 worktree를 본다. 브랜치 이름에 ID가 없거나 worktree가 메인 체크아웃이면, 작업 세션에 멈추라고 알리고 오너에게 보고한다.
 
@@ -113,6 +118,15 @@ description: 데스크톱 앱에서 waypoint 레포의 중재자 세션을 맡�
 - 머지한 뒤 STATUS를 `waypoint:git`의 「중재자의 머지」대로 정리(마지막 PR이면 `MERGED`, 중간 PR이면 `IN_PROGRESS`)해 커밋·push하고, 작업 세션에 머지를 알린다.
 - 머지가 끝난 작업 세션은 오너 턴에서 한꺼번에 보관할지 묻고, 오너가 승낙한 세션만 `archive_session`으로 보관한다. 보관하면 앱이 기본값으로 worktree를 정리한다. 정리되지 않은 worktree는 `git worktree remove`로 지운다.
 
+## 보드 동기화 실패
+
+세션 시작 요약에 `경고: 보드 동기화 실패(<시각>): <단계>: <이유>` 줄이 있거나, STATUS를 push한 출력에 `waypoint: 직전 보드 동기화 실패` 줄이 나오면 그 자리에서 처리한다.
+1. `waypoint:git`의 「보드 동기화」에서 그 단계의 원인을 찾아 고친다.
+2. 메인 체크아웃에서 `sh .githooks/board-sync.sh`를 실행하고, `.git/waypoint/board-sync.status`가 `ok`로 시작하는지 본다.
+3. 원인이 `gh` 토큰의 `project` 권한이면 중재자가 고칠 수 없다. STATUS 「오너 할 일」에 `gh auth refresh -s project 실행(보드 동기화)`을 올리고 오너에게 알린다. 오너가 실행했다고 하면 2번을 하고 그 줄을 지운다.
+
+동기화는 매번 STATUS 전체를 맞추므로, 다음에 성공하면 밀린 변경이 함께 반영된다. 실패하는 동안에도 STATUS와 스테이지 진행은 멈추지 않는다.
+
 ## compact 뒤
 
 중재자의 대화 기록에만 있는 정보는 없다. 정보는 다음 위치에 있다.
@@ -124,7 +138,7 @@ description: 데스크톱 앱에서 waypoint 레포의 중재자 세션을 맡�
 | 중재자가 대신 답한 질문, 작업 세션의 가정 | 작업 브랜치의 「진행 기록」, 검토 요약 |
 | 결정 | DECISIONS |
 | 계획 승인, 결과 승인 | 작업 브랜치의 스테이지 문서 「승인 결과」 |
-| 세부 진행 | 스테이지 문서, PR 본문, 커밋 |
+| 세부 진행 | 스테이지 문서, 스테이지 이슈 본문(보드가 없으면 PR 본문), 커밋 |
 | 작업 세션과 스테이지의 대응 | 세션 이름과 브랜치 이름에 든 ID |
 | 검토 대기 상한 | 레포 CLAUDE.md의 waypoint 블록 |
 

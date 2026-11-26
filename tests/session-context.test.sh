@@ -207,6 +207,29 @@ run2 stale-hook-current "$T/want-new" "$T/new"
 rm -rf "$T/new/.githooks"
 run2 stale-hook-none "$T/want-new" "$T/new"
 
+# 13b stale-pre-push, stale-board-sync: 보드 동기화 훅 사본(4단계 설계 5.9절)도 같은 방식으로 경고한다.
+PPV=$(sed -n 's/^# waypoint-hook-version: //p' "$ROOT/plugin/githooks/pre-push")
+BSV=$(sed -n 's/^# waypoint-hook-version: //p' "$ROOT/plugin/scripts/board-sync.sh")
+mkdir -p "$T/new/.githooks"
+printf '#!/bin/sh\n# waypoint-hook-version: 0\n' > "$T/new/.githooks/pre-push"
+{ echo "경고: .githooks/pre-push가 낡았다(레포 0, 플러그인 $PPV). 플러그인의 githooks/pre-push로 바꿔라."; cat "$T/want-new"; } > "$T/want-stale-pp"
+run2 stale-pre-push "$T/want-stale-pp" "$T/new"
+printf '#!/bin/sh\n# waypoint-hook-version: %s\n' "$PPV" > "$T/new/.githooks/pre-push"
+printf '#!/bin/sh\necho old\n' > "$T/new/.githooks/board-sync.sh"
+{ echo "경고: .githooks/board-sync.sh가 낡았다(레포 0, 플러그인 $BSV). 플러그인의 scripts/board-sync.sh로 바꿔라."; cat "$T/want-new"; } > "$T/want-stale-bs"
+run2 stale-board-sync "$T/want-stale-bs" "$T/new"
+rm -rf "$T/new/.githooks"
+
+# 13c sync-fail, sync-ok, sync-none: 메인 체크아웃의 보드 동기화 상태 파일이 실패면 경고 한 줄(4단계 설계 5.8절).
+mkdir -p "$T/new/.git/waypoint"
+echo 'fail 2026-11-26T10:00:00+0900 board: Project를 읽지 못함($URL)' > "$T/new/.git/waypoint/board-sync.status"
+{ echo '경고: 보드 동기화 실패(2026-11-26T10:00:00+0900): board: Project를 읽지 못함($URL)'; cat "$T/want-new"; } > "$T/want-sync-fail"
+run2 sync-fail "$T/want-sync-fail" "$T/new"
+echo 'ok 2026-11-26T10:00:00+0900' > "$T/new/.git/waypoint/board-sync.status"
+run2 sync-ok "$T/want-new" "$T/new"
+rm -rf "$T/new/.git/waypoint"
+run2 sync-none "$T/want-new" "$T/new"
+
 # 14 parent-dedupe: 레포 밖 세션은 레포마다 개수 줄만, 같은 메인 체크아웃은 한 번만, 숫자는 메인 체크아웃의 STATUS에서.
 g init -q -b main "$T/parent2/proj"
 # shellcheck disable=SC2086

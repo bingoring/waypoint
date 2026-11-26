@@ -662,6 +662,18 @@ git add docs/waypoint && WAYPOINT_ALLOW_BRANCH_STATUS=1 git commit -m "docs(wayp
 
 Expected: `diff` 출력이 없고, 커밋이 pre-commit 검사를 통과한다. `WAYPOINT_ALLOW_BRANCH_STATUS=1`은 이 커밋에만 쓴다.
 
+- [ ] **M6b 보드 적용(선택)**
+
+4단계 설계(`docs/superpowers/specs/2026-11-25-board-sync-design.md`) 5.10절 「레포마다 하는 일」이다. M6a의 새 형식 STATUS가 있어야 한다. 오너가 보드를 원하지 않으면 건너뛴다. 템플릿 Project(「waypoint 보드 템플릿」)가 아직 없으면 먼저 `sh <waypoint 체크아웃>/plugin/scripts/board-setup.sh template <소유자>`로 만들고, 출력 끝의 「GitHub 화면에서 할 일」 세 가지를 마친다.
+
+```bash
+gh auth status 2>&1 | grep -q "'project'" || echo "오너가 gh auth refresh -s project 를 먼저 실행한다"
+sh <waypoint 체크아웃>/plugin/scripts/board-setup.sh repo $REPO <템플릿 주소>
+git add CLAUDE.md .githooks/pre-push .githooks/board-sync.sh && git commit -m "chore(waypoint): 보드 동기화(보드 줄과 pre-push 훅)"
+```
+
+Expected: 「복사함」과 「연결함」이 나오고, CLAUDE.md의 「검토 대기 상한」 줄 아래에 `- 보드: <주소>` 줄이 생긴다. 이 브랜치의 push는 기본 브랜치로 가지 않으므로 동기화를 띄우지 않는다. 첫 동기화는 M10의 7번에서 한다. M9에서 M1부터 다시 하게 되면 `board-setup.sh repo`를 다시 실행하지 않는다(Project가 하나 더 생긴다). 앞 브랜치의 보드 줄과 `.githooks/` 두 사본을 같은 내용으로 다시 넣어 커밋한다.
+
 - [ ] **M7 CI**
 
 `.gitmodules`가 없어졌다면 `.github/workflows/*.yml`의 `submodules: true` 줄을 지운다. 문서 경로로 판정하는 조건(`waypoint`, `docs/dlc`)은 `docs/waypoint/**`로 바꾼다. 바뀐 것이 있으면 커밋한다: `git commit -am "ci: waypoint 서브모듈 체크아웃 제거"`.
@@ -713,6 +725,10 @@ gh pr create -R $GH --base $BASE --title "chore(waypoint): waypoint 문서를 do
 6. 각 worktree `<wt>`에서 옛 submodule 디렉터리가 남아 있으면 지운다. 남아 있는 디렉터리는 추적되지 않는 상태여야 한다.
 
 Expected: 모든 worktree에서 `test ! -e <wt>/$SUB`가 참이다.
+
+7. M6b를 했으면 프로젝트 레포의 메인 체크아웃에서 `sh .githooks/board-sync.sh`로 첫 동기화를 한다. `git config core.hooksPath`가 `.githooks`인지도 확인한다.
+
+Expected: `.git/waypoint/board-sync.status`가 `ok`로 시작하고, `MERGED`가 아닌 STATUS 줄마다 이슈가 하나씩 보드에 들어가 있다.
 
 ---
 

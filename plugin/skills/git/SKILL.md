@@ -47,7 +47,7 @@ STATUS의 줄을 고치는 커밋은 위 「문서 커밋 흐름」대로 메인
 모든 스테이지는 worktree의 작업 브랜치와 PR로 진행하고, 메인 체크아웃은 기본 브랜치에 둔다. 상태 값과 「지금」 머리말은 `waypoint:stage`의 「STATUS 표」를 따른다. 아래에서 「STATUS를 바꾼다」고 적은 일은, 중재자가 시작한 작업 세션이면 직접 하지 않고 `waypoint:worker`의 「보고」로 중재자에게 알린다.
 
 1. **스테이지를 시작하면 worktree와 작업 브랜치를 만든다.** 브랜치 이름에 스테이지 ID를 넣는다(예: `feature/3-13-serverless`, `content/2-9-or-batch7`). 접두어는 레포의 기존 관례를 따른다. 만드는 곳은 아래 「작업 위치」를 따른다.
-2. **스테이지 문서를 처음 커밋하면 바로 초안 PR을 연다**(`gh pr create --draft`). 메인 체크아웃에서 STATUS의 그 줄을 `IN_PROGRESS`(`계획: `)로 바꾸고 링크 칸에 PR을 적는다. 초안 PR을 쓸 수 없는 레포에서는 일반 PR을 열고 제목 앞에 `[작업 중]`을 붙인다. 이 표시는 결과 검토 때 뗀다.
+2. **스테이지 문서를 처음 커밋하면 바로 초안 PR을 연다**(`gh pr create --draft`). 보드를 쓰는 레포에서는 PR 본문에 `Refs #<이슈 번호>`를 적고 `Closes`나 `Fixes`는 쓰지 않는다(`waypoint:stage`의 「진행 기록」). 메인 체크아웃에서 STATUS의 그 줄을 `IN_PROGRESS`(`계획: `)로 바꾸고 링크 칸에 PR을 적는다. 초안 PR을 쓸 수 없는 레포에서는 일반 PR을 열고 제목 앞에 `[작업 중]`을 붙인다. 이 표시는 결과 검토 때 뗀다.
 3. **계획 검토:** 계획이 준비되면 STATUS를 `AI_PROPOSED`(`계획 검토: `)로 바꾼다. 오너는 PR에서 문서를 보거나 채팅으로 답한다. 답은 브랜치에 있는 스테이지 문서의 「승인 결과」에 기록한다.
 4. **구현:** 코드 스테이지는 계획 승인 뒤 STATUS를 `IN_PROGRESS`(`구현: `)로 되돌리고 구현한다.
 5. **결과 검토:** 결과가 준비되면 PR을 초안에서 검토 준비 상태로 바꾸고(`gh pr ready`), STATUS를 `AI_PROPOSED`(`결과 검토: `)로 바꾼다.
@@ -101,3 +101,20 @@ STATUS의 줄을 고치는 커밋은 위 「문서 커밋 흐름」대로 메인
 - **검사 2(STATUS 형식):** `waypoint:stage`의 「STATUS 표」 규칙(머리 줄, 칸 7개, 상태 값, ID, 「지금」의 길이와 머리말, 링크, `id:`가 있는 문서와 표의 대응, `(막음: <ID>)`, 허용하는 줄)을 검사한다. 실패하면 줄 번호와 고치는 법이 나온다.
 - `WAYPOINT_ALLOW_BRANCH_STATUS=1`은 검사 1만 건너뛴다. 레포 이전 절차(waypoint 레포의 절차 M)의 STATUS 변환 커밋에만 쓴다. 그 밖의 예외는 오너가 판단해 `--no-verify`로 넘긴다.
 - 세션 시작 요약 앞에 「`.githooks/pre-commit`이 낡았다」는 경고가 나오면, `${CLAUDE_PLUGIN_ROOT}/githooks/pre-commit`을 Read 도구로 읽어 `<메인>/.githooks/pre-commit`에 Write 도구로 쓰고 `chmod +x <메인>/.githooks/pre-commit`을 실행한 뒤 메인 체크아웃에서 커밋한다. worktree의 사본을 고치지 않는다.
+
+### 보드 동기화
+
+CLAUDE.md waypoint 블록에 `- 보드: <Project 주소>` 줄이 있는 레포는 STATUS를 GitHub Project 보드와 스테이지 이슈에 맞춘다. 원본은 STATUS다. 이슈의 제목, 라벨, 열림·닫힘과 Project 필드는 동기화만 고치고, 세션은 이슈 본문만 고친다(`waypoint:stage`의 「진행 기록」). 보드에서 사람이 바꾼 값은 다음 동기화가 STATUS 값으로 되돌린다.
+- **언제 도는가:** `.githooks/pre-push`가 기본 브랜치로 가는 push에서 `docs/waypoint/STATUS.md`가 바뀌었으면 `.githooks/board-sync.sh`를 백그라운드로 띄운다. push는 동기화를 기다리지 않고, 동기화가 실패해도 막히지 않는다.
+- **결과:** 메인 체크아웃의 `.git/waypoint/board-sync.status` 첫 줄이 `ok <시각>`이거나 `fail <시각> <단계>: <이유>`다. 자세한 기록은 같은 폴더의 `board-sync.log`에 있다.
+- **실패가 드러나는 곳:** 다음 push 출력의 `waypoint: 직전 보드 동기화 실패` 줄과 세션 시작 요약의 `경고: 보드 동기화 실패` 줄.
+- **직접 실행:** 메인 체크아웃에서 `sh .githooks/board-sync.sh`. 기본 브랜치 끝 커밋의 STATUS로 맞추고 결과(성공 또는 실패)를 한 줄로 알린다. 다른 동기화가 돌고 있으면 끝나기를 기다렸다가 실행한다. 매번 전체를 맞추므로 밀린 변경도 함께 반영된다.
+- **단계별 원인:**
+  - `tools`: PATH에 `gh`나 `jq`가 없다.
+  - `check`: 커밋의 STATUS가 형식 검사를 통과하지 못했다. 메시지대로 STATUS를 고쳐 커밋하고 push한다.
+  - `board`: Project를 읽지 못했거나, 「보드:」 줄의 주소 형식이 틀렸거나, origin이 GitHub 레포가 아니다. `gh auth status`로 토큰에 `project` 권한이 있는지 본다. 권한이 없으면 오너가 `gh auth refresh -s project`를 실행해야 한다. 「보드:」 줄의 주소도 확인한다.
+  - `fields`: Project에 필요한 필드나 선택지가 없다. 템플릿에서 복사한 Project인지 본다.
+  - `issue`, `items`, `field-edit`: 이슈 만들기, 카드 넣기, 필드 고치기 중 하나가 실패했다. `board-sync.log`의 마지막 줄을 보고, 대개는 다시 실행하면 된다.
+  - `lock`: 앞선 동기화가 10분 넘게 끝나지 않았다. `.git/waypoint/board-sync.lock/pid`의 프로세스가 없으면 그 폴더를 지우고 다시 실행한다.
+- **낡은 사본:** 세션 시작 요약에 `.githooks/pre-push`나 `.githooks/board-sync.sh`가 낡았다는 경고가 나오면, 「pre-commit 검사」의 마지막 항목과 같은 방법으로 `${CLAUDE_PLUGIN_ROOT}/githooks/pre-push`나 `${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.sh`를 메인 체크아웃의 `.githooks/`에 복사하고 커밋한다.
+- **처음 적용:** 새 레포는 `waypoint:init`의 보드 단계에서, 이미 waypoint를 쓰는 레포는 waypoint 레포의 절차 M(보드 적용 단계)으로 붙인다.

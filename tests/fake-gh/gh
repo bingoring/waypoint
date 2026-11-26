@@ -1,0 +1,179 @@
+#!/bin/sh
+# 보드 동기화 테스트용 가짜 gh. 진짜 GitHub에 접속하지 않는다.
+# 상태는 $FAKE_GH_DIR 의 JSON 파일(tests/board-lib.sh 참조), 호출 기록은 $FAKE_GH_LOG.
+# $FAKE_GH_FAIL 에 "<명령> <하위 명령>"(예: "project item-add")을 넣으면 그 호출은 실패한다.
+# 지원하는 모양은 board-sync.sh·board-setup.sh가 쓰는 것뿐이다.
+
+D=${FAKE_GH_DIR:?}
+printf '%s\n' "$*" >> "${FAKE_GH_LOG:-/dev/null}"
+# $FAKE_GH_EAT_STDIN=1: 표준 입력을 다 읽어 버린다. 호출한 쪽이 반복문의 입력을 gh에 물려주면 드러난다.
+[ -n "${FAKE_GH_EAT_STDIN:-}" ] && cat > /dev/null
+case " ${FAKE_GH_FAIL:-} " in
+  *" $1 $2 "*) echo "fake gh: 실패 주입($1 $2)" >&2; exit 1 ;;
+esac
+
+P="$D/project.json" I="$D/items.json" IS="$D/issues.json" L="$D/labels.json" W="$D/workflows.json" V="$D/views.json"
+[ -f "$V" ] || echo '[]' > "$V"
+upd() { f=$1; shift; jq "$@" "$f" > "$f.t" && mv "$f.t" "$f"; }
+# opt <이름> <값> ...: --이름 값 형태의 인자에서 값을 꺼낸다
+arg() { want=$1; shift; while [ $# -gt 0 ]; do [ "$1" = "$want" ] && { printf '%s' "$2"; return 0; }; shift; done; return 1; }
+has() { want=$1; shift; for a; do [ "$a" = "$want" ] && return 0; done; return 1; }
+
+read_project() {
+  # $FAKE_GH_PAGE_SIZE: 카드 목록을 이 수만큼씩 나눠 돌려준다(페이지 넘김 시험). 커서는 시작 위치 숫자다.
+  jq -n --slurpfile p "$P" --slurpfile it "$I" --slurpfile is "$IS" --slurpfile w "$W" --slurpfile v "$V" --arg kind "$1" --arg wf "$2" --arg vw "$3" \
+    --arg after "${4:-}" --arg size "${FAKE_GH_PAGE_SIZE:-1000}" '
+    $p[0] as $p | $is[0] as $is
+    | ($size | tonumber) as $sz | (if $after == "" then 0 else ($after | tonumber) end) as $st
+    | ($p.fields | map({key:.id, value:.}) | from_entries) as $byid
+    | ($p.fields | map({key:.name, value:.}) | from_entries) as $byname
+    | {data:{($kind):{projectV2:{
+        id:$p.id, title:$p.title, number:$p.number,
+        fields:{nodes:[$p.fields[] | {__typename:(if .dataType=="SINGLE_SELECT" then "ProjectV2SingleSelectField" else "ProjectV2Field" end), id, name, dataType} + (if .options then {options} else {} end)]},
+        items:{pageInfo:{hasNextPage:(($st + $sz) < ($it[0] | length)), endCursor:(($st + $sz) | tostring)}, nodes:[$it[0][$st:($st + $sz)][] | . as $item
+          | ($is | map(select(.number == $item.issue)) | .[0]) as $iss
+          | {id, isArchived,
+             content:{__typename:"Issue", id:("I_"+($iss.number|tostring)), number:$iss.number, title:$iss.title, state:$iss.state, url:$iss.url,
+                      repository:{nameWithOwner:($iss.repo // "test/repo")}, labels:{nodes:[$iss.labels[] | {name:.}]}},
+             fieldValues:{nodes:([{__typename:"ProjectV2ItemFieldTextValue", text:$iss.title, field:{name:"Title"}}]
+               + [$item.values | to_entries[] | . as $e | $byname[$e.key] as $f
+                  | if $f.dataType == "SINGLE_SELECT" then
+                      (($f.options | map(select(.id == $e.value)) | .[0]) as $o
+                       | if $o then {__typename:"ProjectV2ItemFieldSingleSelectValue", name:$o.name, optionId:$o.id, field:{name:$f.name}} else empty end)
+                    else {__typename:"ProjectV2ItemFieldTextValue", text:$e.value, field:{name:$f.name}} end])}}]}}}}}
+    | if $wf == "1" then .data[$kind].projectV2.workflows = {nodes:$w[0]} else . end
+    | if $vw == "1" then .data[$kind].projectV2.views = {nodes:[$v[0][] | {id, name, layout}]} else . end'
+}
+
+case "$1 $2" in
+  "api graphql")
+    if f=$(arg --input "$@"); then
+      body=$(cat "$f")
+      q=$(printf '%s' "$body" | jq -r .query)
+      case $q in
+        *updateProjectV2Field*)
+          fid=$(printf '%s' "$body" | jq -r .variables.f)
+          printf '%s' "$body" | jq -c '.variables.o' > "$D/newopts.json"
+          upd "$P" --arg fid "$fid" --slurpfile no "$D/newopts.json" '
+            ([.fields[] | select(.id == $fid) | (.options // [])[] | .id]) as $oldids
+            | .fields |= map(if .id == $fid then .options = [ $no[0] | to_entries[] | .key as $k | .value | (.id // "") as $i
+                | if ($i != "" and ($oldids | index($i)) != null) then . else . + {id:("n" + ($k|tostring) + "x" + (now|floor|tostring))} end ] else . end)'
+          # 없어진 선택지 id를 쓰던 값은 지워진다(GitHub이 그렇게 한다)
+          upd "$I" --slurpfile p "$P" '
+            ($p[0].fields | map(select(.dataType=="SINGLE_SELECT")) | map({key:.name, value:[.options[].id]}) | from_entries) as $ids
+            | map(.values |= with_entries(. as $e | select(($ids[$e.key] == null) or (($ids[$e.key] | index($e.value)) != null))))'
+          jq -n --slurpfile p "$P" --arg fid "$fid" '{data:{updateProjectV2Field:{projectV2Field:($p[0].fields[] | select(.id == $fid) | {options})}}}'
+          ;;
+        *deleteProjectV2Workflow*)
+          wid=$(printf '%s' "$body" | jq -r .variables.w)
+          upd "$W" --arg w "$wid" 'map(select(.id != $w))'
+          echo '{"data":{"deleteProjectV2Workflow":{"deletedWorkflowId":"'"$wid"'"}}}'
+          ;;
+        *createProjectV2View*)
+          printf '%s' "$body" | jq -c '.variables' > "$D/view.json"
+          upd "$V" --slurpfile n "$D/view.json" '. + [{id:("V_" + ((length + 1)|tostring)), name:$n[0].name, layout:$n[0].layout, visible:($n[0].f // [])}]'
+          jq -c '{data:{createProjectV2View:{projectV2View:(.[-1] | {id, name, layout})}}}' "$V"
+          ;;
+        *updateProjectV2View*)
+          printf '%s' "$body" | jq -c '.variables' > "$D/view.json"
+          upd "$V" --slurpfile n "$D/view.json" 'map(if .id == $n[0].v then .name = ($n[0].name // .name) | .visible = ($n[0].f // .visible) else . end)'
+          jq -c --slurpfile n "$D/view.json" '{data:{updateProjectV2View:{projectV2View:(.[] | select(.id == $n[0].v) | {id, name, layout})}}}' "$V"
+          ;;
+        *) echo "fake gh: 모르는 graphql mutation" >&2; exit 1 ;;
+      esac
+    else
+      q= after=
+      for a; do
+        case $a in
+          query=*) q=${a#query=} ;;
+          after=*) after=${a#after=} ;;
+        esac
+      done
+      wf=0 vw=0
+      case $q in *"workflows("*) wf=1 ;; esac
+      case $q in *"views("*) vw=1 ;; esac
+      case $q in
+        *"organization(login"*) read_project organization "$wf" "$vw" "$after" ;;
+        *) read_project user "$wf" "$vw" "$after" ;;
+      esac
+    fi
+    ;;
+  "issue list")
+    # 이슈마다 "repo"(없으면 test/repo)가 있고, -R 의 레포 것만 돌려준다.
+    r=$(arg -R "$@" || echo test/repo)
+    jq -c --arg r "$r" '[.[] | select((.repo // "test/repo") == $r) | {number, title, state, url}]' "$IS"
+    ;;
+  "issue create")
+    t=$(arg --title "$@"); lb=$(arg --label "$@"); bf=$(arg --body-file "$@")
+    n=$(jq '(map(.number) | max // 0) + 1' "$IS")
+    upd "$IS" --argjson n "$n" --arg t "$t" --arg lb "$lb" --rawfile b "$bf" \
+      '. + [{number:$n, title:$t, state:"OPEN", url:("https://github.com/test/repo/issues/"+($n|tostring)), labels:[$lb], body:$b}]'
+    echo "https://github.com/test/repo/issues/$n"
+    ;;
+  "issue edit")
+    t=$(arg --title "$@")
+    upd "$IS" --argjson n "$3" --arg t "$t" 'map(if .number == $n then .title = $t else . end)'
+    ;;
+  "issue close") upd "$IS" --argjson n "$3" 'map(if .number == $n then .state = "CLOSED" else . end)' ;;
+  "issue reopen") upd "$IS" --argjson n "$3" 'map(if .number == $n then .state = "OPEN" else . end)' ;;
+  "label list") jq -c 'map({name:.})' "$L" ;;
+  "label create") upd "$L" --arg n "$3" '. + [$n]' ;;
+  "project item-add")
+    u=$(arg --url "$@")
+    n=${u##*/}
+    # 이미 카드가 있는 이슈면 그 카드를 돌려준다(GitHub의 addProjectV2ItemById와 같다).
+    id=$(jq -r --argjson n "$n" '[.[] | select(.issue == $n)][0].id // ""' "$I")
+    if [ -z "$id" ]; then
+      id="PVTI_$(jq 'length + 1' "$I")"
+      upd "$I" --arg id "$id" --argjson n "$n" '. + [{id:$id, issue:$n, isArchived:false, values:{}}]'
+    fi
+    jq -nc --arg id "$id" --arg u "$u" '{id:$id, url:$u, type:"Issue"}'
+    ;;
+  "project item-edit")
+    iid=$(arg --id "$@"); fid=$(arg --field-id "$@")
+    fname=$(jq -r --arg f "$fid" '.fields[] | select(.id == $f) | .name' "$P")
+    [ -n "$fname" ] || { echo "fake gh: 모르는 필드 $fid" >&2; exit 1; }
+    if has --clear "$@"; then
+      upd "$I" --arg i "$iid" --arg k "$fname" 'map(if .id == $i then .values |= del(.[$k]) else . end)'
+    elif v=$(arg --text "$@"); then
+      upd "$I" --arg i "$iid" --arg k "$fname" --arg v "$v" 'map(if .id == $i then .values[$k] = $v else . end)'
+    elif v=$(arg --single-select-option-id "$@"); then
+      upd "$I" --arg i "$iid" --arg k "$fname" --arg v "$v" 'map(if .id == $i then .values[$k] = $v else . end)'
+    fi
+    ;;
+  "project create")
+    # 새 Project: 기본 필드(Title, Status 세 선택지), 기본 자동화 여섯 개, 표 보기 하나. 이전 상태는 버린다.
+    o=$(arg --owner "$@"); t=$(arg --title "$@")
+    jq -n --arg t "$t" '{id:"PVT_new", title:$t, number:1, fields:[
+      {id:"F_TITLE", name:"Title", dataType:"TITLE"},
+      {id:"F_STATUS", name:"Status", dataType:"SINGLE_SELECT", options:[
+        {id:"o_todo", name:"Todo", color:"GRAY", description:""},
+        {id:"o_prog", name:"In Progress", color:"YELLOW", description:""},
+        {id:"o_done", name:"Done", color:"GREEN", description:""}]}]}' > "$P"
+    echo '[]' > "$I"
+    jq -n '[range(1; 7) | {id:("W_" + tostring), name:("기본 자동화 " + tostring), enabled:true}]' > "$W"
+    echo '[{"id":"V_1","name":"View 1","layout":"TABLE_LAYOUT","visible":[]}]' > "$V"
+    jq -nc --arg o "$o" '{number:1, url:("https://github.com/users/" + $o + "/projects/1"), id:"PVT_new"}'
+    ;;
+  "project field-create")
+    nm=$(arg --name "$@"); ty=$(arg --data-type "$@"); so=$(arg --single-select-options "$@" || true)
+    fid="F_new$(jq '.fields | length' "$P")"
+    upd "$P" --arg id "$fid" --arg n "$nm" --arg ty "$ty" --arg so "$so" \
+      '.fields += [{id:$id, name:$n, dataType:$ty} + (if $ty == "SINGLE_SELECT" then {options:[$so | split(",") | to_entries[] | {id:($id + "_" + (.key|tostring)), name:.value, color:"GRAY", description:""}]} else {} end)]'
+    jq -nc --arg id "$fid" --arg n "$nm" '{id:$id, name:$n}'
+    ;;
+  "project list")
+    # $FAKE_GH_DIR/projects.json([{number,title,url,id}])이 있으면 그것을, 없으면 빈 목록을 돌려준다.
+    if [ -f "$D/projects.json" ]; then jq -c '{projects: ., totalCount: length}' "$D/projects.json"; else echo '{"projects":[],"totalCount":0}'; fi
+    ;;
+  "project copy")
+    # 복사본은 원본과 같은 필드를 가진다. 가짜 gh는 Project 하나만 두므로 상태는 그대로 두고 새 번호만 돌려준다.
+    o=$(arg --target-owner "$@")
+    jq -nc --arg o "$o" '{number:2, url:("https://github.com/users/" + $o + "/projects/2"), id:"PVT_copy"}'
+    ;;
+  "project link") ;;
+  *)
+    echo "fake gh: 지원하지 않는 호출: $*" >&2
+    exit 1
+    ;;
+esac
