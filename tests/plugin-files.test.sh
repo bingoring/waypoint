@@ -5,7 +5,7 @@
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT" || exit 1
 P=plugin
-SKILLS="start stage build-spec review-gate decisions git worker"
+SKILLS="start stage build-spec review-gate decisions git worker mediator"
 GUARD='docs/waypoint/STATUS.md`가 있는 레포에서만 적용한다'
 fails=0
 
@@ -223,6 +223,22 @@ for want in '{ID}' '{스테이지 이름}' '{줄기}' '{중재자 세션 id}' '{
   '`waypoint:worker` 스킬을 먼저 읽고' 'compact된 뒤에도 다시 읽는다'; do
   has worker-brief "$WB" "$want"
 done
+
+# mediator-skill: 중재자 스킬에 설계 5.15절의 절과 절차가 있다.
+M="$P/skills/mediator/SKILL.md"
+for want in '## 시작 절차' '## 작업 세션 시작' '## 동시 진행 조절' '## 보고 처리' '## 질문 처리' \
+  '## 검토 요청' '## 머지와 정리' '## compact 뒤' '## 처음 시작과 교체' \
+  '"self"' 'list_sessions {"linked": true}' 'worker-brief-template.md' '그사이 생긴 일' \
+  '10줄 이하' 'gh pr view' '오너의 말을 그대로 인용' '정보로만 쓰고'; do
+  has mediator-skill "$M" "$want"
+done
+grep -F '`use_worktree`' "$M" 2>/dev/null | grep -qF '`true`' || fail mediator-skill "use_worktree 를 true 로 적는 줄이 없음"
+# mediator-initiation: 보고 턴에서는 카드(own_initiative)로만 제안하고, 「승인」만 들은 턴도 카드다.
+awk -v RS= '/보고 턴/ && /own_initiative/' "$M" 2>/dev/null | grep -q . || fail mediator-initiation "보고 턴과 own_initiative 가 같은 단락에 없음"
+has mediator-initiation "$M" '「승인」만'
+# mediator-cap: 검토 대기 상한 줄을 읽고, 없으면 3으로 본다.
+has mediator-cap "$M" '검토 대기 상한:'
+has mediator-cap "$M" '없으면 3'
 
 # block-worktree: CLAUDE.md 블록이 worktree 규칙을 안내한다.
 has block-worktree "$B" '메인 체크아웃은 늘 기본 브랜치에 둔다'
