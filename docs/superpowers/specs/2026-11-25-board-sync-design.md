@@ -1,7 +1,7 @@
 # waypoint 보드 동기화 설계
 
 - 작성일: 2026-11-25
-- 상태: 오너 승인(2026-11-25)
+- 상태: 오너 승인(2026-11-26)
 - 범위: waypoint 고도화 4단계 중 4단계
 - 앞 단계: [`2026-11-24-plugin-split-design.md`](2026-11-24-plugin-split-design.md)(1단계, 플러그인 전환), [`2026-11-25-status-cleanup-design.md`](2026-11-25-status-cleanup-design.md)(2단계, STATUS 정리), [`2026-11-25-mediator-sessions-design.md`](2026-11-25-mediator-sessions-design.md)(3단계, 중재자 세션)
 
