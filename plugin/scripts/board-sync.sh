@@ -205,7 +205,7 @@ END {
 
 # wp_board_urls <CLAUDE.md>: 「- 보드:」 줄의 Project 주소를 한 줄에 하나씩 출력한다. 형식이 틀린 주소는 stderr에 경고하고 건너뛴다.
 wp_board_urls() {
-  awk '/^[ \t]*- 보드:/ { sub(/^[ \t]*- 보드:[ \t]*/, ""); n = split($0, a, /[ \t]+/); for (i = 1; i <= n; i++) if (a[i] != "") print a[i] }' "$1" |
+  awk '{ sub(/\r$/, "") } /^[ \t]*- 보드:/ { sub(/^[ \t]*- 보드:[ \t]*/, ""); n = split($0, a, /[ \t]+/); for (i = 1; i <= n; i++) if (a[i] != "") print a[i] }' "$1" |
     while IFS= read -r u; do
       if printf '%s\n' "$u" | grep -qE '^https://github\.com/(users|orgs)/[A-Za-z0-9._-]+/projects/[0-9]+/?$'; then
         printf '%s\n' "${u%/}"
@@ -227,7 +227,7 @@ WP_GQL_PROJECT='query($owner: String!, $number: Int!, $after: String) {
         nodes {
           id
           isArchived
-          content { __typename ... on Issue { number title state url } }
+          content { __typename ... on Issue { number title state url repository { nameWithOwner } } }
           fieldValues(first: 30) { nodes { __typename
             ... on ProjectV2ItemFieldTextValue { text field { ... on ProjectV2FieldCommon { name } } }
             ... on ProjectV2ItemFieldSingleSelectValue { name optionId field { ... on ProjectV2FieldCommon { name } } } } }
@@ -237,9 +237,11 @@ WP_GQL_PROJECT='query($owner: String!, $number: Int!, $after: String) {
   }
 }'
 
-# 읽은 Project에서 카드 목록: [{item, number, title, state, url, v:{필드 이름: 값}}] (ID 값이 있는 이슈 카드만)
+# 읽은 Project에서 카드 목록: [{item, number, title, state, url, v:{필드 이름: 값}}] (이 레포의 이슈이고 ID 값이 있는 카드만)
+# jq --arg k <user|organization> --arg repo <owner/repo>. 한 Project에 여러 레포의 카드가 있어도(설계 5.12절) 이 레포 것만 본다.
 WP_JQ_CARDS='.data[$k].projectV2.items.nodes
   | map(select(.content.__typename == "Issue"))
+  | map(select((.content.repository.nameWithOwner // "" | ascii_downcase) == ($repo | ascii_downcase)))
   | map({item: .id, number: .content.number, title: .content.title, state: .content.state, url: .content.url,
          v: ([.fieldValues.nodes[] | select(.field.name != null) | {key: .field.name, value: (.text // .name)}] | from_entries)})
   | map(select((.v.ID // "") != ""))'
@@ -273,9 +275,14 @@ wp_repo() {
   _u=$(git remote get-url origin 2>/dev/null) || return 1
   _u=${_u%.git}
   case $_u in
-    https://github.com/*) printf '%s\n' "${_u#https://github.com/}" ;;
-    git@github.com:*) printf '%s\n' "${_u#git@github.com:}" ;;
-    ssh://git@github.com/*) printf '%s\n' "${_u#ssh://git@github.com/}" ;;
+    https://github.com/*) _u=${_u#https://github.com/} ;;
+    git@github*:*) _u=${_u#*:} ;;
+    ssh://git@github*/*) _u=${_u#ssh://git@*/} ;;
+    *) return 1 ;;
+  esac
+  case $_u in
+    */*/* | /* | */ | '') return 1 ;;
+    */*) printf '%s\n' "$_u" ;;
     *) return 1 ;;
   esac
 }
@@ -341,28 +348,37 @@ wp_sync_project() {
   _fid_id=$(jq -r '.ID.id' "$WP_TMP/fields.json")
 
   # 가: 카드가 없는 줄(MERGED 제외) → 이슈를 찾거나 만들고 카드에 넣는다.
-  jq -c --arg k "$_kind" "$WP_JQ_CARDS" "$_pj" > "$WP_TMP/cards.json"
+  jq -c --arg k "$_kind" --arg repo "$WP_REPO" "$WP_JQ_CARDS" "$_pj" > "$WP_TMP/cards.json"
   jq -r --slurpfile c "$WP_TMP/cards.json" '.[] | select(.open) | select(.id as $i | $c[0] | map(.v.ID) | index($i) | not) | .id' "$WP_TMP/desired.json" |
     while IFS= read -r _id; do
       _title=$(jq -r --arg i "$_id" '.[] | select(.id == $i) | .title' "$WP_TMP/desired.json")
       _iurl=$(jq -r --arg i "$_id" '[.[] | select(.title | startswith("[" + $i + "] ") or . == ("[" + $i + "]"))] | sort_by(.number) | .[0].url // ""' "$WP_TMP/issues.json")
       if [ -z "$_iurl" ]; then
         printf '%s' "$WP_BODY" > "$WP_TMP/body.md"
-        _iurl=$(gh issue create -R "$WP_REPO" --title "$_title" --label waypoint --body-file "$WP_TMP/body.md") || { wp_fail issue "이슈를 만들지 못함($_id)"; exit 1; }
+        _iurl=$(gh issue create -R "$WP_REPO" --title "$_title" --label waypoint --body-file "$WP_TMP/body.md" < /dev/null) || { wp_fail issue "이슈를 만들지 못함($_id)"; exit 1; }
         _inum=${_iurl##*/}
         jq --argjson n "$_inum" --arg t "$_title" --arg u "$_iurl" '. + [{number: $n, title: $t, state: "OPEN", url: $u}]' "$WP_TMP/issues.json" > "$WP_TMP/i2" && mv "$WP_TMP/i2" "$WP_TMP/issues.json"
         wp_log "이슈 만듦 $_id $_iurl"
       fi
-      _item=$(gh project item-add "$_num" --owner "$_owner" --url "$_iurl" --format json | jq -r .id) && [ -n "$_item" ] && [ "$_item" != null ] ||
+      _item=$(gh project item-add "$_num" --owner "$_owner" --url "$_iurl" --format json < /dev/null | jq -r .id) && [ -n "$_item" ] && [ "$_item" != null ] ||
         { wp_fail items "카드에 넣지 못함($_id, $_url)"; exit 1; }
-      gh project item-edit --project-id "$_pid" --id "$_item" --field-id "$_fid_id" --text "$_id" > /dev/null ||
+      gh project item-edit --project-id "$_pid" --id "$_item" --field-id "$_fid_id" --text "$_id" < /dev/null > /dev/null ||
         { wp_fail field-edit "ID를 적지 못함($_id)"; exit 1; }
       wp_log "카드 넣음 $_id ($_url)"
+    done || return 1
+  # 카드 없는 MERGED 줄: 카드는 만들지 않는다. 이전 실패로 열린 이슈만 남아 있으면 닫는다.
+  jq -r --slurpfile c "$WP_TMP/cards.json" '.[] | select(.open | not) | select(.id as $i | $c[0] | map(.v.ID) | index($i) | not) | .id' "$WP_TMP/desired.json" |
+    while IFS= read -r _id; do
+      _inum=$(jq -r --arg i "$_id" '[.[] | select(.state == "OPEN") | select(.title | startswith("[" + $i + "] ") or . == ("[" + $i + "]"))] | sort_by(.number) | .[0].number // ""' "$WP_TMP/issues.json")
+      [ -n "$_inum" ] || continue
+      gh issue close "$_inum" -R "$WP_REPO" < /dev/null > /dev/null || { wp_fail issue "카드 없는 이슈를 닫지 못함($_id #$_inum)"; exit 1; }
+      jq --argjson n "$_inum" 'map(if .number == $n then .state = "CLOSED" else . end)' "$WP_TMP/issues.json" > "$WP_TMP/i2" && mv "$WP_TMP/i2" "$WP_TMP/issues.json"
+      wp_log "카드 없는 이슈를 닫음 $_id #$_inum"
     done || return 1
   # 카드를 넣었으면 다시 읽는다
   if [ "$(jq -r --slurpfile c "$WP_TMP/cards.json" '[.[] | select(.open) | select(.id as $i | $c[0] | map(.v.ID) | index($i) | not)] | length' "$WP_TMP/desired.json")" != 0 ]; then
     wp_read_project "$_kind" "$_owner" "$_num" "$_pj" || { wp_fail board "Project를 다시 읽지 못함($_url)"; return 1; }
-    jq -c --arg k "$_kind" "$WP_JQ_CARDS" "$_pj" > "$WP_TMP/cards.json"
+    jq -c --arg k "$_kind" --arg repo "$WP_REPO" "$WP_JQ_CARDS" "$_pj" > "$WP_TMP/cards.json"
   fi
 
   # 나: 카드가 있는 줄 → 다른 것만 고친다. 고칠 호출을 gh 인자(@sh)로 만든다.
@@ -386,7 +402,7 @@ wp_sync_project() {
     | @sh' "$WP_TMP/desired.json" > "$WP_TMP/actions.txt" || { wp_fail field-edit "고칠 목록을 만들지 못함($_url)"; return 1; }
   while IFS= read -r _a; do
     eval "set -- $_a"
-    gh "$@" > /dev/null || { wp_fail field-edit "gh $1 $2 실패($_url)"; return 1; }
+    gh "$@" < /dev/null > /dev/null || { wp_fail field-edit "gh $1 $2 실패($_url)"; return 1; }
   done < "$WP_TMP/actions.txt"
   wp_log "고침 $(wc -l < "$WP_TMP/actions.txt" | tr -d ' ')건 ($_url)"
 
@@ -396,34 +412,54 @@ wp_sync_project() {
   return 0
 }
 
-# wp_lock: 잠금을 잡으면 0. 다른 동기화가 실행 중이면 재실행 표시를 남기고 2. 잠금이 10분 넘게 풀리지 않으면 실패로 기록하고 1.
+# wp_lock [wait]: 잠금을 잡으면 0. 다른 동기화가 실행 중이면 2(wait가 아니면 재실행 표시를 남긴다).
+# 잠금이 10분 넘게 풀리지 않으면 실패로 기록하고 1.
+# 잠금 폴더는 mkdir로 원자적으로 만들고, 그 안에 started를 먼저, pid를 나중에 쓴다. pid가 아직 없는 잠금은
+# 막 만들어지는 중이므로 남의 실행으로 본다(10분이 지나도 pid가 없으면 낡은 잠금).
 wp_lock() {
   _lk="$WP_DIR/board-sync.lock"
   if mkdir "$_lk" 2> /dev/null; then
-    echo $$ > "$_lk/pid"; date +%s > "$_lk/started"
+    date +%s > "$_lk/started"; echo $$ > "$_lk/pid.t" && mv "$_lk/pid.t" "$_lk/pid"
     return 0
   fi
-  _pid=; _st=0
+  _pid=; _st=
   [ -r "$_lk/pid" ] && read -r _pid < "$_lk/pid"
   [ -r "$_lk/started" ] && read -r _st < "$_lk/started"
-  if [ -n "$_pid" ] && kill -0 "$_pid" 2> /dev/null; then
-    _age=$(( $(date +%s) - ${_st:-0} ))
+  case $_st in '' | *[!0-9]*) _st= ;; esac
+  if [ -n "$_st" ]; then
+    _age=$(( $(date +%s) - _st ))
+  elif [ -n "$(find "$_lk" -maxdepth 0 -mmin +10 2> /dev/null)" ]; then
+    _age=601
+  else
+    _age=0
+  fi
+  if [ -z "$_pid" ] && [ "$_age" -le 600 ] || { [ -n "$_pid" ] && kill -0 "$_pid" 2> /dev/null; }; then
     if [ "$_age" -gt 600 ]; then
-      wp_fail lock "잠금이 오래 풀리지 않음(PID $_pid, ${_age}초). 그 프로세스를 확인한 뒤 $_lk를 지우고 다시 실행한다"
+      wp_fail lock "잠금이 오래 풀리지 않음(PID ${_pid:-없음}, ${_age}초). 그 프로세스를 확인한 뒤 $_lk를 지우고 다시 실행한다"
       return 1
     fi
-    : > "$WP_DIR/board-sync.rerun"
-    wp_log "다른 동기화가 실행 중(PID $_pid). 끝난 뒤 다시 실행하도록 표시함"
+    if [ "${1:-}" != wait ]; then
+      : > "$WP_DIR/board-sync.rerun"
+      wp_log "다른 동기화가 실행 중(PID ${_pid:-준비 중}). 끝난 뒤 다시 실행하도록 표시함"
+    fi
     return 2
   fi
   rm -rf "$_lk"
   wp_log "오래된 잠금을 지움(PID ${_pid:-없음})"
   if mkdir "$_lk" 2> /dev/null; then
-    echo $$ > "$_lk/pid"; date +%s > "$_lk/started"
+    date +%s > "$_lk/started"; echo $$ > "$_lk/pid.t" && mv "$_lk/pid.t" "$_lk/pid"
     return 0
   fi
-  : > "$WP_DIR/board-sync.rerun"
+  [ "${1:-}" = wait ] || : > "$WP_DIR/board-sync.rerun"
   return 2
+}
+
+# wp_unlock: 이 프로세스가 쥔 잠금만 푼다(trap에서도 부른다).
+wp_unlock() {
+  _p=
+  [ -r "$WP_DIR/board-sync.lock/pid" ] && read -r _p < "$WP_DIR/board-sync.lock/pid"
+  [ "$_p" = "$$" ] && rm -rf "$WP_DIR/board-sync.lock"
+  return 0
 }
 
 # wp_run <커밋>: 그 커밋의 STATUS와 「보드:」 줄로 한 번 동기화한다.
@@ -431,9 +467,12 @@ wp_run() {
   _commit=$1
   WP_TMP=$(mktemp -d) || return 1
   git show "$_commit:CLAUDE.md" > "$WP_TMP/CLAUDE.md" 2>/dev/null || : > "$WP_TMP/CLAUDE.md"
-  _urls=$(wp_board_urls "$WP_TMP/CLAUDE.md")
-  [ -n "$_urls" ] || { rm -rf "$WP_TMP"; return 0; }
+  _urls=$(wp_board_urls "$WP_TMP/CLAUDE.md" 2> "$WP_TMP/urls.err")
+  _bad=$(sed -n 's/^waypoint: 보드 주소 형식이 틀려 건너뛴다: //p' "$WP_TMP/urls.err" | tr '\n' ' ' | sed 's/ $//')
+  # 「보드:」 줄이 없으면 할 일이 없다(실패가 아니다). 줄은 있는데 주소가 모두 틀리면 실패다.
+  [ -n "$_urls" ] || [ -n "$_bad" ] || { rm -rf "$WP_TMP"; return 0; }
   wp_log "시작 commit=$_commit"
+  [ -n "$_urls" ] || { wp_fail board "보드 주소 형식이 틀림: $_bad (https://github.com/users|orgs/<소유자>/projects/<번호> 꼴이어야 한다)"; rm -rf "$WP_TMP"; return 1; }
   for _t in gh jq; do
     command -v "$_t" > /dev/null 2>&1 || { wp_fail tools "PATH에서 $_t를 찾지 못함(PATH=$PATH)"; rm -rf "$WP_TMP"; return 1; }
   done
@@ -444,7 +483,7 @@ wp_run() {
 
   gh issue list -R "$WP_REPO" --label waypoint --state all --limit 1000 --json number,title,state,url > "$WP_TMP/issues.json" 2> "$WP_TMP/gh.err" ||
     { wp_fail issue "이슈 목록을 읽지 못함: $(head -n 1 "$WP_TMP/gh.err")"; rm -rf "$WP_TMP"; return 1; }
-  if ! gh label list -R "$WP_REPO" --json name --limit 200 | jq -e 'map(.name) | index("waypoint")' > /dev/null 2>&1; then
+  if ! gh label list -R "$WP_REPO" --search waypoint --json name --limit 100 | jq -e 'map(.name) | index("waypoint")' > /dev/null 2>&1; then
     gh label create waypoint -R "$WP_REPO" --color 5319E7 --description "waypoint 스테이지 이슈(STATUS에서 만들어짐)" > /dev/null 2>&1 ||
       { wp_fail issue "waypoint 라벨을 만들지 못함"; rm -rf "$WP_TMP"; return 1; }
   fi
@@ -452,6 +491,11 @@ wp_run() {
   for _u in $_urls; do
     wp_sync_project "$_u" || { rm -rf "$WP_TMP"; return 1; }
   done
+  if [ -n "$_bad" ]; then
+    wp_fail board "보드 주소 형식이 틀려 건너뜀: $_bad. 나머지 Project는 맞췄다"
+    rm -rf "$WP_TMP"
+    return 1
+  fi
   printf 'ok %s\n' "$(wp_now)" > "$WP_DIR/board-sync.status"
   wp_log "성공"
   rm -rf "$WP_TMP"
@@ -459,10 +503,12 @@ wp_run() {
 }
 
 wp_main() {
-  _c=
+  _c=; _manual=1
   while [ $# -gt 0 ]; do
     case $1 in
-      --commit) _c=$2; shift 2 ;;
+      --commit)
+        [ $# -ge 2 ] && [ -n "$2" ] || { echo "사용: board-sync.sh [--commit <sha>]" >&2; return 2; }
+        _c=$2; _manual=; shift 2 ;;
       *) echo "사용: board-sync.sh [--commit <sha>]" >&2; return 2 ;;
     esac
   done
@@ -473,28 +519,57 @@ wp_main() {
     _c=$(git rev-parse -q --verify "refs/heads/$_def^{commit}") || return 1
   fi
   # 보드를 쓰지 않는 레포: 아무것도 남기지 않고 끝낸다(실패가 아니다).
-  git show "$_c:CLAUDE.md" 2>/dev/null | grep -qE '^[[:space:]]*- 보드:' || return 0
+  git show "$_c:CLAUDE.md" 2>/dev/null | grep -qE '^[[:space:]]*- 보드:' || { [ -z "$_manual" ] || echo "waypoint 보드 동기화: CLAUDE.md에 「- 보드:」 줄이 없어 할 일이 없다"; return 0; }
 
   WP_DIR="$(git rev-parse --path-format=absolute --git-common-dir)/waypoint"
   mkdir -p "$WP_DIR" || return 1
-  wp_lock; _lrc=$?
-  [ "$_lrc" = 2 ] && return 0
+  if [ -n "$_manual" ]; then
+    # 직접 실행: 다른 동기화가 돌고 있으면 끝나기를 기다린다(2초 간격). 기다린 뒤에는 기본 브랜치 끝 커밋으로 한다.
+    _said=
+    while :; do
+      wp_lock wait; _lrc=$?
+      [ "$_lrc" = 2 ] || break
+      [ -n "$_said" ] || { echo "waypoint 보드 동기화: 다른 동기화가 끝나기를 기다린다" >&2; _said=1; }
+      sleep 2
+    done
+  else
+    wp_lock; _lrc=$?
+    [ "$_lrc" = 2 ] && return 0
+  fi
   [ "$_lrc" = 0 ] || return 1
-  trap 'rm -rf "$WP_DIR/board-sync.lock"' EXIT
+  trap wp_unlock EXIT
 
   _rc=0; _n=0
   while :; do
     wp_run "$_c"; _rc=$?
     _n=$((_n + 1))
     # 실행 중에 다른 push가 동기화를 청했으면, 기본 브랜치 끝 커밋(가장 최근 STATUS)으로 한 번 더 한다.
-    [ -e "$WP_DIR/board-sync.rerun" ] && [ "$_n" -lt 4 ] || break
+    if [ ! -e "$WP_DIR/board-sync.rerun" ]; then
+      # 잠금을 푸는 사이에 들어온 요청도 놓치지 않는다: 풀고 나서 표시가 있으면 잠금을 다시 잡아 이어 간다.
+      wp_unlock
+      [ -e "$WP_DIR/board-sync.rerun" ] && [ "$_n" -lt 4 ] || break
+      wp_lock wait || break
+    fi
+    if [ "$_n" -ge 4 ]; then
+      wp_log "재실행 요청이 남음(4번 실행함). 다음 push나 직접 실행 때 반영된다"
+      break
+    fi
     rm -f "$WP_DIR/board-sync.rerun"
     _def=$(wp_default_branch) && _c=$(git rev-parse -q --verify "refs/heads/$_def^{commit}") || break
     wp_log "다시 실행(실행 중에 요청이 있었음)"
   done
-  rm -rf "$WP_DIR/board-sync.lock"
-  if [ "$(wc -l < "$WP_DIR/board-sync.log" 2>/dev/null || echo 0)" -gt 500 ]; then
+  wp_unlock
+  trap - EXIT
+  if [ -f "$WP_DIR/board-sync.log" ] && [ "$(wc -l < "$WP_DIR/board-sync.log")" -gt 500 ]; then
     tail -n 500 "$WP_DIR/board-sync.log" > "$WP_DIR/board-sync.log.t" && mv "$WP_DIR/board-sync.log.t" "$WP_DIR/board-sync.log"
+  fi
+  if [ -n "$_manual" ]; then
+    _st=
+    [ -r "$WP_DIR/board-sync.status" ] && IFS= read -r _st < "$WP_DIR/board-sync.status"
+    case $_st in
+      ok*) echo "waypoint 보드 동기화: 성공(${_st#ok })" ;;
+      *) echo "waypoint 보드 동기화: 실패. $WP_DIR/board-sync.status 와 board-sync.log 를 본다" >&2 ;;
+    esac
   fi
   return "$_rc"
 }

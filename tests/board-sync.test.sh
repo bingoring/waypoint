@@ -79,7 +79,7 @@ grep -qF 'example.com' "$T/err" || fail urls-bad-warn "경고 없음"
 # ---- Task 4: Project와 이슈 맞추기 ----
 
 # parity: 실제 GitHub 응답(픽스처)을 board-sync의 카드 해석으로 읽을 수 있다.
-jq -c --arg k user "$WP_JQ_CARDS" "$ROOT/tests/fixtures/board/project-graphql.json" > "$T/real-cards.json"
+jq -c --arg k user --arg repo bingoring/waypoint-board-test "$WP_JQ_CARDS" "$ROOT/tests/fixtures/board/project-graphql.json" > "$T/real-cards.json"
 [ "$(jq -r '.[0].v.ID' "$T/real-cards.json")" = 2-1 ] || fail parity "ID: $(cat "$T/real-cards.json")"
 [ "$(jq -r '.[0].v["줄기"]' "$T/real-cards.json")" = 앱 ] || fail parity "줄기: $(cat "$T/real-cards.json")"
 [ "$(jq -r '.[0].number' "$T/real-cards.json")" = 1 ] || fail parity "이슈 번호"
@@ -160,6 +160,9 @@ run_sync
 board_seed_project; seed_21; mkrepo "$BOARD" '| 2-1 | 새 이름 | IN_PROGRESS | 앱 | 구현: 시험 | | [#1](https://github.com/test/repo/pull/1) |'
 run_sync
 [ "$(board_card 2-1 | jq -r .title)" = "[2-1] 새 이름" ] || fail title-change "$(board_card 2-1)"
+# body-untouched: 이미 있는 이슈를 고칠 때 본문은 건드리지 않는다(제목을 고친 이 경우의 호출 기록으로 본다).
+[ "$(board_calls '^issue edit')" -ge 1 ] || fail body-untouched "issue edit가 없어 검사가 의미 없음"
+grep -E '^issue edit' "$FAKE_GH_LOG" | grep -qE -- '--body' && fail body-untouched "본문을 고침"
 
 # unknown-card: STATUS에 없는 ID의 카드는 지우지 않고 경고한다.
 board_seed_project; seed_21; board_add_issue 9 "[9-9] 옛" OPEN; board_add_item PVTI_9 9 '{"ID":"9-9"}'; mkrepo "$BOARD" "$ROW_21"
@@ -218,8 +221,6 @@ run_sync
 case $(status_line) in ok*) ;; *) fail gh-error-retry "상태: $(status_line) / $(cat "$T/out")" ;; esac
 [ "$(board_calls '^issue create')" = 1 ] || fail gh-error-retry "이슈를 또 만듦"
 
-# body-untouched: 지금까지 어떤 경우에도 이미 있는 이슈의 본문을 고치지 않았다(이번 경우 기록 기준).
-grep -E '^issue edit' "$FAKE_GH_LOG" | grep -qE -- '--body' && fail body-untouched "본문을 고침"
 # commit-arg: --commit 으로 준 커밋의 STATUS를 읽는다(작업 트리가 아니라).
 board_seed_project; mkrepo "$BOARD" "$ROW_21"
 first=$(g rev-parse HEAD)
@@ -229,15 +230,69 @@ run_sync --commit "$first"
 [ -z "$(board_card 2-2)" ] || fail commit-arg "주지 않은 커밋의 줄을 반영함"
 [ -n "$(board_card 2-1)" ] || fail commit-arg "준 커밋의 줄을 반영하지 않음"
 
+# ---- 독립 리뷰에서 나온 경우 ----
+
+# url-bad-fail: 「보드:」 줄은 있는데 주소 형식이 모두 틀리면 조용히 끝내지 않고 실패로 기록한다.
+board_seed_project; mkrepo "- 보드: $FAKE_URL/views/1" "$ROW_21"
+run_sync
+case $(status_line) in "fail "*" board: "*) ;; *) fail url-bad-fail "상태: $(status_line)" ;; esac
+# url-one-bad: 하나만 틀리면 맞는 Project는 맞추고 실패로 기록한다.
+board_seed_project; mkrepo "- 보드: $FAKE_URL https://example.com/x" "$ROW_21"
+run_sync
+[ -n "$(board_card 2-1)" ] || fail url-one-bad "맞는 Project도 맞추지 않음"
+case $(status_line) in "fail "*"example.com"*) ;; *) fail url-one-bad "상태: $(status_line)" ;; esac
+# crlf: CLAUDE.md 줄 끝이 CRLF여도 주소를 읽는다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+printf '# r\r\n\r\n## Waypoint\r\n\r\n%s\r\n' "$BOARD" > "$R/CLAUDE.md"; g commit -qam crlf
+run_sync
+case $(status_line) in ok*) ;; *) fail crlf "상태: $(status_line) / $(cat "$T/out")" ;; esac
+[ -n "$(board_card 2-1)" ] || fail crlf "카드 없음"
+
+# other-repo-card: 한 Project에 다른 레포의 같은 ID 카드가 있어도 이 레포의 카드로 보지 않는다(설계 5.12 통합 보드).
+board_seed_project
+board_add_issue 7 "[2-1] 남의 것" OPEN
+jq 'map(if .number == 7 then .repo = "other/repo" | .url = "https://github.com/other/repo/issues/7" else . end)' "$FAKE_GH_DIR/issues.json" > "$T/i" && mv "$T/i" "$FAKE_GH_DIR/issues.json"
+board_add_item PVTI_7 7 '{"ID":"2-1","Status":"s1"}'
+mkrepo "$BOARD" "$ROW_21"
+run_sync
+[ "$(board_calls '^issue create')" = 1 ] || fail other-repo-card "이 레포의 이슈를 만들지 않음: $(cat "$FAKE_GH_LOG")"
+[ "$(board_calls '^issue (edit|close|reopen) 7 ')" = 0 ] || fail other-repo-card "다른 레포의 이슈를 고침"
+[ "$(jq -r '.[] | select(.id == "PVTI_7") | .values.Status' "$FAKE_GH_DIR/items.json")" = s1 ] || fail other-repo-card "다른 레포의 카드를 고침"
+
+# merged-orphan: 카드 없이 남은 열린 이슈는 줄이 MERGED가 되면 닫는다(카드는 만들지 않는다).
+board_seed_project; board_add_issue 3 "[1-1] 설계" OPEN; mkrepo "$BOARD" '| 1-1 | 설계 | MERGED | | | | [문서](a.md) |'
+run_sync
+[ "$(jq -r '.[] | select(.number == 3) | .state' "$FAKE_GH_DIR/issues.json")" = CLOSED ] || fail merged-orphan "이슈를 닫지 않음"
+[ "$(board_calls '^project item-add')" = 0 ] || fail merged-orphan "카드를 만듦"
+
+# paginate: 카드가 여러 페이지에 걸쳐도 모두 읽는다(가짜 gh가 한 장에 하나씩).
+board_seed_project; seed_21
+board_add_issue 2 "[2-2] 다음" OPEN; board_add_item PVTI_2 2 '{"ID":"2-2","Status":"s1","단계":"p2"}'
+mkrepo "$BOARD" "$ROW_21" '| 2-2 | 다음 | PENDING | | | | |'
+FAKE_GH_PAGE_SIZE=1 run_sync
+[ "$(board_calls '^(issue create|project item-add|project item-edit|issue edit)')" = 0 ] || fail paginate "$(cat "$FAKE_GH_LOG")"
+
+# stdin: 반복문 안의 gh 호출이 표준 입력을 읽어도 남은 줄을 잃지 않는다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21" '| 2-2 | 다음 | PENDING | | | | |' '| 2-3 | 셋째 | PENDING | | | | |'
+FAKE_GH_EAT_STDIN=1 run_sync < /dev/null
+for id in 2-1 2-2 2-3; do [ -n "$(board_card $id)" ] || fail stdin "$id 카드 없음"; done
+[ "$(card_val 2-1 지금)" = "구현: 시험" ] || fail stdin "필드를 고치다 멈춤: $(board_card 2-1)"
+
+# commit-noarg: --commit 뒤에 값이 없으면 사용법을 알리고 끝난다(멈추지 않는다).
+(cd "$R" && exec sh "$BS" --commit > /dev/null 2>&1) & p=$!
+sleep 2
+if kill -0 "$p" 2> /dev/null; then kill "$p"; fail commit-noarg "끝나지 않음"; fi
+wait "$p" 2> /dev/null
+
 # ---- Task 5: 잠금과 재실행 ----
 LK="$R/.git/waypoint/board-sync.lock"
 mklock() { mkdir -p "$LK"; echo "$1" > "$LK/pid"; echo "$2" > "$LK/started"; }
 
-# lock-busy: 살아 있는 동기화가 잠금을 쥐고 있으면 재실행 표시만 남기고 끝난다.
+# lock-busy: 살아 있는 동기화가 잠금을 쥐고 있으면 훅이 띄운 실행(--commit)은 재실행 표시만 남기고 끝난다.
 board_seed_project; mkrepo "$BOARD" "$ROW_21"
 sleep 30 & live=$!
 mklock "$live" "$(date +%s)"
-run_sync
+run_sync --commit "$(g rev-parse HEAD)"
 [ -s "$FAKE_GH_LOG" ] && fail lock-busy "gh를 부름"
 [ -e "$R/.git/waypoint/board-sync.rerun" ] || fail lock-busy "재실행 표시가 없음"
 [ -d "$LK" ] || fail lock-busy "남의 잠금을 지움"
@@ -245,7 +300,7 @@ run_sync
 # lock-old: 살아 있는 PID인데 10분이 넘은 잠금은 실패로 기록한다.
 rm -rf "$LK" "$R/.git/waypoint/board-sync.rerun"
 mklock "$live" "$(( $(date +%s) - 700 ))"
-run_sync
+run_sync --commit "$(g rev-parse HEAD)"
 case $(status_line) in "fail "*" lock: "*) ;; *) fail lock-old "상태: $(status_line)" ;; esac
 kill "$live" 2> /dev/null; wait "$live" 2> /dev/null
 
@@ -256,6 +311,33 @@ mklock "$dead" "$(date +%s)"
 run_sync
 case $(status_line) in ok*) ;; *) fail lock-stale "상태: $(status_line) / $(cat "$T/out")" ;; esac
 [ -d "$LK" ] && fail lock-stale "끝난 뒤 잠금이 남음"
+
+# lock-nopid: 막 만들어져 PID가 아직 없는 잠금은 남의 실행으로 보고 지우지 않는다.
+board_seed_project; mkrepo "$BOARD" "$ROW_21"
+mkdir -p "$LK"
+run_sync --commit "$(g rev-parse HEAD)"
+[ -s "$FAKE_GH_LOG" ] && fail lock-nopid "gh를 부름"
+[ -d "$LK" ] || fail lock-nopid "남의 잠금을 지움"
+[ -e "$R/.git/waypoint/board-sync.rerun" ] || fail lock-nopid "재실행 표시가 없음"
+# lock-bad-started: 시작 시각이 비어 있어도 살아 있는 PID면 바쁜 잠금이다(실패로 적지 않는다).
+rm -rf "$LK" "$R/.git/waypoint/board-sync.rerun" "$R/.git/waypoint/board-sync.status"
+sleep 30 & live=$!
+mkdir -p "$LK"; echo "$live" > "$LK/pid"; : > "$LK/started"
+run_sync --commit "$(g rev-parse HEAD)"
+[ -z "$(status_line)" ] || fail lock-bad-started "상태: $(status_line)"
+[ -e "$R/.git/waypoint/board-sync.rerun" ] || fail lock-bad-started "재실행 표시가 없음"
+
+# manual-wait: 직접 실행(--commit 없음)은 다른 동기화가 끝나기를 기다렸다가 실행한다.
+rm -f "$R/.git/waypoint/board-sync.rerun"
+(cd "$R" && sh "$BS") > "$T/out" 2>&1 & p=$!
+sleep 2
+kill -0 "$p" 2> /dev/null || fail manual-wait "기다리지 않고 끝남: $(cat "$T/out")"
+rm -rf "$LK"; kill "$live" 2> /dev/null; wait "$live" 2> /dev/null
+wait "$p"
+case $(status_line) in ok*) ;; *) fail manual-wait "상태: $(status_line) / $(cat "$T/out")" ;; esac
+[ -n "$(board_card 2-1)" ] || fail manual-wait "카드 없음"
+grep -qF '성공' "$T/out" || fail manual-wait "결과를 알리지 않음: $(cat "$T/out")"
+[ -e "$R/.git/waypoint/board-sync.rerun" ] && fail manual-wait "재실행 표시를 남김"
 
 # rerun: 실행 중에 재실행 표시가 생기면, 끝난 뒤 기본 브랜치 끝 커밋으로 한 번 더 실행한다.
 board_seed_project; mkrepo "$BOARD" "$ROW_21"
