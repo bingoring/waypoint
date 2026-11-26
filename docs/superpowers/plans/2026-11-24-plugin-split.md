@@ -577,7 +577,10 @@ git -C $REPO fetch -q && git -C $REPO branch -a --no-merged origin/$BASE   # 비
 git -C $REPO worktree list                          # 각 worktree <wt> 에 대해 아래 두 줄
 git -C <wt> status --porcelain                      # 비어 있어야 함
 git -C <wt>/$SUB status --porcelain                 # 비어 있어야 함
+git -C $REPO branch --show-current                  # $BASE 여야 함
 ```
+
+메인 체크아웃이 `$BASE`가 아니면, 그 브랜치를 맡은 세션이나 오너가 먼저 그 작업을 worktree로 옮긴다(2단계 설계 `2026-11-25-status-cleanup-design.md` 5.8절). 새 규칙에서는 메인 체크아웃을 늘 기본 브랜치에 둔다.
 
 하나라도 비어 있지 않으면 멈추고 오너에게 보고한다. 모두 비어 있으면 오너에게 「지금 $REPO에서 작업 중인 다른 세션을 멈춰 달라」고 요청하고 확인을 받는다.
 
@@ -634,7 +637,7 @@ git commit -am "docs(waypoint): 문서 경로를 docs/waypoint로 바꿈"
 - [ ] **M6 플러그인 설정·훅·CLAUDE.md**
 
 1. `.claude/settings.json`이 없으면 `plugin/templates/project-settings.json`을 복사한다. 있으면 두 키를 합친다.
-2. `.githooks/commit-msg`가 없으면 `plugin/githooks/commit-msg`를 복사하고 `chmod +x`한다.
+2. `.githooks/commit-msg`가 없으면 `plugin/githooks/commit-msg`를 복사하고 `chmod +x`한다. `.githooks/pre-commit`도 없으면 `plugin/githooks/pre-commit`을 복사하고 `chmod +x`한다. `.githooks/pre-commit`이 이미 있으면 덮어쓰지 말고 멈춰서 오너에게 알린다(합친 파일의 둘째 줄에도 `# waypoint-hook-version: <번호>`가 있어야 세션 시작 때 낡은 훅을 알아챈다).
 3. `git config core.hooksPath .githooks`를 실행한다.
 4. CLAUDE.md를 정리한다.
    - waypoint·`docs/dlc`·서브모듈 커밋 순서를 말하던 문장을 지운다.
@@ -645,6 +648,20 @@ git commit -am "docs(waypoint): 문서 경로를 docs/waypoint로 바꿈"
 git add -A .claude .githooks CLAUDE.md && git commit -m "chore(waypoint): 플러그인 설정·commit-msg 훅·CLAUDE.md 블록"
 ```
 
+- [ ] **M6a STATUS 변환**
+
+2단계 설계(`docs/superpowers/specs/2026-11-25-status-cleanup-design.md`) 5.8절 「변환 절차」 1~8번을 따른다. 기준이 되는 옛 STATUS는 M5까지 반영된 커밋의 `docs/waypoint/STATUS.md`다. M6에서 설치한 pre-commit 훅이 변환 결과를 검사한다.
+
+```bash
+OLD=$(git rev-parse HEAD)                     # M5·M6까지 반영된 커밋
+{ printf '%s STATUS 정리 때 옮긴 기록이다. 이후로는 쓰지 않는다.\n\n' "$(date +%F)"; git show "$OLD:docs/waypoint/STATUS.md"; } > docs/waypoint/HISTORY.md
+# 2~6번: 새 표 작성(상태 값 대응표), 스테이지 문서 frontmatter(id:)·진행 기록, 오너 확인 목록 → 오너 답 반영
+tail -n +3 docs/waypoint/HISTORY.md | diff - <(git show "$OLD:docs/waypoint/STATUS.md")   # 출력 없음
+git add docs/waypoint && WAYPOINT_ALLOW_BRANCH_STATUS=1 git commit -m "docs(waypoint): STATUS를 새 형식으로 변환(옛 내용은 HISTORY.md)"
+```
+
+Expected: `diff` 출력이 없고, 커밋이 pre-commit 검사를 통과한다. `WAYPOINT_ALLOW_BRANCH_STATUS=1`은 이 커밋에만 쓴다.
+
 - [ ] **M7 CI**
 
 `.gitmodules`가 없어졌다면 `.github/workflows/*.yml`의 `submodules: true` 줄을 지운다. 문서 경로로 판정하는 조건(`waypoint`, `docs/dlc`)은 `docs/waypoint/**`로 바꾼다. 바뀐 것이 있으면 커밋한다: `git commit -am "ci: waypoint 서브모듈 체크아웃 제거"`.
@@ -652,7 +669,7 @@ git add -A .claude .githooks CLAUDE.md && git commit -m "chore(waypoint): 플러
 - [ ] **M8 검증**
 
 ```bash
-git grep -n -e 'docs/dlc' -e 'waypoint/projects' -- ':!docs/waypoint/DECISIONS.md' ':!docs/superpowers'   # 0줄
+git grep -n -e 'docs/dlc' -e 'waypoint/projects' -- ':!docs/waypoint/DECISIONS.md' ':!docs/waypoint/HISTORY.md' ':!docs/superpowers'   # 0줄
 git grep -nw waypoint -- ':!docs/waypoint' ':!docs/superpowers' ':!CLAUDE.md' ':!.claude'                 # 한 줄씩 판단
 git log --merges --oneline origin/$BASE..HEAD                                                             # M4 커밋 한 줄만
 CLAUDE_PROJECT_DIR=$REPO sh <waypoint 체크아웃>/plugin/scripts/session-context.sh | head -3             # "<waypoint>", "# waypoint 핵심 규칙"
@@ -674,7 +691,7 @@ gh pr create -R $GH --base $BASE --title "chore(waypoint): waypoint 문서를 do
 - 「**merge commit으로 머지할 것(squash 금지: 이력이 사라짐)**」
 - 머지 뒤 남은 브랜치 처리법(설계 문서 5.5절 「남는 브랜치의 처리」)
 
-오너가 머지하기 직전에 `git -C /Users/ywyeom/private/waypoint fetch -q && git -C /Users/ywyeom/private/waypoint log --oneline $SPLIT_FROM..origin/master -- projects/$NAME`를 실행한다. 출력이 있으면 M1부터 다시 하고 브랜치를 force-with-lease로 갱신한다.
+오너가 머지하기 직전에 `git -C /Users/ywyeom/private/waypoint fetch -q && git -C /Users/ywyeom/private/waypoint log --oneline $SPLIT_FROM..origin/master -- projects/$NAME`를 실행한다. 출력이 있으면 M1부터 다시 하고(M6a의 STATUS 변환도 다시 한다) 브랜치를 force-with-lease로 갱신한다.
 
 - [ ] **M10 머지 뒤 정리**
 
@@ -739,6 +756,7 @@ Expected: 모든 worktree에서 `test ! -e <wt>/$SUB`가 참이다.
   - CLAUDE.md 9행 근처의 서브모듈 순서 문장을 블록으로 교체한다.
   - `README.md`, `prototypes/ball-roguelite/README.md`, `apps/yawn/tool/sprites/export.py`의 사용법 주석(5행, `../../docs/dlc/projects/app-factory/...` → `../../docs/waypoint/...`)을 바꾼다.
   - 레포가 private이므로 문서도 이제 비공개가 된다. 이 사실을 PR 본문에 적는다.
+  - M9에서 PR을 `gh pr create --draft`로 연다. 거절되면 일반 PR로 열고, 그 결과를 오너에게 알린다. 개인 계정의 private 레포에서 초안 PR을 쓸 수 있는지가 2단계 설계 10절의 미확인 사항이다. 쓸 수 없으면 이 레포의 스테이지 PR은 제목 앞 `[작업 중]` 표시로 대신한다(`waypoint:git`).
   - M10에서 worktree 4곳 모두의 `docs/dlc`를 확인한다.
 - **검증:** 레포 CI가 실행하는 테스트 명령을 실행한다. 그리고 `python3 -m py_compile apps/yawn/tool/sprites/export.py`를 실행한다.
 
