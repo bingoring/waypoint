@@ -44,6 +44,7 @@ EOF
   echo '["bug"]' > "$FAKE_GH_DIR/labels.json"
   echo '[]' > "$FAKE_GH_DIR/workflows.json"
   echo '[]' > "$FAKE_GH_DIR/views.json"
+  rm -f "$FAKE_GH_DIR/lag.json" "$FAKE_GH_DIR/lag-now.json"
   : > "$FAKE_GH_LOG"
 }
 
