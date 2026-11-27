@@ -69,6 +69,21 @@ c=$(board_card 2-1)
 [ "$(printf '%s' "$c" | jq -r .state)" = OPEN ] || fail reopen "$c"
 [ "$(printf '%s' "$c" | jq -r .title)" = "[2-1] 새 이름" ] || fail title "$c"
 
+# lag: FAKE_GH_LAG=1 이면 item-add가 새로 만든 카드가 다음 읽기 한 번에서 빠지고, 그 다음 읽기에는 나온다.
+read_item() { gh api graphql -F owner=test -F number=1 -f query="$Q" | jq -c --arg i "$1" '[.data.user.projectV2.items.nodes[] | select(.id == $i)]'; }
+url2=$(gh issue create -R "$FAKE_REPO" --title "[2-2] 지연" --label waypoint --body-file "$T/body")
+item2=$(FAKE_GH_LAG=1 gh project item-add 1 --owner test --url "$url2" --format json | jq -r .id)
+gh project item-edit --project-id PVT_test --id "$item2" --field-id F_ID --text "2-2"
+[ "$(read_item "$item2" | jq length)" = 0 ] || fail lag "첫 읽기에 나옴"
+[ "$(read_item "$item2" | jq length)" = 1 ] || fail lag "둘째 읽기에 안 나옴"
+# lag-id: FAKE_GH_LAG_MODE=id 이면 카드는 나오고 ID 값만 빠진다.
+url3=$(gh issue create -R "$FAKE_REPO" --title "[2-3] 지연" --label waypoint --body-file "$T/body")
+item3=$(FAKE_GH_LAG=1 FAKE_GH_LAG_MODE=id gh project item-add 1 --owner test --url "$url3" --format json | jq -r .id)
+gh project item-edit --project-id PVT_test --id "$item3" --field-id F_ID --text "2-3"
+idv() { read_item "$item3" | jq -r '[.[].fieldValues.nodes[] | select(.field.name == "ID") | .text] | .[0] // "없음"'; }
+v=$(idv); [ "$v" = 없음 ] || fail lag-id "첫 읽기의 ID: $v"
+v=$(idv); [ "$v" = 2-3 ] || fail lag-id "둘째 읽기의 ID: $v"
+
 # fail-inject: FAKE_GH_FAIL 에 든 하위 명령은 실패한다.
 if FAKE_GH_FAIL="project item-add" gh project item-add 1 --owner test --url "$url" --format json > /dev/null 2>&1; then
   fail fail-inject "실패하지 않음"

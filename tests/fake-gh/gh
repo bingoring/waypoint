@@ -2,6 +2,8 @@
 # 보드 동기화 테스트용 가짜 gh. 진짜 GitHub에 접속하지 않는다.
 # 상태는 $FAKE_GH_DIR 의 JSON 파일(tests/board-lib.sh 참조), 호출 기록은 $FAKE_GH_LOG.
 # $FAKE_GH_FAIL 에 "<명령> <하위 명령>"(예: "project item-add")을 넣으면 그 호출은 실패한다.
+# $FAKE_GH_LAG=<N>: item-add가 새로 만든 카드를 그 뒤 N번의 Project 읽기에서 감춘다(쓰기 직후의 읽기가 늦게 반영되는 GitHub 흉내).
+#   $FAKE_GH_LAG_MODE=id 이면 카드는 보이고 ID 값만 감춘다. 읽기 횟수는 첫 페이지(after 없음) 호출로 센다.
 # 지원하는 모양은 board-sync.sh·board-setup.sh가 쓰는 것뿐이다.
 
 D=${FAKE_GH_DIR:?}
@@ -21,22 +23,27 @@ has() { want=$1; shift; for a; do [ "$a" = "$want" ] && return 0; done; return 1
 
 read_project() {
   # $FAKE_GH_PAGE_SIZE: 카드 목록을 이 수만큼씩 나눠 돌려준다(페이지 넘김 시험). 커서는 시작 위치 숫자다.
-  jq -n --slurpfile p "$P" --slurpfile it "$I" --slurpfile is "$IS" --slurpfile w "$W" --slurpfile v "$V" --arg kind "$1" --arg wf "$2" --arg vw "$3" \
+  # 읽기 지연: 이번 읽기에서 감출 카드는 $D/lag-now.json([{id, mode}])에 있다(아래 "api graphql"에서 정한다).
+  [ -f "$D/lag-now.json" ] || echo '[]' > "$D/lag-now.json"
+  jq -n --slurpfile p "$P" --slurpfile it "$I" --slurpfile is "$IS" --slurpfile w "$W" --slurpfile v "$V" --slurpfile lag "$D/lag-now.json" --arg kind "$1" --arg wf "$2" --arg vw "$3" \
     --arg after "${4:-}" --arg size "${FAKE_GH_PAGE_SIZE:-1000}" '
     $p[0] as $p | $is[0] as $is
+    | ($lag[0] | map(select(.mode != "id") | .id)) as $hide
+    | ($lag[0] | map(select(.mode == "id") | .id)) as $noid
+    | ($it[0] | map(select(.id as $x | $hide | index($x) | not))) as $items
     | ($size | tonumber) as $sz | (if $after == "" then 0 else ($after | tonumber) end) as $st
     | ($p.fields | map({key:.id, value:.}) | from_entries) as $byid
     | ($p.fields | map({key:.name, value:.}) | from_entries) as $byname
     | {data:{($kind):{projectV2:{
         id:$p.id, title:$p.title, number:$p.number,
         fields:{nodes:[$p.fields[] | {__typename:(if .dataType=="SINGLE_SELECT" then "ProjectV2SingleSelectField" else "ProjectV2Field" end), id, name, dataType} + (if .options then {options} else {} end) + (if .databaseId then {databaseId} else {} end)]},
-        items:{pageInfo:{hasNextPage:(($st + $sz) < ($it[0] | length)), endCursor:(($st + $sz) | tostring)}, nodes:[$it[0][$st:($st + $sz)][] | . as $item
+        items:{pageInfo:{hasNextPage:(($st + $sz) < ($items | length)), endCursor:(($st + $sz) | tostring)}, nodes:[$items[$st:($st + $sz)][] | . as $item
           | ($is | map(select(.number == $item.issue)) | .[0]) as $iss
           | {id, isArchived,
              content:{__typename:"Issue", id:("I_"+($iss.number|tostring)), number:$iss.number, title:$iss.title, state:$iss.state, url:$iss.url,
                       repository:{nameWithOwner:($iss.repo // "test/repo")}, labels:{nodes:[$iss.labels[] | {name:.}]}},
              fieldValues:{nodes:([{__typename:"ProjectV2ItemFieldTextValue", text:$iss.title, field:{name:"Title"}}]
-               + [$item.values | to_entries[] | . as $e | $byname[$e.key] as $f
+               + [$item.values | (if ($noid | index($item.id)) != null then del(.ID) else . end) | to_entries[] | . as $e | $byname[$e.key] as $f
                   | if $f.dataType == "SINGLE_SELECT" then
                       (($f.options | map(select(.id == $e.value)) | .[0]) as $o
                        | if $o then {__typename:"ProjectV2ItemFieldSingleSelectValue", name:$o.name, optionId:$o.id, field:{name:$f.name}} else empty end)
@@ -89,6 +96,15 @@ case "$1 $2" in
           after=*) after=${a#after=} ;;
         esac
       done
+      # 읽기 지연: 첫 페이지 호출에서 이번 읽기에 감출 카드를 정하고 남은 횟수를 하나 줄인다. 같은 읽기의 다음 페이지는 같은 목록을 쓴다.
+      if [ -z "$after" ]; then
+        if [ -f "$D/lag.json" ]; then
+          jq -c '[.[] | select(.left > 0) | {id, mode}]' "$D/lag.json" > "$D/lag-now.json"
+          upd "$D/lag.json" 'map(.left -= 1) | map(select(.left > 0))'
+        else
+          echo '[]' > "$D/lag-now.json"
+        fi
+      fi
       wf=0 vw=0
       case $q in *"workflows("*) wf=1 ;; esac
       case $q in *"views("*) vw=1 ;; esac
@@ -145,6 +161,10 @@ case "$1 $2" in
     if [ -z "$id" ]; then
       id="PVTI_$(jq 'length + 1' "$I")"
       upd "$I" --arg id "$id" --argjson n "$n" '. + [{id:$id, issue:$n, isArchived:false, values:{}}]'
+      if [ -n "${FAKE_GH_LAG:-}" ]; then
+        [ -f "$D/lag.json" ] || echo '[]' > "$D/lag.json"
+        upd "$D/lag.json" --arg id "$id" --argjson n "$FAKE_GH_LAG" --arg m "${FAKE_GH_LAG_MODE:-card}" '. + [{id:$id, left:$n, mode:$m}]'
+      fi
     fi
     jq -nc --arg id "$id" --arg u "$u" '{id:$id, url:$u, type:"Issue"}'
     ;;

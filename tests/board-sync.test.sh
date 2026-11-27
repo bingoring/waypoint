@@ -278,6 +278,53 @@ FAKE_GH_EAT_STDIN=1 run_sync < /dev/null
 for id in 2-1 2-2 2-3; do [ -n "$(board_card $id)" ] || fail stdin "$id 카드 없음"; done
 [ "$(card_val 2-1 지금)" = "구현: 시험" ] || fail stdin "필드를 고치다 멈춤: $(board_card 2-1)"
 
+# ---- 카드를 넣은 직후의 읽기 지연(2026-11-27 duty 첫 동기화) ----
+# GitHub은 카드를 넣고 바로 다시 읽으면 새 카드를 아직 보여 주지 않을 수 있다. 그 카드를 건너뛰고 「성공」으로 끝내면
+# 새 카드의 Status·지금·기다림·단계가 빈 채로 남는다(duty 3-13). 가짜 gh의 FAKE_GH_LAG로 흉내 낸다.
+ROW_310='| 3-10 | 피드백 | AI_PROPOSED | | 결과 검토: a | | [문서](a.md) |'
+ROW_312='| 3-12 | 모바일 | AI_PROPOSED | | 결과 검토: b | | [문서](b.md) |'
+ROW_313='| 3-13 | 비용 | IN_PROGRESS | | 구현: c | 오너 할 일 | [문서](c.md) |'
+# lag_sync <환경 변수 지정>...: 다시 읽기 사이에 쉬지 않고 동기화한다.
+lag_sync() { (cd "$R" && env WP_BOARD_SYNC_REREAD_WAITS="0 0" "$@" sh "$BS") > "$T/out" 2>&1; }
+# lag_cards_ok <이름>: 세 카드의 필드가 모두 STATUS와 같은지 본다.
+lag_cards_ok() {
+  for want in '{"ID":"3-10","Status":"검토 대기","지금":"결과 검토: a","단계":"3"}' \
+              '{"ID":"3-12","Status":"검토 대기","지금":"결과 검토: b","단계":"3"}' \
+              '{"ID":"3-13","Status":"진행 중","지금":"구현: c","기다림":"오너 할 일: 확인","단계":"3"}'; do
+    id=$(printf '%s' "$want" | jq -r .ID)
+    [ "$(board_card "$id" | jq -cS .values)" = "$(printf '%s' "$want" | jq -cS .)" ] || fail "$1" "$id: $(board_card "$id")"
+  done
+}
+
+# reread-lag: 다시 읽은 결과에 새 카드가 한 번 빠져도, 다시 읽어 모든 새 카드의 필드를 맞춘다.
+board_seed_project; mkrepo "$BOARD" "$ROW_310" "$ROW_312" "$ROW_313" -- '확인 (막음: 3-13)'
+lag_sync FAKE_GH_LAG=1
+case $(status_line) in ok*) ;; *) fail reread-lag "상태: $(status_line) / $(cat "$T/out")" ;; esac
+lag_cards_ok reread-lag
+grep -qF '3-13(카드 없음)' "$R/.git/waypoint/board-sync.log" || fail reread-lag "빠진 까닭을 적지 않음: $(cat "$R/.git/waypoint/board-sync.log")"
+
+# reread-lag-id: 카드는 보이는데 ID 값만 늦게 보여도 같다.
+board_seed_project; mkrepo "$BOARD" "$ROW_310" "$ROW_312" "$ROW_313" -- '확인 (막음: 3-13)'
+lag_sync FAKE_GH_LAG=1 FAKE_GH_LAG_MODE=id
+case $(status_line) in ok*) ;; *) fail reread-lag-id "상태: $(status_line) / $(cat "$T/out")" ;; esac
+lag_cards_ok reread-lag-id
+grep -qF '3-13(카드는 있고 ID 값 없음)' "$R/.git/waypoint/board-sync.log" || fail reread-lag-id "빠진 까닭을 적지 않음: $(cat "$R/.git/waypoint/board-sync.log")"
+
+# reread-never: 끝까지 안 보이면 「성공」이 아니라 items 실패로 기록한다. 보이는 카드(2-1)의 변경은 마저 맞춘다.
+board_seed_project; seed_21
+mkrepo "$BOARD" '| 2-1 | 구현 | IN_PROGRESS | 앱 | 구현: 바뀜 | | [#1](https://github.com/test/repo/pull/1) |' "$ROW_310" "$ROW_312" "$ROW_313" -- '확인 (막음: 3-13)'
+lag_sync FAKE_GH_LAG=99
+case $(status_line) in "fail "*" items: "*3-13*) ;; *) fail reread-never "상태: $(status_line) / $(cat "$T/out")" ;; esac
+grep -qF '성공' "$R/.git/waypoint/board-sync.log" && fail reread-never "성공으로 적음: $(cat "$R/.git/waypoint/board-sync.log")"
+[ "$(card_val 2-1 지금)" = "구현: 바뀜" ] || fail reread-never "보이는 카드를 맞추지 않음: $(board_card 2-1)"
+# reread-recover: GitHub이 따라잡은 뒤의 평소 동기화는 이슈와 카드를 새로 만들지 않고 필드만 맞춘다.
+rm -f "$FAKE_GH_DIR/lag.json" "$FAKE_GH_DIR/lag-now.json"
+run_sync
+case $(status_line) in ok*) ;; *) fail reread-recover "상태: $(status_line) / $(cat "$T/out")" ;; esac
+lag_cards_ok reread-recover
+[ "$(board_calls '^issue create')" = 3 ] || fail reread-recover "issue create $(board_calls '^issue create')번"
+[ "$(jq length "$FAKE_GH_DIR/items.json")" = 4 ] || fail reread-recover "카드 $(jq length "$FAKE_GH_DIR/items.json")장"
+
 # commit-noarg: --commit 뒤에 값이 없으면 사용법을 알리고 끝난다(멈추지 않는다).
 (cd "$R" && exec sh "$BS" --commit > /dev/null 2>&1) & p=$!
 sleep 2
